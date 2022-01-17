@@ -12,9 +12,13 @@ pylint
 yapf
 
 #############################
-## Not-Versioned
+## Standalone
 
 numpy
+
+#############################
+## Not-Versioned
+
 pandas
 scikit-learn
 tensorflow

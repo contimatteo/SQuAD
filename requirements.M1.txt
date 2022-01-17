@@ -1,0 +1,22 @@
+#
+# python  (3.8.5)
+# pip     (21.1.1)
+#
+# author: @contimatteo
+#
+
+#############################
+## Dev
+
+pylint
+yapf
+
+#############################
+## Standalone
+
+numpy
+
+#############################
+## Not-Versioned
+
+tensorflow-macos
