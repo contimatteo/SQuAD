@@ -1,8 +1,9 @@
 {
   "editor.tabSize": 4,
+  "editor.detectIndentation": false,
+
 
   "python.formatting.provider": "yapf",
-  "python.showStartPage": false,
   "python.linting.lintOnSave": true,
   "python.linting.pylintPath": "pylint",
   "python.linting.pylintEnabled": true,
