@@ -1,0 +1,20 @@
+#
+# python  (3.8.5)
+# pip     (21.1.1)
+#
+# author: @contimatteo
+#
+
+#############################
+## Dev
+
+pylint
+yapf
+
+#############################
+## Not-Versioned
+
+numpy
+pandas
+scikit-learn
+tensorflow
