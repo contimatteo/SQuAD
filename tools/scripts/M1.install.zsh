@@ -9,9 +9,9 @@ pip install grpcio
 
 
 pip install cython
-# pip install --no-binary :all: --no-use-pep517 pandas
-pip install --no-binary :all: pandas
+pip install --no-binary :all: --no-use-pep517 pandas
+# pip install --no-binary :all: pandas
 
 
-# pip install --no-cache-dir -r requirements.M1.txt 
 pip install -r requirements.M1.txt 
+# pip install --no-cache-dir -r requirements.M1.txt 
