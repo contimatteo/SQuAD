@@ -1,4 +1,4 @@
-from utils import LocalStorageManager
+from utils.storage import LocalStorageManager
 
 ###
 
