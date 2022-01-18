@@ -22,3 +22,6 @@ h5py
 
 tensorflow-macos
 tensorflow-metal
+
+pandas
+scikit-learn
