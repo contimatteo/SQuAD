@@ -24,12 +24,12 @@ help:
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-setup.M1:
-	${PIP} install -r requirements.M1.txt --no-cache-dir
 setup.GPU:
 	${PIP} install -r requirements.GPU.txt --no-cache-dir
 setup.CPU:
 	${PIP} install -r requirements.CPU.txt --no-cache-dir
+setup.M1:
+	./tools/scripts/M1.install.zsh
 
 train:
 	${PYTHON} src/train.py
