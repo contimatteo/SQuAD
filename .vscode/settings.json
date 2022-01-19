@@ -18,14 +18,16 @@
   },
 
   
+  "python.pythonPath": "${workspaceFolder}/venv/bin/python",
+  "python.envFile": "${workspaceFolder}/.env",
   "python.formatting.provider": "yapf",
-  "python.linting.lintOnSave": true,
   "python.linting.pylintPath": "pylint",
   "python.linting.pylintEnabled": true,
-  "python.envFile": "${workspaceFolder}/.env",
+  "python.linting.lintOnSave": true,
 
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
     "editor.formatOnSave": true
-  }
+},
+"python.linting.enabled": true
 }

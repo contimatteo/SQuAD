@@ -14,11 +14,10 @@ yapf
 #############################
 ## Standalone
 
-numpy
-h5py
-
 #############################
 ## Not-Versioned
 
 tensorflow-macos
 tensorflow-metal
+
+scikit-learn
