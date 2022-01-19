@@ -25,9 +25,9 @@ help:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 setup.GPU:
-	${PIP} install -r requirements.GPU.txt --no-cache-dir
+	${PIP} install -r ./tools/requirements/GPU.txt
 setup.CPU:
-	${PIP} install -r requirements.CPU.txt --no-cache-dir
+	${PIP} install -r ./tools/requirements/CPU.txt
 setup.M1:
 	./tools/scripts/M1.install.zsh
 

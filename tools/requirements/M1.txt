@@ -12,9 +12,6 @@ pylint
 yapf
 
 #############################
-## Standalone
-
-#############################
 ## Not-Versioned
 
 tensorflow-macos
