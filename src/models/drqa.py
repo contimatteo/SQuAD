@@ -10,16 +10,11 @@ from models.layers import EmbeddingLayers, DenseLayers, RnnLayers, AttentionLaye
 
 
 def _optimizer():
-    lr = 1e-4
-    return Adam(learning_rate=lr)
+    return Adam(learning_rate=1e-4)
 
 
 def _compile(model):
-    loss = ['mse']
-    metrics = ['mse']
-
-    model.compile(loss=loss, optimizer=_optimizer(), metrics=metrics)
-
+    model.compile(loss=['mse'], optimizer=_optimizer(), metrics=['mse'])
     return model
 
 

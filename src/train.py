@@ -1,8 +1,8 @@
-import utils.warnings
-
+import utils.env_setup
 import numpy as np
-
 import utils.configs as Configs
+
+from wandb.keras import WandbCallback
 from models import DrQA
 
 ###
@@ -26,7 +26,7 @@ def train():
     Y = Y_train()
 
     model = DrQA()
-    model.fit(X, Y, epochs=10)
+    model.fit(X, Y, epochs=10, callbacks=[WandbCallback()])
 
 
 ###

@@ -1,6 +1,6 @@
 #
 # python  (3.8.5)
-# pip     (21.1.1)
+# pip     (21.3.1)
 #
 # author: @contimatteo
 #
@@ -12,9 +12,14 @@ pylint
 yapf
 
 #############################
+## Standalone
+
+python-dotenv
+
+#############################
 ## Not-Versioned
 
+scikit-learn
 tensorflow-macos
 tensorflow-metal
-
-scikit-learn
+wandb
