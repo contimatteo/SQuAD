@@ -2,6 +2,7 @@ import utils.warnings
 
 import numpy as np
 
+import utils.configs as Configs
 from models import DrQA
 
 ###
@@ -10,11 +11,8 @@ N_EXAMPLES = 20
 
 
 def X_train() -> np.ndarray:
-    N_QUESTION_TOKENS = 5
-    Xq = np.random.rand(N_EXAMPLES, N_QUESTION_TOKENS)
-
-    N_PASSAGE_TOKENS = 10
-    Xp = np.random.rand(N_EXAMPLES, N_PASSAGE_TOKENS)
+    Xq = np.random.rand(N_EXAMPLES, Configs.N_QUESTION_TOKENS)
+    Xp = np.random.rand(N_EXAMPLES, Configs.N_PASSAGE_TOKENS)
 
     return [Xq, Xp]
 

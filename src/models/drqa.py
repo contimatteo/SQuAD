@@ -1,9 +1,10 @@
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import Concatenate, Flatten
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.layers import Concatenate, Flatten, Dense
+from tensorflow.keras.optimizers import Adam, Adamax
 
-from models.layers import EmbeddingLayers, DenseLayers, RnnLayers
+import utils.configs as Configs
+from models.layers import EmbeddingLayers, DenseLayers, RnnLayers, AttentionLayers
 
 ###
 
@@ -23,26 +24,32 @@ def _compile(model):
 
 
 def DrQA() -> Model:
-    xqi = Input(shape=(5, ))
-    xpi = Input(shape=(10, ))
+    n_q_tokens = Configs.N_QUESTION_TOKENS
+    n_p_tokens = Configs.N_PASSAGE_TOKENS
+
+    xqi = Input(shape=(n_q_tokens, ))
+    xpi = Input(shape=(n_p_tokens, ))
+
+    print()
+    print()
 
     # Question
-    xqe = EmbeddingLayers.glove(5)(xqi)
-    xqr = RnnLayers.drqa_question()(xqe)
-    xqd = DenseLayers.regularized()(xqr)
+    xq = EmbeddingLayers.glove(n_q_tokens)(xqi)
+    xq = RnnLayers.drqa()(xq)
+    xq = AttentionLayers.weighted_sum()(xq)
 
     # Passage
-    xpe = EmbeddingLayers.glove(10)(xpi)
-    xpr = RnnLayers.drqa_passage()(xpe)
-    xpd = DenseLayers.regularized()(xpr)
+    xp = EmbeddingLayers.glove(n_p_tokens)(xpi)
+    xp = RnnLayers.drqa()(xp)
 
     # Output
-    xqo = Flatten()(xqd)
-    xpo = Flatten()(xpd)
-    xo = Concatenate()([xqo, xpo])
+    xq = Flatten()(xq)
+    xp = Flatten()(xp)
+    xo = Concatenate()([xq, xp])
+    xo = Dense(1)(xo)
 
     #
 
-    model = Model([xqd, xpd], xo)
+    model = Model([xqi, xpi], xo)
 
     return _compile(model)
