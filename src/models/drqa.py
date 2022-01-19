@@ -30,9 +30,6 @@ def DrQA() -> Model:
     xqi = Input(shape=(n_q_tokens, ))
     xpi = Input(shape=(n_p_tokens, ))
 
-    print()
-    print()
-
     # Question
     xq = EmbeddingLayers.glove(n_q_tokens)(xqi)
     xq = RnnLayers.drqa()(xq)
