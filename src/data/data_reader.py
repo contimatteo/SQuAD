@@ -1,6 +1,11 @@
 import os
+import sys
 import data_utils
 
+import json
+import numpy as np
+import tensorflow as tf
+import pandas as pd
 # if glove_embeddings is None:
 #   if not os.path.exists(GLOVE_LOCAL_DIR):
 #     os.makedirs(GLOVE_LOCAL_DIR)
@@ -45,6 +50,7 @@ def download_training_set():
     create_tmp_directories()
     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
     data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+    return RAW_FILE
 
 
 def download_glove():
@@ -56,7 +62,59 @@ def download_glove():
     create_tmp_directories()
     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
     data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+    return RAW_FILE
+
+    
+def load_training_set():
+    raw_file = ""
+    if len(sys.argv)<=1:
+        raw_file = download_training_set()
+    else:
+        raw_file = sys.argv[1]
+    
+    print(raw_file)
+    if not os.path.exists(raw_file):
+        raise Exception(raw_file+" does not exists.")
+        
+
+  
+    with open(raw_file, 'r') as j:
+        contents = json.loads(j.read())
+
+    #pc=['data','paragraphs','qas','answers']
+    #js = pd.io.json.json_normalize(contents , pc )
+    #m = pd.io.json.json_normalize(contents, pc[:-1] )
+    #r = pd.io.json.json_normalize(contents,pc[:-2])
+
+    #idx = np.repeat(r['context'].values, r.qas.str.len())
+    #ndx  = np.repeat(m['id'].values,m['answers'].str.len())
+    #m['context'] = idx
+    #js['q_idx'] = ndx
+    #main = pd.concat([ m[['id','question','context']].set_index('id'),js.set_index('q_idx')],1,sort=False).reset_index()
+    #main['c_id'] = main['context'].factorize()[0]
+
+    #print(main.head())
+    #print(main.columns)
 
 
-download_training_set()
+
+    contents = contents["data"]
+    df = pd.json_normalize(contents,['paragraphs','qas','answers'],["title",["paragraphs","context"],["paragraphs","qas","question"]])
+    df = df[["title","paragraphs.context","paragraphs.qas.question","text","answer_start"]]
+
+    df.rename(columns = {'title':'title', 'paragraphs.context':'paragraph', 
+                         'paragraphs.qas.question':'question', 'text':'answer', 'answer_start':'answer_start'}, inplace = True)
+    
+    return df
+    
+    
+    
+    
+    
+    
+pd.set_option('display.max_columns', None)    
+pd.set_option('display.max_colwidth', None)
+df = load_training_set() 
+print(df.columns)
+print(df[0:1])
 download_glove()
