@@ -7,18 +7,18 @@ from models import DrQA
 
 ###
 
-N_EXAMPLES = 20
+N_EXAMPLES = 500
 
 
 def X_train() -> np.ndarray:
-    Xq = np.random.rand(N_EXAMPLES, Configs.N_QUESTION_TOKENS)
-    Xp = np.random.rand(N_EXAMPLES, Configs.N_PASSAGE_TOKENS)
+    Xq = np.random.random_sample((N_EXAMPLES, Configs.N_QUESTION_TOKENS))
+    Xp = np.random.random_sample((N_EXAMPLES, Configs.N_PASSAGE_TOKENS))
 
     return [Xq, Xp]
 
 
 def Y_train() -> np.ndarray:
-    return np.random.rand(N_EXAMPLES, )
+    return np.random.random_sample((N_EXAMPLES, ))
 
 
 def train():

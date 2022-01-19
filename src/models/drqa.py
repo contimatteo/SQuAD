@@ -10,17 +10,20 @@ from models.layers import EmbeddingLayers, DenseLayers, RnnLayers, AttentionLaye
 
 
 def _optimizer():
-    lr = 1e-3
+    lr = 1e-4
     return Adam(learning_rate=lr)
 
 
 def _compile(model):
-    loss = ['mae']
-    metrics = ['accuracy']
+    loss = ['mse']
+    metrics = ['mse']
 
     model.compile(loss=loss, optimizer=_optimizer(), metrics=metrics)
 
     return model
+
+
+###
 
 
 def DrQA() -> Model:
