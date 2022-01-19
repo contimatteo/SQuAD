@@ -37,6 +37,8 @@ single-line-if-stmt=no
 # Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
 #expected-line-ending-format=
 
+# https://stackoverflow.com/a/49011908/7846837
+variable-rgx=[A-Za-z0-9_]{1,30}$
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

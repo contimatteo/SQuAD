@@ -1,21 +1,34 @@
-from utils.storage import LocalStorageManager
+import utils.warnings
+
+import numpy as np
+
+from models import DrQA
 
 ###
 
-LocalStorage = LocalStorageManager()
+N_EXAMPLES = 20
 
-###
+
+def X_train() -> np.ndarray:
+    N_QUESTION_TOKENS = 5
+    Xq = np.random.rand(N_EXAMPLES, N_QUESTION_TOKENS)
+
+    N_PASSAGE_TOKENS = 10
+    Xp = np.random.rand(N_EXAMPLES, N_PASSAGE_TOKENS)
+
+    return [Xq, Xp]
+
+
+def Y_train() -> np.ndarray:
+    return np.random.rand(N_EXAMPLES, )
 
 
 def train():
-    print()
-    print("    root = ", str(LocalStorage.dirs.root))
-    print("     tmp = ", str(LocalStorage.dirs.tmp))
-    print("    logs = ", str(LocalStorage.dirs.logs))
-    print("    data = ", str(LocalStorage.dirs.data))
-    print("datasets = ", str(LocalStorage.dirs.datasets))
-    print("  models = ", str(LocalStorage.dirs.models))
-    print()
+    X = X_train()
+    Y = Y_train()
+
+    model = DrQA()
+    model.fit(X, Y, epochs=10)
 
 
 ###
