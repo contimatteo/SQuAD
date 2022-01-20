@@ -1,7 +1,9 @@
+from typing import Callable, Any, Tuple
+
 import tensorflow as tf
 
-from tensorflow.keras.layers import Embedding
-from tensorflow.keras.layers import Dense, Lambda
+from tensorflow.keras.layers import Lambda
+from tensorflow.keras.layers import Embedding, Dense
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Softmax
 from tensorflow.keras.layers import Dropout
@@ -13,7 +15,7 @@ from tensorflow.keras.layers import Bidirectional, LSTM
 class EmbeddingLayers():
 
     @staticmethod
-    def glove(input_length):
+    def glove(input_length: int) -> Callable[[Any], Any]:
         assert isinstance(input_length, int)
 
         i_dim = 100  # size of the vocabulary
@@ -23,7 +25,7 @@ class EmbeddingLayers():
         #  - `trainable` --> `False`
         #  - `embeddings_initializer` --> `Constant(glove_matrix)`
 
-        def _nn(x):
+        def _nn(x: Any) -> Any:
             x = Embedding(i_dim, o_dim, input_length=input_length, trainable=True)(x)
             x = Dropout(.3)(x)
             return x
@@ -37,7 +39,7 @@ class EmbeddingLayers():
 class DenseLayers():
 
     @staticmethod
-    def regularized():
+    def regularized() -> Dense:
         return Dense(5)
 
 
@@ -47,14 +49,14 @@ class DenseLayers():
 class RnnLayers():
 
     @staticmethod
-    def drqa():
+    def drqa() -> Callable[[Any], Any]:
         units = 128
         initializer = 'glorot_uniform'
 
-        def _lstm():
+        def _lstm() -> LSTM:
             return LSTM(units, dropout=.3, recurrent_initializer=initializer, return_sequences=True)
 
-        def _nn(x):
+        def _nn(x: Any) -> Any:
             # x = Bidirectional(_lstm(), merge_mode="concat")(x)
             # x = Bidirectional(_lstm(), merge_mode="concat")(x)
             x = Bidirectional(_lstm(), merge_mode="concat")(x)
@@ -69,24 +71,18 @@ class RnnLayers():
 class AttentionLayers():
 
     @staticmethod
-    def weighted_sum():
+    def weighted_sum() -> Callable[[Any], Any]:
 
-        def _nn(x):
-            # --> (None, 20, 256)
+        def _nn(x: Any) -> Any:
+            # --> (batch, n_tokens, embedding_dim)
             scores = Dense(1, use_bias=False)(x)  # 1 score foreach embedding input
-            # --> (None, 20, 1)
-
+            # --> (batch, n_tokens, 1)
             weights = Softmax(axis=1)(scores)
-            # --> (None, 20, 1)
-
-            # average
-            x_weighted = weights * x
-            # --> (None, 20, 1)
-
-            # sum
-            x_weighted_summed = tf.reduce_sum(x_weighted, axis=1)
-            # --> (None, 20)
-
-            return x_weighted_summed  #, x_weighted
+            # --> (batch, n_tokens, 1)
+            x_weighted = weights * x  # average
+            # --> (batch, n_tokens, 1)
+            x_weighted_summed = tf.reduce_sum(x_weighted, axis=1)  # sum
+            # --> (batch, n_tokens)
+            return x_weighted_summed  #, weights
 
         return _nn
