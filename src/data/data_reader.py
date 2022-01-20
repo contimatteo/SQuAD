@@ -38,7 +38,7 @@ def download_data(drive_id, zip_file_name, required_file_name):
         if os.path.exists(zip_file_name):
             os.remove(zip_file_name)
         data_utils.download_url(drive_id, zip_file_name)
-    print("Successful download")
+    
 
 
 def download_training_set():
@@ -66,17 +66,16 @@ def download_glove():
 
     
 def load_training_set():
+    print("Data downloading")
     raw_file = ""
     if len(sys.argv)<=1:
         raw_file = download_training_set()
     else:
         raw_file = sys.argv[1]
-    
-    print(raw_file)
     if not os.path.exists(raw_file):
         raise Exception(raw_file+" does not exists.")
-        
-
+    print("Data downloaded at position: " + raw_file + "\n")  
+    print("Converting json to dataframe") 
   
     with open(raw_file, 'r') as j:
         contents = json.loads(j.read())
@@ -102,9 +101,9 @@ def load_training_set():
     df = pd.json_normalize(contents,['paragraphs','qas','answers'],["title",["paragraphs","context"],["paragraphs","qas","question"]])
     df = df[["title","paragraphs.context","paragraphs.qas.question","text","answer_start"]]
 
-    df.rename(columns = {'title':'title', 'paragraphs.context':'paragraph', 
+    df.rename(columns = {'title':'title', 'paragraphs.context':'passage', 
                          'paragraphs.qas.question':'question', 'text':'answer', 'answer_start':'answer_start'}, inplace = True)
-    
+    print("Converted json to dataframe \n")
     return df
     
     
@@ -112,9 +111,9 @@ def load_training_set():
     
     
     
-pd.set_option('display.max_columns', None)    
-pd.set_option('display.max_colwidth', None)
-df = load_training_set() 
-print(df.columns)
-print(df[0:1])
-download_glove()
+#pd.set_option('display.max_columns', None)    
+#pd.set_option('display.max_colwidth', None)
+#df = load_training_set() 
+#print(df.columns)
+#print(df[0:1])
+#download_glove()
