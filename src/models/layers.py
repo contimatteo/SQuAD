@@ -1,4 +1,5 @@
-from typing import Callable, Any, Tuple
+from re import X
+from typing import Callable, Any, Tuple, List
 
 import tensorflow as tf
 
@@ -84,5 +85,39 @@ class AttentionLayers():
             x_weighted_summed = tf.reduce_sum(x_weighted, axis=1)  # sum
             # --> (batch, n_tokens)
             return x_weighted_summed  #, weights
+
+        return _nn
+
+
+###
+
+
+class Seq2SeqLayers():
+
+    @staticmethod
+    def encoder() -> Callable[[Any], Any]:
+        units = 128
+
+        def _rnn():
+            return LSTM(units, return_state=True)
+
+        def _nn(x: Any) -> Any:
+            x, hidden_state, cell_state = _rnn()(x)
+            states = [hidden_state, cell_state]
+            return x, states
+
+        return _nn
+
+    @staticmethod
+    def decoder() -> Callable[[Any, List[Any]], Any]:
+        units = 128
+
+        def _rnn():
+            return LSTM(units, return_sequences=True, return_state=True)
+
+        def _nn(x: Any, encoder_states: List[Any]) -> Any:
+            x, hidden_state, cell_state = _rnn()(x, initial_state=encoder_states)
+            states = [hidden_state, cell_state]
+            return x, states
 
         return _nn
