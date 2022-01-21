@@ -77,8 +77,8 @@ def load_training_set():
     print("Data downloaded at position: " + raw_file + "\n")  
     print("Converting json to dataframe") 
   
-    with open(raw_file, 'r') as j:
-        contents = json.loads(j.read())
+    with open(raw_file, 'r',encoding="utf8", errors='ignore') as j:
+        contents = json.loads(j.read().encode('utf-8').strip(),encoding='unicode_escape')
 
     #pc=['data','paragraphs','qas','answers']
     #js = pd.io.json.json_normalize(contents , pc )
