@@ -1,10 +1,10 @@
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Concatenate, Flatten, Dense
-from tensorflow.keras.optimizers import Adam, Adamax
+from tensorflow.keras.optimizers import Adam
 
 import utils.configs as Configs
-from models.layers import EmbeddingLayers, DenseLayers, RnnLayers, AttentionLayers
+from models.layers import EmbeddingLayers, RnnLayers, AttentionLayers
 
 ###
 
