@@ -1,6 +1,6 @@
-from re import X
 from typing import Callable, Any, Tuple, List
 
+import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras.layers import Lambda
@@ -74,17 +74,27 @@ class AttentionLayers():
     @staticmethod
     def weighted_sum() -> Callable[[Any], Any]:
 
-        def _nn(x: Any) -> Any:
-            # --> (batch, n_tokens, embedding_dim)
-            scores = Dense(1, use_bias=False)(x)  # 1 score foreach embedding input
-            # --> (batch, n_tokens, 1)
-            weights = Softmax(axis=1)(scores)
-            # --> (batch, n_tokens, 1)
-            x_weighted = weights * x  # average
-            # --> (batch, n_tokens, 1)
-            x_weighted_summed = tf.reduce_sum(x_weighted, axis=1)  # sum
-            # --> (batch, n_tokens)
-            return x_weighted_summed  #, weights
+        def _nn(q: Any) -> Any:
+            # bj     = int
+            # b      = (n_tokens, 1)
+            # qj     = (embedding_dim,)
+            # q      = (n_tokens, embedding_dim)
+
+            # # --> (batch, n_tokens, embedding_dim)
+            # scores = Dense(1, use_bias=False)(q)  # 1 score foreach embedding input
+            # # --> (batch, n_tokens, 1)
+            # weights = Softmax(axis=1)(scores)
+            # # --> (batch, n_tokens, 1)
+            # x_weighted = weights * x  # average
+            # # --> (batch, n_tokens, 1)
+            # x_weighted_summed = tf.reduce_sum(x_weighted, axis=1)  # sum
+            # # --> (batch, n_tokens)
+            # return x_weighted_summed  #, weights
+
+            b = Dense(1, activation="softmax", use_bias=False)(q)
+            q_weighted = b * q
+            weighted_sum = tf.reduce_sum(q_weighted, axis=1)
+            return weighted_sum
 
         return _nn
 
