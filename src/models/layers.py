@@ -1,11 +1,12 @@
 from typing import Callable, Any, List, Tuple
 
+import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras.layers import Embedding, Dense
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Softmax
-from tensorflow.keras.layers import Lambda
+from tensorflow.keras.layers import Lambda, Multiply
 from tensorflow.keras.layers import Bidirectional, LSTM
 
 ###
@@ -69,45 +70,23 @@ class RnnLayers():
 
 class AttentionLayers():
     '''
-    ### Input:
+    ## Unified Model Components
+
+    #### INPUT:
      - @param `query`
      - @param `keys`
-
-    ### Computation
+     - @param `values` (optional)
+   
+    #### COMPUTATION
      1. `energy_scores = compatibility_func(query, keys)`
      2. `attention_weights = distribution_func(energy_scores)`
      3. `weighted_values = values ? attention_weights * values : attention_weights * keys`
      4. `context_vector = tf.reduce_sum(weighted_values)`
 
-    ### Output
+    #### OUTPUT
      - @param `context_vector`
-     - @param `attention_weights`
+     - @param `attention_weights` (optional)
     '''
-
-    # @staticmethod
-    # def core(compatibility_func, distribution_func):
-    #     def _nn(query, keys):
-    #         energy_scores = compatibility_func(query, keys)
-    #         attention_weights = distribution_func(energy_scores)
-    #         weighted_values = attention_weights * keys
-    #         context_vector = tf.reduce_sum(weighted_values)
-    #         return context_vector
-    #     return _nn
-
-    # @staticmethod
-    # def weighted_sum() -> Callable[[Any], Any]:
-    #     def _nn(inp: Any) -> Any:
-    #         # --> (batch, n_tokens, embedding_dim)
-    #         q = inp
-    #         # --> (batch, n_tokens, embedding_dim)
-    #         b = Dense(1, activation="softmax", use_bias=False)(q)
-    #         # --> (batch, n_tokens, 1)
-    #         q_weighted = b * q
-    #         # --> (batch, n_tokens, 1)
-    #         weighted_sum = tf.reduce_sum(q_weighted, axis=1)
-    #         # --> (batch, n_tokens)
-    #         return weighted_sum
-    #     return _nn
 
     @staticmethod
     def weighted_sum(axis: int) -> Callable[[Any, Any], Any]:
@@ -118,24 +97,56 @@ class AttentionLayers():
             return tf.reduce_sum(values_weighted, axis=axis)
 
         return _weight_and_sum
-        # return Lambda(_weight_and_sum)
+
+    @staticmethod
+    def core(compatibility_func, distribution_func):
+
+        def _nn(keys, query=None):
+            energy_scores = compatibility_func(keys, query)
+            attention_weights = distribution_func(energy_scores)
+            context_vector = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
+            return context_vector
+
+        return _nn
 
     #
 
     @staticmethod
     def question_encoding() -> Callable[[Any], Any]:
 
-        def _nn(keys: Any) -> Any:
-            compatibility_func = Dense(1, use_bias=False)
-            distribution_func = Softmax()
+        def compatibility_func(keys, *_):
+            return Dense(1, use_bias=False)(keys)
 
-            # --> (batch, n_tokens, embedding_dim)
-            energy_scores = compatibility_func(keys)
-            # --> (batch, n_tokens, 1)
+        def distribution_func(scores):
+            return Softmax()(scores)
+
+        def _nn(keys: Any) -> Any:
+            # energy_scores = compatibility_func(keys)
+            # attention_weights = distribution_func(energy_scores)
+            # weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
+            # return weighted_sum
+            return AttentionLayers.core(compatibility_func, distribution_func)(keys, None)
+
+        return _nn
+
+    @staticmethod
+    def passage_embeddings() -> Callable[[Any, Any], Any]:
+
+        def compatibility_func(query: Any, keys: Any) -> Any:
+            ### TODO: missing computation steps ...
+            # q_scores = Dense(1, activation="relu", use_bias=False)(query)
+            # k_scores = Dense(1, activation="relu", use_bias=False)(keys)
+            # return tf.matmul(q_scores, k_scores, transpose_b=True)
+            return Dense(1, activation="relu", use_bias=False)(query)
+
+        def distribution_func(scores):
+            return Softmax()(scores)
+
+        def _nn(query_and_keys: List[Any]) -> Any:
+            query, keys = query_and_keys[0], query_and_keys[1]
+            energy_scores = compatibility_func(query, keys)
             attention_weights = distribution_func(energy_scores)
-            # --> (batch, n_tokens, 1)
             weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
-            # --> (batch, n_tokens)
             return weighted_sum
 
         return _nn

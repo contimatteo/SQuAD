@@ -15,7 +15,7 @@ def _optimizer():
 
 
 def _compile(model):
-    model.compile(loss=['mse'], optimizer=_optimizer(), metrics=['mse'])
+    model.compile(loss=['mse'], optimizer=_optimizer(), metrics=['mse'], run_eagerly=True)
     return model
 
 
@@ -29,18 +29,34 @@ def DRQA() -> Model:
     q_xi = Input(shape=(n_q_tokens, ))
     p_xi = Input(shape=(n_p_tokens, ))
 
-    # Question
+    ### QUESTION ##############################################################
+
+    ### embeddings
     q_embd = EmbeddingLayers.glove(n_q_tokens)(q_xi)
+
+    ### lstm
     q_rnn = RnnLayers.drqa()(q_embd)
+
+    ### self-attention (simplfied version)
     q_att = AttentionLayers.question_encoding()(q_rnn)
 
-    # Passage
+    ### PASSAGE ###############################################################
+
+    ### embeddings
     p_embd = EmbeddingLayers.glove(n_p_tokens)(p_xi)
+
+    ### aligend-attention
     p_att = Attention()([p_embd, q_embd])  # ([query, keys/values])
+    ### aligend-attention
+    # p_att = AttentionLayers.passage_embeddings()([p_embd, q_embd])  # ([query, keys/values])
+
+    ### lstm (features)
     p_concat = Concatenate(axis=2)([p_embd, p_att])
+    ### lstm
     p_rnn = RnnLayers.drqa()(p_concat)
 
-    # Output
+    ### OUTPUT ################################################################
+
     q_out = Flatten()(q_att)
     p_out = Flatten()(p_rnn)
     out = Concatenate()([q_out, p_out])

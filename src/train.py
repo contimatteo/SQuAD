@@ -27,7 +27,7 @@ def train():
     Y = Y_train()
 
     model = DRQA()
-    model.fit(X, Y, epochs=10, callbacks=[WandbCallback()])
+    model.fit(X, Y, epochs=5, batch_size=100, callbacks=[WandbCallback()])
 
 
 ###
