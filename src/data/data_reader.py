@@ -105,15 +105,23 @@ def load_training_set():
                          'paragraphs.qas.question':'question', 'text':'answer', 'answer_start':'answer_start'}, inplace = True)
     print("Converted json to dataframe \n")
     return df
+ 
+
+def data_reader():
+    return load_training_set()
     
     
+def main():
+    pd.set_option('display.max_columns', None)    
+    pd.set_option('display.max_colwidth', None)
+    df = load_training_set() 
+    print(df.columns)
+    print(df[0:1])
+    download_glove()
+
+
+if __name__ == "__main__":
+    main()
+   
     
     
-    
-    
-#pd.set_option('display.max_columns', None)    
-#pd.set_option('display.max_colwidth', None)
-#df = load_training_set() 
-#print(df.columns)
-#print(df[0:1])
-#download_glove()

@@ -1,15 +1,21 @@
 from data_cleaning import data_cleaning
-from data_reader import load_training_set
+from data_reader import data_reader
 import pandas as pd
 
 
 def data_preprocessing(*_):
-    df = load_training_set() 
-    print("Data cleaning")
+    df = data_reader() 
     df = data_cleaning(df)
-    print("Data cleaned \n")
+    #print("data_preprocessing ended")
     return df
 
-pd.set_option('display.max_columns', None)    
-pd.set_option('display.max_colwidth', None)
-print(data_preprocessing()[0:1])
+
+def main():
+    pd.set_option('display.max_columns', None)    
+    pd.set_option('display.max_colwidth', None)
+    print(data_preprocessing()[0:1]) 
+
+
+if __name__ == "__main__":
+    main()
+  

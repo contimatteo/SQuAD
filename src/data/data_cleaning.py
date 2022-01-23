@@ -4,9 +4,18 @@ import pandas as pd
 import numpy as np
 from nltk.tokenize import RegexpTokenizer
 from copy import deepcopy
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),'utils'))
+from preprocessing_utils import df_apply_function_with_dict
+from preprocessing_utils import df_apply_function_with_dict_2
+from preprocessing_utils import get_dict
+from preprocessing_utils import insert_dict
 
 
 span_tokenize_dict = {}
+sentence_tokenize_dict = {}
 
 
 #def __regex_separator(text,separator):
@@ -22,44 +31,15 @@ span_tokenize_dict = {}
 #        df[col] = df.apply(lambda x: __regex_separator(x[col],separator), axis = 1)
 #    return df
 
-
-
-def get_answer_start_end(passage,answer_text,answer_start):
-    answer_end = len(answer_text) + answer_start
-    
-    if passage not in span_tokenize_dict.keys():
-        span_tokenize_dict[passage] = span_tokenize(passage)
-
-
-    
-    interval = [i for i, (s, e) in enumerate(span_tokenize_dict[passage]) if e >= answer_start and s <= answer_end]
-    if len(interval) <1:
-       #raise Exception(interval + " is empty.") 
-       mamma= [answer_text]#[str(passage)[96]]
-       print(mamma)
-       
-       return mamma
-       # 
-       #return [-1,-1]
-    return [min(interval),max(interval)]
-
-
-def add_labels(df):
-    df["label"] = df.apply(lambda x: get_answer_start_end(x["passage"], x["answer"],x["answer_start"]), axis = 1)
-    return df
-
-
-def data_cleaning(df):
-    #df = separate_words(df)
-    
-    return add_labels(df).drop(axis=1, columns='answer_start')
-  
-
-
+def nltk_downlaod_utilities():
+    nltk.download('wordnet')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('omw-1.4')
 
 
 def tokenizers():
-    tokenizer1 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S')
+    #r'[\d.,]+|[A-Z][.A-Z]+\b\.*|\w+|\S'
+    tokenizer1 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S')#    |[A-Z][.A-Z]+\b\.*|
     tokenizer2 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S|.')
     return tokenizer1, tokenizer2
 
@@ -91,16 +71,48 @@ def group_tokens(t,t_with_spaces):
     return t1
 
 
+def tokenize_sentence_df(df_row,sentence_name):
+    sentence = df_row[sentence_name]
+    t1,_ = tokenizers()
+    return t1.tokenize(sentence)
+
+
+def tokenize_sentence(sentence):
+    t1,_ = tokenizers()
+    if sentence not in sentence_tokenize_dict.keys():
+        sentence_tokenize_dict[sentence] = t1.tokenize(sentence)
+
+    return sentence_tokenize_dict[sentence]
+
+#def tokenize_sentence(sentence):
+#    t1,_ = tokenizers()
+#    if sentence not in get_dict()["sentence_tokenize_dict"].keys():
+#        get_dict()["sentence_tokenize_dict"][sentence] = t1.tokenize(sentence)
+
+#    return get_dict()["sentence_tokenize_dict"][sentence]
+
 
 def tokenize_with_spaces(sentence):
-    t1,t2 = tokenizers()
-    sentence_tokenized = t1.tokenize(sentence)
+    _,t2 = tokenizers()
+
+    sentence_tokenized = tokenize_sentence(sentence)
     sentence_tokenized_with_spaces = t2.tokenize(sentence)
     t_grouped = group_tokens(sentence_tokenized, sentence_tokenized_with_spaces)
     return t_grouped
 
+#def split_into_words(df):
+#    df["word_tokens_passage"] = df_apply_function_with_dict(df,tokenize_sentence_df,"sentence_tokenize_dict","passage",sentence_name="passage")
+#    df["word_tokens_question"] = df_apply_function_with_dict(df, tokenize_sentence_df,"sentence_tokenize_dict","question",sentence_name="question")
+#    return df
 
-def span_tokenize(sentence):
+
+def split_into_words(df):
+    df["word_tokens_passage"] = df.apply(lambda x: tokenize_sentence(x["passage"]), axis = 1)
+    df["word_tokens_question"] = df.apply(lambda x: tokenize_sentence(x["question"]), axis = 1)
+    return df
+
+
+def span_tokenize(sentence,*_):
     tokenized_sentence = tokenize_with_spaces(sentence)
     span_list = []
     j = 0
@@ -110,10 +122,70 @@ def span_tokenize(sentence):
     return span_list
 
 
+def get_answer_start_end(passage,answer_text,answer_start):
+    answer_end = len(answer_text) + answer_start
+    
+    if passage not in span_tokenize_dict.keys():
+        span_tokenize_dict[passage] = span_tokenize(passage)
+
+    interval = [i for i, (s, e) in enumerate(span_tokenize_dict[passage]) if e >= answer_start and s <= answer_end]
+    if len(interval) <1:
+       #raise Exception(interval + " is empty.") 
+       mamma= [answer_text]#[str(passage)[96]]
+       print(mamma)
+       
+       return mamma
+       # 
+       #return [-1,-1]
+    return [min(interval),max(interval)]
 
 
+def add_labels(df):
+    df["label"] = df.apply(lambda x: get_answer_start_end(x["passage"], x["answer"],x["answer_start"]), axis = 1)
+    return df
 
-#s= "   anna.    va  "
-#   0123456789012345
-#print(tokenize_with_spaces(s))
-#print(span_tokenize(s))
+
+#def get_answer_start_end(df_row,passage_name,answer_name,answer_start_name):
+#    passage=df_row[passage_name]
+#    answer_text=df_row[answer_name]
+#    answer_start=df_row[answer_start_name]
+    
+#    answer_end = len(answer_text) + answer_start
+#    interval = [i for i, (s, e) in enumerate(span_tokenize(passage)) if e >= answer_start and s <= answer_end]
+#    if len(interval) <1:
+#       #raise Exception(interval + " is empty.") 
+#       err= [answer_text]#[str(passage)[96]]
+#       print("anwer not found: ",err)
+#       return [-1,-1]
+#    return [min(interval),max(interval)]
+
+
+#def add_labels(df):
+#    df["label"] = df_apply_function_with_dict_2(df, get_answer_start_end,span_tokenize,"span_tokenize_dict","passage",passage_name="passage",answer_name="answer",answer_start_name="answer_start")
+#    #df.apply(lambda x: get_answer_start_end(x["passage"], x["answer"],x["answer_start"]), axis = 1)
+#    return df
+
+
+def data_cleaning(df):
+    #df = separate_words(df)
+    nltk_downlaod_utilities()
+    print()
+    print("Data cleaning")
+    df = add_labels(df).drop(axis=1, columns='answer_start')
+    df = split_into_words(df)
+    print("Data cleaned \n")
+    return df
+
+
+def main():
+    insert_dict("sentence_tokenize_dict")
+    print(get_dict())
+    s= "   anna.    va  "
+    nltk_downlaod_utilities()
+    print(tokenize_with_spaces(s))
+    print(span_tokenize(s))
+    print(get_dict())
+
+
+if __name__ == "__main__":
+    main()
