@@ -1,6 +1,7 @@
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import Concatenate, Flatten, Dense
+from tensorflow.keras.layers import Attention, Dense
+from tensorflow.keras.layers import Concatenate, Flatten
 from tensorflow.keras.optimizers import Adam
 
 import utils.configs as Configs
@@ -25,26 +26,28 @@ def DRQA() -> Model:
     n_q_tokens = Configs.N_QUESTION_TOKENS
     n_p_tokens = Configs.N_PASSAGE_TOKENS
 
-    xqi = Input(shape=(n_q_tokens, ))
-    xpi = Input(shape=(n_p_tokens, ))
+    q_xi = Input(shape=(n_q_tokens, ))
+    p_xi = Input(shape=(n_p_tokens, ))
 
     # Question
-    xq = EmbeddingLayers.glove(n_q_tokens)(xqi)
-    xq = RnnLayers.drqa()(xq)
-    xq = AttentionLayers.question_encoding()(xq)
+    q_embd = EmbeddingLayers.glove(n_q_tokens)(q_xi)
+    q_rnn = RnnLayers.drqa()(q_embd)
+    q_att = AttentionLayers.question_encoding()(q_rnn)
 
     # Passage
-    xp = EmbeddingLayers.glove(n_p_tokens)(xpi)
-    xp = RnnLayers.drqa()(xp)
+    p_embd = EmbeddingLayers.glove(n_p_tokens)(p_xi)
+    p_att = Attention()([p_embd, q_embd])  # ([query, keys/values])
+    p_concat = Concatenate(axis=2)([p_embd, p_att])
+    p_rnn = RnnLayers.drqa()(p_concat)
 
     # Output
-    xq = Flatten()(xq)
-    xp = Flatten()(xp)
-    xo = Concatenate()([xq, xp])
-    xo = Dense(1)(xo)
+    q_out = Flatten()(q_att)
+    p_out = Flatten()(p_rnn)
+    out = Concatenate()([q_out, p_out])
+    out = Dense(1)(out)
 
     #
 
-    model = Model([xqi, xpi], xo)
+    model = Model([q_xi, p_xi], out)
 
     return _compile(model)
