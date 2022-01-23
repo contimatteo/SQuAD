@@ -1,52 +1,48 @@
 import nltk
-import data_reader
-import pandas as pd
-import numpy as np
 from nltk.tokenize import RegexpTokenizer
 from copy import deepcopy
 import sys
 import os
-from functools import lru_cache
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),'utils'))
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 # from preprocessing_utils import df_apply_function_with_dict
 # from preprocessing_utils import df_apply_function_with_dict_2
-from preprocessing_utils import get_dict
-from preprocessing_utils import insert_dict
+# from preprocessing_utils import get_dict
+# from preprocessing_utils import insert_dict
 
 
 span_tokenize_dict = {}
 sentence_tokenize_dict = {}
 
 
-#def __regex_separator(text,separator):
+# def __regex_separator(text,separator):
 #   # separator =["�"]#["�"]
-#    for sep in separator: 
+#    for sep in separator:
 #       text= text.replace(sep," ")
 #    return text
-
-
-#def separate_words(df,separator=["-"]):
+#
+#
+# def separate_words(df,separator=["-"]):
 #    columns=["passage","answer","question"]
 #    for col in columns:
 #        df[col] = df.apply(lambda x: __regex_separator(x[col],separator), axis = 1)
 #    return df
 
-def nltk_downlaod_utilities():
+def nltk_download_utilities():
     nltk.download('wordnet')
     nltk.download('averaged_perceptron_tagger')
     nltk.download('omw-1.4')
 
 
 def tokenizers():
-    #r'[\d.,]+|[A-Z][.A-Z]+\b\.*|\w+|\S'
-    tokenizer1 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S')#    |[A-Z][.A-Z]+\b\.*|
+    # r'[\d.,]+|[A-Z][.A-Z]+\b\.*|\w+|\S'
+    tokenizer1 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S')  # |[A-Z][.A-Z]+\b\.*|
     tokenizer2 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S|.')
     return tokenizer1, tokenizer2
 
 
 def group_tokens(t, t_with_spaces):
-    t1=deepcopy(t)
+    t1 = deepcopy(t)
     first_item_found = False
     first_string = ""
     j = 0
@@ -85,11 +81,11 @@ def tokenize_sentence(sentence):
 
     return sentence_tokenize_dict[sentence]
 
-#def tokenize_sentence(sentence):
+# def tokenize_sentence(sentence):
 #    t1,_ = tokenizers()
 #    if sentence not in get_dict()["sentence_tokenize_dict"].keys():
 #        get_dict()["sentence_tokenize_dict"][sentence] = t1.tokenize(sentence)
-
+#
 #    return get_dict()["sentence_tokenize_dict"][sentence]
 
 
@@ -101,9 +97,9 @@ def tokenize_with_spaces(sentence):
     t_grouped = group_tokens(sentence_tokenized, sentence_tokenized_with_spaces)
     return t_grouped
 
-#def split_into_words(df):
-#    df["word_tokens_passage"] = df_apply_function_with_dict(df,tokenize_sentence_df,"sentence_tokenize_dict","passage",sentence_name="passage")
-#    df["word_tokens_question"] = df_apply_function_with_dict(df, tokenize_sentence_df,"sentence_tokenize_dict","question",sentence_name="question")
+# def split_into_words(df):
+#     df["word_tokens_passage"] = df_apply_function_with_dict(df,tokenize_sentence_df,"sentence_tokenize_dict","passage",sentence_name="passage")
+#     df["word_tokens_question"] = df_apply_function_with_dict(df, tokenize_sentence_df,"sentence_tokenize_dict","question",sentence_name="question")
 #    return df
 
 
@@ -133,10 +129,8 @@ def get_answer_start_end(passage, answer_text, answer_start):
     interval = [i for i, (s, e) in enumerate(span_tokenize_dict[passage]) if e >= answer_start and s <= answer_end]
     if len(interval) < 1:
         # raise Exception(interval + " is empty.")
-        mamma= [answer_text] # [str(passage)[96]]
-        print(mamma)
-
-        # return mamma
+        at = [answer_text]  # [str(passage)[96]]
+        print(at)
         return [-1, -1]
     return [min(interval), max(interval)]
 
@@ -168,8 +162,8 @@ def add_labels(df):
 
 
 def data_cleaning(df):
-    #df = separate_words(df)
-    nltk_downlaod_utilities()
+    # df = separate_words(df)
+    nltk_download_utilities()
     print()
     print("Data cleaning")
     df = add_labels(df).drop(axis=1, columns='answer_start')
@@ -181,8 +175,8 @@ def data_cleaning(df):
 def main():
     insert_dict("sentence_tokenize_dict")
     print(get_dict())
-    s= "   anna.    va  "
-    nltk_downlaod_utilities()
+    s = "   anna.    va  "
+    nltk_download_utilities()
     print(tokenize_with_spaces(s))
     print(span_tokenize(s))
     print(get_dict())

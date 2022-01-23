@@ -1,11 +1,10 @@
 import os
 import sys
 import data_utils
-
 import json
-import numpy as np
-import tensorflow as tf
 import pandas as pd
+
+
 # if glove_embeddings is None:
 #   if not os.path.exists(GLOVE_LOCAL_DIR):
 #     os.makedirs(GLOVE_LOCAL_DIR)
@@ -38,7 +37,6 @@ def download_data(drive_id, zip_file_name, required_file_name):
         if os.path.exists(zip_file_name):
             os.remove(zip_file_name)
         data_utils.download_url(drive_id, zip_file_name)
-    
 
 
 def download_training_set():
@@ -64,57 +62,55 @@ def download_glove():
     data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
     return RAW_FILE
 
-    
+
 def load_training_set():
     print("Data downloading")
     raw_file = ""
-    if len(sys.argv)<=1:
+    if len(sys.argv) <= 1:
         raw_file = download_training_set()
     else:
         raw_file = sys.argv[1]
     if not os.path.exists(raw_file):
         raise Exception(raw_file+" does not exists.")
-    print("Data downloaded at position: " + raw_file + "\n")  
-    print("Converting json to dataframe") 
-  
-    with open(raw_file, 'r',encoding="utf8", errors='ignore') as j:
-        contents = json.loads(j.read().encode('utf-8').strip(),encoding='unicode_escape')
+    print("Data downloaded at position: " + raw_file + "\n")
+    print("Converting json to dataframe")
 
-    #pc=['data','paragraphs','qas','answers']
-    #js = pd.io.json.json_normalize(contents , pc )
-    #m = pd.io.json.json_normalize(contents, pc[:-1] )
-    #r = pd.io.json.json_normalize(contents,pc[:-2])
+    with open(raw_file, 'r', encoding="utf8", errors='ignore') as j:
+        contents = json.loads(j.read().encode('utf-8').strip(), encoding='unicode_escape')
 
-    #idx = np.repeat(r['context'].values, r.qas.str.len())
-    #ndx  = np.repeat(m['id'].values,m['answers'].str.len())
-    #m['context'] = idx
-    #js['q_idx'] = ndx
-    #main = pd.concat([ m[['id','question','context']].set_index('id'),js.set_index('q_idx')],1,sort=False).reset_index()
-    #main['c_id'] = main['context'].factorize()[0]
-
-    #print(main.head())
-    #print(main.columns)
-
-
+    # pc=['data','paragraphs','qas','answers']
+    # js = pd.io.json.json_normalize(contents , pc )
+    # m = pd.io.json.json_normalize(contents, pc[:-1] )
+    # r = pd.io.json.json_normalize(contents,pc[:-2])
+    #
+    # idx = np.repeat(r['context'].values, r.qas.str.len())
+    # ndx  = np.repeat(m['id'].values,m['answers'].str.len())
+    # m['context'] = idx
+    # js['q_idx'] = ndx
+    # main = pd.concat([ m[['id','question','context']].set_index('id'),js.set_index('q_idx')],1,sort=False).reset_index()
+    # main['c_id'] = main['context'].factorize()[0]
+    #
+    # print(main.head())
+    # print(main.columns)
 
     contents = contents["data"]
-    df = pd.json_normalize(contents,['paragraphs','qas','answers'],["title",["paragraphs","context"],["paragraphs","qas","question"]])
-    df = df[["title","paragraphs.context","paragraphs.qas.question","text","answer_start"]]
+    df = pd.json_normalize(contents, ['paragraphs', 'qas', 'answers'], ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"]])
+    df = df[["title", "paragraphs.context", "paragraphs.qas.question", "text", "answer_start"]]
 
-    df.rename(columns = {'title':'title', 'paragraphs.context':'passage', 
-                         'paragraphs.qas.question':'question', 'text':'answer', 'answer_start':'answer_start'}, inplace = True)
+    df.rename(columns={'title': 'title', 'paragraphs.context': 'passage',
+                       'paragraphs.qas.question': 'question', 'text': 'answer', 'answer_start': 'answer_start'}, inplace=True)
     print("Converted json to dataframe \n")
     return df
- 
+
 
 def data_reader():
     return load_training_set()
-    
-    
+
+
 def main():
-    pd.set_option('display.max_columns', None)    
+    pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
-    df = load_training_set() 
+    df = load_training_set()
     print(df.columns)
     print(df[0:1])
     download_glove()
@@ -122,6 +118,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-   
-    
-    
