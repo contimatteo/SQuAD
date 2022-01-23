@@ -21,7 +21,7 @@ def _compile(model):
 ###
 
 
-def DrQA() -> Model:
+def DRQA() -> Model:
     n_q_tokens = Configs.N_QUESTION_TOKENS
     n_p_tokens = Configs.N_PASSAGE_TOKENS
 
@@ -31,7 +31,7 @@ def DrQA() -> Model:
     # Question
     xq = EmbeddingLayers.glove(n_q_tokens)(xqi)
     xq = RnnLayers.drqa()(xq)
-    xq = AttentionLayers.weighted_sum()(xq)
+    xq = AttentionLayers.question_encoding()(xq)
 
     # Passage
     xp = EmbeddingLayers.glove(n_p_tokens)(xpi)

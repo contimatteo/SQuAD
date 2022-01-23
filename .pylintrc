@@ -40,7 +40,7 @@ single-line-if-stmt=no
 
 # # https://stackoverflow.com/a/49011908/7846837
 # variable-rgx=[A-Za-z0-9_]{1,30}$
-variable-rgx=[a-z]{1}[a-z0-9_]{0,29}$
+variable-rgx=[A-Za-z]{1}[a-z0-9_]{0,29}$
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

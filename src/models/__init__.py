@@ -1,1 +1,1 @@
-from .drqa import DrQA
+from .drqa import DRQA
