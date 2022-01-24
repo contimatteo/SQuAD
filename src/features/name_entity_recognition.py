@@ -1,8 +1,4 @@
 import sys
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
-from nltk import word_tokenize
-# from nltk import pos_tag
 import pandas as pd
 from nltk import ne_chunk
 import os

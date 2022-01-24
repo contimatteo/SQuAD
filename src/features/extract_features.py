@@ -1,7 +1,4 @@
 import sys
-from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet
-from nltk import word_tokenize
 from nltk import pos_tag
 import pandas as pd
 import os
@@ -10,6 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__
 from data_preprocessing import data_preprocessing
 from lemmatize import apply_lemmatize
 from name_entity_recognition import apply_ner
+from term_frequency import apply_term_frequency
 
 
 def apply_pos_tag(df: pd.DataFrame):
@@ -21,6 +19,7 @@ def apply_pos_tag(df: pd.DataFrame):
 def extract_features(df: pd.DataFrame):
     df = apply_pos_tag(df)
     df = apply_ner(df)
+    df = apply_term_frequency(df)
     df = apply_lemmatize(df)
     return df
 
