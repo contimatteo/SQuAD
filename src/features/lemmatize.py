@@ -1,7 +1,8 @@
 import sys
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
-from nltk import pos_tag
+from nltk import word_tokenize
+# from nltk import pos_tag
 import pandas as pd
 import os
 
@@ -25,16 +26,15 @@ def get_wordnet_pos(tag):
         return ''
 
 
-def lemmatize(lemmatizer, tokens, passage, lemmatize_dict):
+def lemmatize(lemmatizer, tokens, passage, pos_tag, lemmatize_dict):
     if passage not in lemmatize_dict.keys():
-        pos_tag_dict = dict(pos_tag(tokens))
         token_lemmatized = []
-        for x in tokens:
-            pos = get_wordnet_pos(pos_tag_dict[x])
+        for word, pos in zip(tokens, pos_tag):
+            pos = get_wordnet_pos(pos)
             if pos == '':
-                token_lemmatized.append(x)
+                token_lemmatized.append(word)
             else:
-                token_lemmatized.append(lemmatizer.lemmatize(x, pos=pos))
+                token_lemmatized.append(lemmatizer.lemmatize(word, pos=pos))
         lemmatize_dict[passage] = token_lemmatized
     return lemmatize_dict[passage]
 
@@ -69,9 +69,9 @@ def lemmatize(lemmatizer, tokens, passage, lemmatize_dict):
 def apply_lemmatize(df: pd.DataFrame):
     lemmatizer = WordNetLemmatizer()
     df["lemmatized_passage"] = df.apply(
-        lambda x: lemmatize(lemmatizer, x["word_tokens_passage"], x["passage"], lemmatize_passage_dict), axis=1)
+        lambda x: lemmatize(lemmatizer, x["word_tokens_passage"], x["passage"], x["pos"], lemmatize_passage_dict), axis=1)
     df["lemmatized_question"] = df.apply(
-        lambda x: lemmatize(lemmatizer, x["word_tokens_question"], x["passage"], lemmatize_question_dict), axis=1)
+        lambda x: lemmatize(lemmatizer, x["word_tokens_question"], x["passage"], x["pos"], lemmatize_question_dict), axis=1)
     # df["lemmatized_passage"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_passage_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_passage")
     # df["lemmatized_question"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_question_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_question")
     return df

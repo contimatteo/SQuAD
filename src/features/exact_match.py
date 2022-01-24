@@ -6,6 +6,7 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
 from data_preprocessing import data_preprocessing
+from extract_features import extract_features
 
 # sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 from preprocessing_utils import df_apply_function_with_dict
@@ -43,7 +44,7 @@ def apply_exact_match(df: pd.DataFrame):
 
 def exact_match(df: pd.DataFrame):
     print("Applying lemmatization")
-    df = apply_lemmatize(df)
+    df = extract_features(df)
     print("Applied lemmatization")
     print("Applying exact match")
     df = apply_exact_match(df)
@@ -54,7 +55,7 @@ def exact_match(df: pd.DataFrame):
 # def mayfun2(arg1, arg2):
 #     print(arg1)
 #     print(arg2)
-# 
+#
 #
 # def my_fun(**kwargs):
 #     mayfun2(**kwargs)

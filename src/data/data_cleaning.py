@@ -7,8 +7,8 @@ import os
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 # from preprocessing_utils import df_apply_function_with_dict
 # from preprocessing_utils import df_apply_function_with_dict_2
-# from preprocessing_utils import get_dict
-# from preprocessing_utils import insert_dict
+from preprocessing_utils import get_dict
+from preprocessing_utils import insert_dict
 
 
 span_tokenize_dict = {}
