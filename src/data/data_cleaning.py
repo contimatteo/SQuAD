@@ -32,6 +32,8 @@ def nltk_download_utilities():
     nltk.download('wordnet')
     nltk.download('averaged_perceptron_tagger')
     nltk.download('omw-1.4')
+    nltk.download('maxent_ne_chunker')
+    nltk.download('words')
 
 
 def tokenizers():

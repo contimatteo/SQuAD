@@ -9,6 +9,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
 from data_preprocessing import data_preprocessing
 from lemmatize import apply_lemmatize
+from name_entity_recognition import apply_ner
 
 
 def apply_pos_tag(df: pd.DataFrame):
@@ -19,6 +20,7 @@ def apply_pos_tag(df: pd.DataFrame):
 
 def extract_features(df: pd.DataFrame):
     df = apply_pos_tag(df)
+    df = apply_ner(df)
     df = apply_lemmatize(df)
     return df
 
