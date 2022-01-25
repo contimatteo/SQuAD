@@ -3,7 +3,8 @@ import sys
 import data_utils
 import json
 import pandas as pd
-
+from data_utils import create_tmp_directories, download_data, get_data_dir, get_tmp_data_dir
+from glove_reader import load_glove, download_glove
 
 # if glove_embeddings is None:
 #   if not os.path.exists(GLOVE_LOCAL_DIR):
@@ -20,30 +21,15 @@ import pandas as pd
 #     print("Successful extraction")
 
 
-TRAINING_DATA_LOCAL_DIR = os.path.join(data_utils.get_project_directory(), "data", "raw")
-TMP_TRAIN_DATA_DIR = os.path.join(data_utils.get_project_directory(), "tmp")
-
-
-def create_tmp_directories():
-    if not os.path.exists(TMP_TRAIN_DATA_DIR):
-        os.mkdir(TMP_TRAIN_DATA_DIR)
-
-    if not os.path.exists(TRAINING_DATA_LOCAL_DIR):
-        os.makedirs(TRAINING_DATA_LOCAL_DIR)
-
-
-def download_data(drive_id, zip_file_name, required_file_name):
-    if not os.path.exists(required_file_name):
-        if os.path.exists(zip_file_name):
-            os.remove(zip_file_name)
-        data_utils.download_url(drive_id, zip_file_name)
+# TRAINING_DATA_LOCAL_DIR = os.path.join(data_utils.get_project_directory(), "data", "raw")
+# TMP_TRAIN_DATA_DIR = os.path.join(data_utils.get_project_directory(), "tmp")
 
 
 def download_training_set():
     DRIVE_ID = "19byT_6Hhx4Di1pzbd6bmxQ8sKwCSPhqg"
-    RAW_FILE = os.path.join(TRAINING_DATA_LOCAL_DIR, "training_set.json")
-    REQUIRED_FILE = os.path.join(TMP_TRAIN_DATA_DIR, "training_set.json")
-    ZIP_FILE = os.path.join(TMP_TRAIN_DATA_DIR, "training_set.zip")
+    RAW_FILE = os.path.join(get_data_dir(), "training_set.json")
+    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "training_set.json")
+    ZIP_FILE = os.path.join(get_tmp_data_dir(), "training_set.zip")
 
     create_tmp_directories()
     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
@@ -51,16 +37,16 @@ def download_training_set():
     return RAW_FILE
 
 
-def download_glove():
-    DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
-    RAW_FILE = os.path.join(TRAINING_DATA_LOCAL_DIR, "GloVe.txt")
-    REQUIRED_FILE = os.path.join(TMP_TRAIN_DATA_DIR, "GloVe.6B.50d.txt")
-    ZIP_FILE = os.path.join(TMP_TRAIN_DATA_DIR, "GloVe.6B.zip")
-
-    create_tmp_directories()
-    download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
-    data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
-    return RAW_FILE
+# def download_glove():
+#     DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
+#     RAW_FILE = os.path.join(get_data_dir(), "GloVe.txt")
+#     REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.50d.txt")
+#     ZIP_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.zip")
+#
+#     create_tmp_directories()
+#     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
+#     data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+#     return RAW_FILE
 
 
 def load_training_set():
@@ -104,7 +90,10 @@ def load_training_set():
 
 
 def data_reader():
-    return load_training_set()
+    glove_file = download_glove()
+    glove = load_glove(glove_file)
+    df = load_training_set()
+    return df, glove
 
 
 def main():
@@ -113,7 +102,6 @@ def main():
     df = load_training_set()
     print(df.columns)
     print(df[0:1])
-    download_glove()
 
 
 if __name__ == "__main__":

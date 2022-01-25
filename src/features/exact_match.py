@@ -65,7 +65,7 @@ def main_test():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
 
-    df_cleaned = data_preprocessing()
+    df_cleaned, glove_matrix, WTI = data_preprocessing()
     df = exact_match(df_cleaned[0:5].copy())
     print(df.columns)
 
@@ -77,7 +77,7 @@ def main_test():
 def main():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
-    df_cleaned = data_preprocessing()
+    df_cleaned, glove_matrix, WTI = data_preprocessing()
     df = exact_match(df_cleaned)
     print(df.columns)
 
