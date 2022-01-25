@@ -20,6 +20,9 @@ class WordToIndex:
         else:
             return 0
 
+    def get_list_index(self, token_list: List[str]):
+        return [self.get_word_index(token.lower()) for token in token_list]
+
     def get_index_len(self):
         return len(self.index_dict.keys()) + 1
 
