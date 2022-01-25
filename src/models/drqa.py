@@ -46,9 +46,9 @@ def DRQA() -> Model:
     p_embd = EmbeddingLayers.glove(n_p_tokens)(p_xi)
 
     ### aligend-attention
-    p_att = Attention()([p_embd, q_embd])  # ([query, keys/values])
-    ### aligend-attention
+    # p_att = Attention()([p_embd, q_embd])  # ([query, keys/values])
     # p_att = AttentionLayers.passage_embeddings()([p_embd, q_embd])  # ([query, keys/values])
+    p_att = AttentionLayers.alignment()(p_embd, q_embd)
 
     ### lstm (features)
     p_concat = Concatenate(axis=2)([p_embd, p_att])

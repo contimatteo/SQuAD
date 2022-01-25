@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Embedding, Dense
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Softmax
 from tensorflow.keras.layers import Lambda, Multiply
+from tensorflow.keras.layers import Reshape
 from tensorflow.keras.layers import Bidirectional, LSTM
 
 ###
@@ -148,6 +149,63 @@ class AttentionLayers():
             attention_weights = distribution_func(energy_scores)
             weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
             return weighted_sum
+
+        return _nn
+
+    #
+
+    @staticmethod
+    def alignment() -> Callable[[Any, Any], Any]:
+
+        def alpha():
+            return Dense(1, activation="relu")
+
+        def _compatibility_func(a: Any, b: Any) -> Any:
+            #it's actually scalar product
+            return a * b
+
+        def _distribution_func():
+            return Softmax()
+
+        def _custom_core(query: Any, token_index: Any, alpha_keys: Any) -> Any:
+            token_query = query[:, token_index, :]
+            # (batch_size,token_length)
+            token_query = tf.expand_dims(token_query, axis=1)
+            # (batch_size,1,token_length)
+
+            alpha_token_query = alpha()(token_query)
+            # (batch_size,1,1)
+
+            energy_scores = _compatibility_func(alpha_keys, alpha_token_query)
+            # (batch_size,keys_length,1)
+            attention_weights = _distribution_func()(energy_scores)
+            # (batch_size,keys_length,1)
+
+            return attention_weights
+
+        def _nn(passage: Any, question: Any):
+            alpha_question = alpha()(question)
+
+            aligned_tokens = []
+            for i in range(passage.shape[1]):
+
+                attention_weights = _custom_core(passage, i, alpha_question)
+                # (batch_size,question length,1)
+
+                context_vector = attention_weights * question
+                # (batch_size,question length,token_length)
+                context_vector = tf.reduce_sum(context_vector, axis=1)
+                # (batch_size,token_length)
+
+                context_vector = tf.expand_dims(context_vector, axis=1)
+                # (batch_size,1,token_length)
+
+                aligned_tokens.append(context_vector)
+
+            aligned_passage = tf.concat(aligned_tokens, axis=1)
+            # (batch_size,passage_length,token_length)
+
+            return aligned_passage
 
         return _nn
 
