@@ -23,5 +23,6 @@ class OneHotEncoder:
                 return_list.append(self.one_hot_dict[el])
             else:
                 return_list.append(None)
+                print(f"unable to encode onehot of NER/POS tag: {el}")
         return return_list
 

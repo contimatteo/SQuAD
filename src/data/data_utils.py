@@ -1,16 +1,19 @@
 import os
+
+import spacy.cli
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
 import nltk
 
 
 def nltk_download_utilities():
-    nltk.download('tagsets')
+    # nltk.download('tagsets')
     nltk.download('wordnet')
     nltk.download('averaged_perceptron_tagger')
     nltk.download('omw-1.4')
     nltk.download('maxent_ne_chunker')
     nltk.download('words')
+    # spacy.cli.download("en_core_web_sm")
 
 
 def get_project_directory():

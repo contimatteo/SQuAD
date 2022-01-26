@@ -9,7 +9,7 @@ from one_hot_encoder import OneHotEncoder
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
 from data_preprocessing import data_preprocessing
 from lemmatize import apply_lemmatize
-from name_entity_recognition import apply_ner
+from name_entity_recognition import apply_ner, apply_ner_one_hot
 from term_frequency import apply_term_frequency
 
 
@@ -23,6 +23,7 @@ def extract_features(df: pd.DataFrame):
     df = apply_pos_tag(df)
     df = apply_pos_one_hot(df)
     df = apply_ner(df)
+    df = apply_ner_one_hot(df)
     df = apply_term_frequency(df)
     df = apply_lemmatize(df)
     return df
