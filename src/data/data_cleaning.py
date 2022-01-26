@@ -1,5 +1,6 @@
 from typing import List, Tuple
 
+import pandas as pd
 from nltk.tokenize import RegexpTokenizer
 from copy import deepcopy
 import sys
@@ -14,6 +15,7 @@ from data_utils import nltk_download_utilities
 
 span_tokenize_dict = {}
 sentence_tokenize_dict = {}
+passage_index_dict = {}
 
 
 # def __regex_separator(text,separator):
@@ -99,7 +101,7 @@ def tokenize_with_spaces(sentence):
 #    return df
 
 
-def split_into_words(df):
+def add_split_into_words(df):
     df["word_tokens_passage"] = df.apply(lambda x: tokenize_sentence(x["passage"]), axis=1)
     df["word_tokens_question"] = df.apply(lambda x: tokenize_sentence(x["question"]), axis=1)
     return df
@@ -166,13 +168,25 @@ def add_labels(df):
 #    return df
 
 
+def get_passage_index(passage: str):
+    if passage not in passage_index_dict.keys():
+        passage_index_dict[passage] = len(passage_index_dict.keys())
+    return passage_index_dict[passage]
+
+
+def add_passage_index(df: pd.DataFrame):
+    df["passage_index"] = df.apply(lambda x: get_passage_index(x["passage"]), axis=1)
+    return df
+
+
 def data_cleaning(df):
     # df = separate_words(df)
     nltk_download_utilities()
     print()
     print("Data cleaning")
+    df = add_passage_index(df)
     df = add_labels(df).drop(axis=1, columns='answer_start')
-    df = split_into_words(df)
+    df = add_split_into_words(df)
     print("Data cleaned \n")
     return df
 
