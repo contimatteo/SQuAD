@@ -7,7 +7,7 @@ from word_to_index import WordToIndex
 import numpy as np
 
 
-def apply_word_index(df: pd.DataFrame, WTI):
+def apply_word_index(df: pd.DataFrame, WTI: WordToIndex):
     df["word_index_passage"] = df.apply(
         lambda x: [p for p in WTI.get_list_index(x["word_tokens_passage"])], axis=1)
     df["word_index_question"] = df.apply(

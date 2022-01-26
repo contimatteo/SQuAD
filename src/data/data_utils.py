@@ -1,6 +1,5 @@
 import os
 
-import spacy.cli
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
 import nltk

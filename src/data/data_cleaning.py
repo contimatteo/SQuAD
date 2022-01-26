@@ -179,7 +179,7 @@ def add_passage_index(df: pd.DataFrame):
     return df
 
 
-def data_cleaning(df):
+def data_cleaning(df: pd.DataFrame):
     # df = separate_words(df)
     nltk_download_utilities()
     print()
