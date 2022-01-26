@@ -1,7 +1,10 @@
+from typing import List, Tuple
+
 from nltk.tokenize import RegexpTokenizer
 from copy import deepcopy
 import sys
 import os
+import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 # from preprocessing_utils import df_apply_function_with_dict
@@ -112,7 +115,15 @@ def span_tokenize(sentence, *_):
     return span_list
 
 
-# @lru_cache
+def get_word_pstart_pend(interval: Tuple[int, int], dim: int):
+    p_start, p_end = interval
+    start = np.zeros(dim, dtype=int)
+    end = np.zeros(dim, dtype=int)
+    start[p_start] = 1
+    end[p_end] = 1
+    return list(zip(start, end))
+
+
 def get_answer_start_end(passage, answer_text, answer_start):
     answer_end = len(answer_text) + answer_start
 
@@ -125,7 +136,8 @@ def get_answer_start_end(passage, answer_text, answer_start):
         at = [answer_text]  # [str(passage)[96]]
         print(at)
         return [-1, -1]
-    return [min(interval), max(interval)]
+
+    return get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
 
 
 def add_labels(df):
