@@ -1,4 +1,3 @@
-import nltk
 from nltk.tokenize import RegexpTokenizer
 from copy import deepcopy
 import sys
@@ -7,9 +6,8 @@ import os
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 # from preprocessing_utils import df_apply_function_with_dict
 # from preprocessing_utils import df_apply_function_with_dict_2
-from preprocessing_utils import get_dict
-from preprocessing_utils import insert_dict
-
+from preprocessing_utils import get_dict, insert_dict
+from data_utils import nltk_download_utilities
 
 span_tokenize_dict = {}
 sentence_tokenize_dict = {}
@@ -27,13 +25,6 @@ sentence_tokenize_dict = {}
 #    for col in columns:
 #        df[col] = df.apply(lambda x: __regex_separator(x[col],separator), axis = 1)
 #    return df
-
-def nltk_download_utilities():
-    nltk.download('wordnet')
-    nltk.download('averaged_perceptron_tagger')
-    nltk.download('omw-1.4')
-    nltk.download('maxent_ne_chunker')
-    nltk.download('words')
 
 
 def tokenizers():

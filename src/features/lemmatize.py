@@ -81,7 +81,7 @@ def main_test():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
 
-    df_cleaned = data_preprocessing()
+    df_cleaned, glove_matrix, WTI = data_preprocessing()
     print("Applying lemmatization")
     df = apply_lemmatize(df_cleaned[0:5].copy())
     print("Applied lemmatization")
@@ -96,7 +96,7 @@ def main():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
 
-    df_cleaned = data_preprocessing()
+    df_cleaned, glove_matrix, WTI = data_preprocessing()
     print("Applying lemmatization")
     df = apply_lemmatize(df_cleaned)
     print("Applied lemmatization")

@@ -1,6 +1,16 @@
 import os
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
+import nltk
+
+
+def nltk_download_utilities():
+    nltk.download('tagsets')
+    nltk.download('wordnet')
+    nltk.download('averaged_perceptron_tagger')
+    nltk.download('omw-1.4')
+    nltk.download('maxent_ne_chunker')
+    nltk.download('words')
 
 
 def get_project_directory():
