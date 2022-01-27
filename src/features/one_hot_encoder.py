@@ -4,6 +4,7 @@ import numpy as np
 
 class OneHotEncoder:
     one_hot_dict = {}
+    cache_dict = {}
 
     def fit(self, pos_list):
         pos_len = len(pos_list)
@@ -16,13 +17,15 @@ class OneHotEncoder:
     def get_one_hot_dict(self):
         return self.one_hot_dict
 
-    def transform(self, df_row: List[str]):
-        return_list = []
-        for el in df_row:
-            if el in self.one_hot_dict.keys():
-                return_list.append(self.one_hot_dict[el])
-            else:
-                return_list.append(None)
-                print(f"unable to encode onehot of NER/POS tag: {el}")
-        return return_list
+    def transform(self, df_row: List[str], passage_index: int):
+        if passage_index not in self.cache_dict.keys():
+            return_list = []
+            for el in df_row:
+                if el in self.one_hot_dict.keys():
+                    return_list.append(self.one_hot_dict[el])
+                else:
+                    return_list.append(None)
+                    print(f"unable to encode onehot of NER/POS tag: {el}")
+            self.cache_dict[passage_index] = return_list
+        return self.cache_dict[passage_index]
 

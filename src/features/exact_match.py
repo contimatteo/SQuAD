@@ -6,7 +6,7 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
 from data_preprocessing import data_preprocessing
-from extract_features import extract_features
+# from extract_features import extract_features
 
 # sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 from preprocessing_utils import df_apply_function_with_dict
@@ -42,14 +42,14 @@ def apply_exact_match(df: pd.DataFrame):
     return df
 
 
-def exact_match(df: pd.DataFrame):
-    print("Applying lemmatization")
-    df = extract_features(df)
-    print("Applied lemmatization")
-    print("Applying exact match")
-    df = apply_exact_match(df)
-    print("Applied exact match")
-    return df
+# def exact_match(df: pd.DataFrame):
+#     print("Applying lemmatization")
+#     df = extract_features(df)
+#     print("Applied lemmatization")
+#     print("Applying exact match")
+#     df = apply_exact_match(df)
+#     print("Applied exact match")
+#     return df
 
 
 # def mayfun2(arg1, arg2):
@@ -61,28 +61,28 @@ def exact_match(df: pd.DataFrame):
 #     mayfun2(**kwargs)
 
 
-def main_test():
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_colwidth', None)
-
-    df_cleaned, glove_matrix, WTI = data_preprocessing()
-    df = exact_match(df_cleaned[0:5].copy())
-    print(df.columns)
-
-    print(df[0:1])
-
-    # my_fun(arg1 = "pippo", arg2 = "pluto")
-
-
-def main():
-    pd.set_option('display.max_columns', None)
-    pd.set_option('display.max_colwidth', None)
-    df_cleaned, glove_matrix, WTI = data_preprocessing()
-    df = exact_match(df_cleaned)
-    print(df.columns)
-
-    print(df[0:1])
-
-
-if __name__ == "__main__":
-    main_test()
+# def main_test():
+#     pd.set_option('display.max_columns', None)
+#     pd.set_option('display.max_colwidth', None)
+#
+#     df_cleaned, glove_matrix, WTI = data_preprocessing()
+#     df = exact_match(df_cleaned[0:5].copy())
+#     print(df.columns)
+#
+#     print(df[0:1])
+#
+#     # my_fun(arg1 = "pippo", arg2 = "pluto")
+#
+#
+# def main():
+#     pd.set_option('display.max_columns', None)
+#     pd.set_option('display.max_colwidth', None)
+#     df_cleaned, glove_matrix, WTI = data_preprocessing()
+#     df = exact_match(df_cleaned)
+#     print(df.columns)
+#
+#     print(df[0:1])
+#
+#
+# if __name__ == "__main__":
+#     main_test()

@@ -11,16 +11,20 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__
 from data_preprocessing import data_preprocessing
 from lemmatize import apply_lemmatize
 
+ner_dict = {}
 
-def ner(pos):
-    ne_tree = ne_chunk(pos)
-    iob_tagged = tree2conlltags(ne_tree)
-    return [iob[-1] for iob in iob_tagged]
+
+def ner(pos, passage_index: int):
+    if passage_index not in ner_dict.keys():
+        ne_tree = ne_chunk(pos)
+        iob_tagged = tree2conlltags(ne_tree)
+        ner_dict[passage_index] = [iob[-1] for iob in iob_tagged]
+    return ner_dict[passage_index]
 
 
 def apply_ner(df: pd.DataFrame):
     df["ner"] = df.apply(
-        lambda x: ner(list(zip(x["word_tokens_passage"], x["pos"]))), axis=1)
+        lambda x: ner(list(zip(x["word_tokens_passage"], x["pos"])), x["passage_index"]), axis=1)
     return df
 
 
@@ -35,6 +39,6 @@ def apply_ner_one_hot(df: pd.DataFrame):
     OHE = OneHotEncoder()
     OHE.fit(ner_list)
     df["ner_onehot"] = df.apply(
-        lambda x: [p for p in OHE.transform(x["ner"])], axis=1)
+        lambda x: [p for p in OHE.transform(x["ner"], x["passage_index"])], axis=1)
     return df
 

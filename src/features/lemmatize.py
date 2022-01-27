@@ -26,8 +26,8 @@ def get_wordnet_pos(tag):
         return ''
 
 
-def lemmatize(lemmatizer, tokens, passage, pos_tag, lemmatize_dict):
-    if passage not in lemmatize_dict.keys():
+def lemmatize(lemmatizer, tokens, pos_tag, lemmatize_dict, sentence):
+    if sentence not in lemmatize_dict.keys():
         token_lemmatized = []
         for word, pos in zip(tokens, pos_tag):
             pos = get_wordnet_pos(pos)
@@ -35,8 +35,8 @@ def lemmatize(lemmatizer, tokens, passage, pos_tag, lemmatize_dict):
                 token_lemmatized.append(word)
             else:
                 token_lemmatized.append(lemmatizer.lemmatize(word, pos=pos))
-        lemmatize_dict[passage] = token_lemmatized
-    return lemmatize_dict[passage]
+        lemmatize_dict[sentence] = token_lemmatized
+    return lemmatize_dict[sentence]
 
 
 # def lemmatize(df_row, lemmatizer, word_tokens_name):
@@ -69,9 +69,9 @@ def lemmatize(lemmatizer, tokens, passage, pos_tag, lemmatize_dict):
 def apply_lemmatize(df: pd.DataFrame):
     lemmatizer = WordNetLemmatizer()
     df["lemmatized_passage"] = df.apply(
-        lambda x: lemmatize(lemmatizer, x["word_tokens_passage"], x["passage"], x["pos"], lemmatize_passage_dict), axis=1)
+        lambda x: lemmatize(lemmatizer, x["word_tokens_passage"], x["pos"], lemmatize_passage_dict, x["passage"]), axis=1)
     df["lemmatized_question"] = df.apply(
-        lambda x: lemmatize(lemmatizer, x["word_tokens_question"], x["passage"], x["pos"], lemmatize_question_dict), axis=1)
+            lambda x: lemmatize(lemmatizer, x["word_tokens_question"], x["pos"], lemmatize_question_dict, x["question"]), axis=1)
     # df["lemmatized_passage"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_passage_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_passage")
     # df["lemmatized_question"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_question_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_question")
     return df
