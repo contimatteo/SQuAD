@@ -39,6 +39,6 @@ def apply_ner_one_hot(df: pd.DataFrame):
     OHE = OneHotEncoder()
     OHE.fit(ner_list)
     df["ner_onehot"] = df.apply(
-        lambda x: [p for p in OHE.transform(x["ner"], x["passage_index"])], axis=1)
-    return df
+        lambda x: OHE.transform(x["ner"], x["passage_index"]), axis=1)
+    return df, OHE
 

@@ -12,7 +12,7 @@ from word_to_index import WordToIndex
 def download_glove():
     DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
     RAW_FILE = os.path.join(get_data_dir(), "GloVe.txt")
-    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.50d.txt")
+    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.300d.txt")
     ZIP_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.zip")
 
     create_tmp_directories()
@@ -70,7 +70,7 @@ def glove_embedding(df: pd.DataFrame, glove_embeddings):
     WTI.fit_on_list(glove_embeddings.keys())
 
     TOKENIZER_MAX_WORD_INDEX = WTI.get_index_len()  # np.array(list(tokenizer.word_index.values())).max()
-    embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, 50))
+    embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, 300))
 
     for token in glove_embeddings.keys():
         word_index = WTI.get_word_index(token)

@@ -30,3 +30,12 @@ class WordToIndex:
         if index not in self.word_dict.keys():
             raise Exception("index not found")
         return self.word_dict[index]
+
+    def __init__(self):
+        self.index_dict = {}
+        self.word_dict = {}
+
+    def reset(self):
+        self.index_dict = {}
+        self.word_dict = {}
+

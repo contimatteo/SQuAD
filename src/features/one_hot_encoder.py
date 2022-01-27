@@ -3,11 +3,13 @@ import numpy as np
 
 
 class OneHotEncoder:
-    one_hot_dict = {}
-    cache_dict = {}
+    # one_hot_dict = {}
+    # cache_dict = {}
 
     def fit(self, pos_list):
+        # self.one_hot_dict = {}
         pos_len = len(pos_list)
+        # print(pos_list)
         id_m = np.identity(pos_len, dtype="int")
         pos_dict = {}
         for i, el in enumerate(pos_list):
@@ -29,3 +31,17 @@ class OneHotEncoder:
             self.cache_dict[passage_index] = return_list
         return self.cache_dict[passage_index]
 
+    def get_OHE_in_dict(self, el):
+        if el in self.one_hot_dict.keys():
+            return self.one_hot_dict[el]
+        else:
+            print("element not found in one_hot_encoder")
+            return None
+
+    def __init__(self):
+        self.one_hot_dict = {}
+        self.cache_dict = {}
+
+    def reset(self):
+        self.one_hot_dict = {}
+        self.cache_dict = {}
