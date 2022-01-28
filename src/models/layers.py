@@ -1,14 +1,10 @@
-from typing import Callable, Any, List, Tuple
+from typing import Callable, Any, List
 
-import numpy as np
 import tensorflow as tf
 
-from tensorflow.keras.layers import Embedding, Dense
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.layers import Softmax
-from tensorflow.keras.layers import Lambda, Multiply
-from tensorflow.keras.layers import Reshape
-from tensorflow.keras.layers import Bidirectional, LSTM
+from tensorflow.keras.layers import Dense, Dropout, Dot
+from tensorflow.keras.layers import Embedding, Bidirectional, LSTM
+from tensorflow.keras.activations import softmax
 
 ###
 
@@ -22,7 +18,7 @@ class EmbeddingLayers():
         i_dim = 100  # size of the vocabulary
         o_dim = 50  # dimension of the dense embedding
 
-        # TODO: change params:
+        ### TODO: change params:
         #  - `trainable` --> `False`
         #  - `embeddings_initializer` --> `Constant(glove_matrix)`
 
@@ -77,7 +73,7 @@ class AttentionLayers():
      - @param `query`
      - @param `keys`
      - @param `values` (optional)
-   
+
     #### COMPUTATION
      1. `energy_scores = compatibility_func(query, keys)`
      2. `attention_weights = distribution_func(energy_scores)`
@@ -114,58 +110,32 @@ class AttentionLayers():
 
     @staticmethod
     def question_encoding() -> Callable[[Any], Any]:
+        W = Dense(1, use_bias=False)
 
         def compatibility_func(keys, *_):
-            return Dense(1, use_bias=False)(keys)
+            return W(keys)
 
         def distribution_func(scores):
-            return Softmax()(scores)
+            return softmax(scores)
 
         def _nn(keys: Any) -> Any:
-            # energy_scores = compatibility_func(keys)
-            # attention_weights = distribution_func(energy_scores)
-            # weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
-            # return weighted_sum
             return AttentionLayers.core(compatibility_func, distribution_func)(keys, None)
 
         return _nn
 
     @staticmethod
-    def passage_embeddings() -> Callable[[Any, Any], Any]:
-
-        def compatibility_func(query: Any, keys: Any) -> Any:
-            ### TODO: missing computation steps ...
-            # q_scores = Dense(1, activation="relu", use_bias=False)(query)
-            # k_scores = Dense(1, activation="relu", use_bias=False)(keys)
-            # return tf.matmul(q_scores, k_scores, transpose_b=True)
-            return Dense(1, activation="relu", use_bias=False)(query)
-
-        def distribution_func(scores):
-            return Softmax()(scores)
-
-        def _nn(query_and_keys: List[Any]) -> Any:
-            query, keys = query_and_keys[0], query_and_keys[1]
-            energy_scores = compatibility_func(query, keys)
-            attention_weights = distribution_func(energy_scores)
-            weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
-            return weighted_sum
-
-        return _nn
-
-    #
-
-    @staticmethod
     def alignment() -> Callable[[Any, Any], Any]:
+        ### TODO: exploit the `AttentionLayers.core()` function instead of
+        ### replicating all the common steps of Attention core mechanism.
 
-        def alpha():
-            return Dense(1, activation="relu")
+        _alpha = Dense(1, activation="relu")
 
-        def _compatibility_func(a: Any, b: Any) -> Any:
-            #it's actually scalar product
+        def compatibility(a: Any, b: Any) -> Any:
+            ### TODO: use `Dot` layer ...
             return a * b
 
-        def _distribution_func():
-            return Softmax()
+        def distribution(scores: Any) -> Callable[[Any], Any]:
+            return softmax(scores)
 
         def _custom_core(query: Any, token_index: Any, alpha_keys: Any) -> Any:
             token_query = query[:, token_index, :]
@@ -173,70 +143,106 @@ class AttentionLayers():
             token_query = tf.expand_dims(token_query, axis=1)
             # (batch_size,1,token_length)
 
-            alpha_token_query = alpha()(token_query)
+            alpha_token_query = _alpha(token_query)
             # (batch_size,1,1)
 
-            energy_scores = _compatibility_func(alpha_keys, alpha_token_query)
+            energy_scores = compatibility(alpha_keys, alpha_token_query)
             # (batch_size,keys_length,1)
-            attention_weights = _distribution_func()(energy_scores)
+            attention_weights = distribution(energy_scores)
             # (batch_size,keys_length,1)
 
             return attention_weights
 
-        def _nn(passage: Any, question: Any):
-            alpha_question = alpha()(question)
+        def _nn(passage_and_question: List[Any]) -> Any:
+            passage, question = passage_and_question[0], passage_and_question[1]
 
+            alpha_question = _alpha(question)
             aligned_tokens = []
-            for i in range(passage.shape[1]):
 
+            for i in range(passage.shape[1]):
                 attention_weights = _custom_core(passage, i, alpha_question)
-                # (batch_size,question length,1)
+                ### (batch_size, question_length, 1)
 
                 context_vector = attention_weights * question
-                # (batch_size,question length,token_length)
+                ### (batch_size, question_length,token_length)
                 context_vector = tf.reduce_sum(context_vector, axis=1)
-                # (batch_size,token_length)
+                ### (batch_size, token_length)
 
                 context_vector = tf.expand_dims(context_vector, axis=1)
-                # (batch_size,1,token_length)
+                ### (batch_size, 1, token_length)
 
                 aligned_tokens.append(context_vector)
 
+            # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
             aligned_passage = tf.concat(aligned_tokens, axis=1)
-            # (batch_size,passage_length,token_length)
+            ### (batch_size, passage_length, token_length)
 
             return aligned_passage
 
         return _nn
 
-
-###
-
-
-class Seq2SeqLayers():
+    #
 
     @staticmethod
-    def encoder() -> Callable[[Any], Tuple[Any, List[Any]]]:
-        units = 128
+    def bilinear_similarity() -> Callable[[Any, Any], Any]:
+        Ws = Dense(256, activation="exponential", use_bias=False)
+        We = Dense(256, activation="exponential", use_bias=False)
 
-        def _rnn():
-            return LSTM(units, return_state=True)
+        def compatibility_start(key, query):
+            return Dot(axes=1)([key, Ws(query)])
 
-        def _nn(inp: Any) -> Tuple[Any, List[Any]]:
-            x, hidden_state, cell_state = _rnn()(inp)
-            return x, [hidden_state, cell_state]
+        def compatibility_end(key, query):
+            return Dot(axes=1)([key, We(query)])
 
-        return _nn
+        def distribution(scores):
+            return softmax(scores)
 
-    @staticmethod
-    def decoder() -> Callable[[Any, List[Any]], Tuple[Any, List[Any]]]:
-        units = 128
+        def _nn(passage_and_question: List[Any]) -> Any:
+            queries = passage_and_question[0]  ### --> (_, n_tokens, 256)
+            key = passage_and_question[1]  ### --> (_, 256)
 
-        def _rnn():
-            return LSTM(units, return_sequences=True, return_state=True)
+            ### START
 
-        def _nn(inp: Any, encoder_states: List[Any]) -> Tuple[Any, List[Any]]:
-            x, hidden_state, cell_state = _rnn()(inp, initial_state=encoder_states)
-            return x, [hidden_state, cell_state]
+            start_scores = []
+            for query_idx in range(queries.shape[1]):
+                query = queries[:, query_idx, :]
+                start_score = compatibility_start(key, query)
+                start_scores.append(start_score)
+
+            start_scores = tf.convert_to_tensor(start_scores)
+            ### --> (40, _, 1)
+            start_scores = tf.transpose(start_scores, perm=[1, 0, 2])
+            ### --> (_, 40, 1)
+            start_scores = tf.squeeze(start_scores, axis=[2])
+            ### --> (_, 40)
+
+            start_probability = distribution(start_scores)
+
+            ### START
+
+            end_scores = []
+
+            for query_idx in range(queries.shape[1]):
+                query = queries[:, query_idx, :]
+                score = compatibility_end(key, query)
+                end_scores.append(score)
+
+            end_scores = tf.convert_to_tensor(end_scores)
+            ### --> (40, _, 1)
+            end_scores = tf.transpose(end_scores, perm=[1, 0, 2])
+            ### --> (_, 40, 1)
+            end_scores = tf.squeeze(end_scores, axis=[2])
+            ### --> (_, 40)
+
+            end_probability = distribution(end_scores)
+
+            ###
+
+            probabilities = tf.convert_to_tensor([start_probability, end_probability])
+            ### --> (2, _, 40)
+            probabilities = tf.transpose(probabilities, perm=[1, 2, 0])
+            ### --> (_, 40, 2)
+
+            return probabilities
 
         return _nn

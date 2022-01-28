@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 import utils.env_setup
@@ -8,7 +9,11 @@ from models import DRQA
 
 ###
 
+os.environ["WANDB_JOB_TYPE"] = "training"
+
 N_EXAMPLES = 500
+
+###
 
 
 def X_train() -> np.ndarray:
@@ -19,7 +24,9 @@ def X_train() -> np.ndarray:
 
 
 def Y_train() -> np.ndarray:
-    return np.random.random_sample((N_EXAMPLES, ))
+    shape = (N_EXAMPLES, Configs.N_PASSAGE_TOKENS, 2)
+
+    return np.random.randint(2, size=shape, dtype=int)
 
 
 def train():
@@ -27,7 +34,7 @@ def train():
     Y = Y_train()
 
     model = DRQA()
-    model.fit(X, Y, epochs=5, batch_size=100, callbacks=[WandbCallback()])
+    model.fit(X, Y, epochs=10, batch_size=50, callbacks=[WandbCallback()])
 
 
 ###
