@@ -9,10 +9,10 @@ from copy import copy
 from word_to_index import WordToIndex
 
 
-def download_glove():
+def download_glove(glove_dim: int):
     DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
-    RAW_FILE = os.path.join(get_data_dir(), "GloVe.txt")
-    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.300d.txt")
+    RAW_FILE = os.path.join(get_data_dir(), "GloVe_" + str(glove_dim) + ".txt")
+    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B." + str(glove_dim) + "d.txt")
     ZIP_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.zip")
 
     create_tmp_directories()
@@ -65,12 +65,12 @@ def inject_OOV_embeddings(df: pd.DataFrame, dictionary):
 #                    split=split, char_level=False, oov_token=oov_token)
 
 
-def glove_embedding(df: pd.DataFrame, glove_embeddings):
+def glove_embedding(glove_embeddings, glove_dim):
     WTI = WordToIndex()
     WTI.fit_on_list(glove_embeddings.keys())
 
     TOKENIZER_MAX_WORD_INDEX = WTI.get_index_len()  # np.array(list(tokenizer.word_index.values())).max()
-    embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, 300))
+    embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, glove_dim))
 
     for token in glove_embeddings.keys():
         word_index = WTI.get_word_index(token)

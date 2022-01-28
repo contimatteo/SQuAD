@@ -39,6 +39,10 @@ def apply_padding_to(df: pd.DataFrame, WTI: WordToIndex, OHE_pos: OneHotEncoder,
     NER_ONEHOT = OHE_ner.get_OHE_in_dict(NER)
     TF = 0.0
     df_padded = split_passage(df)
+    df_padded["question_index"] = df_padded.index
+    df_padded["chunk_index"] = df_padded.groupby("question_index").cumcount()
+    print("after split:")
+    print(df_padded.index)
 
     word_index_passage = pad_sequences(df_padded['word_index_passage'].to_list(), maxlen=MAX_PASSAGE_LENGTH,
                                        padding="post",
@@ -112,6 +116,6 @@ def apply_padding_to(df: pd.DataFrame, WTI: WordToIndex, OHE_pos: OneHotEncoder,
 
     df_padded['term_frequency_padded'] = list(term_frequency)
 
-    # df_padded.set_index(["passage_index"], inplace=True)
+    df_padded.set_index(["passage_index", "question_index", "chunk_index"], inplace=True)
 
     return df_padded

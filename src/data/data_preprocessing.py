@@ -15,23 +15,9 @@ def apply_word_index(df: pd.DataFrame, WTI: WordToIndex):
     return df
 
 
-def data_preprocessing(*_):
-    df, glove = data_reader()
+def data_preprocessing(df: pd.DataFrame, WTI):
     df = data_cleaning(df)
-    glove_matrix, WTI = glove_embedding(df, glove)
     df = apply_word_index(df, WTI)
     # print("data_preprocessing ended")
-    return df, glove_matrix, WTI
+    return df
 
-
-def main():
-    pd.set_option('display.max_columns', None)    
-    pd.set_option('display.max_colwidth', None)
-    df = data_preprocessing()
-    print(df.columns)
-    print(df[0:1])
-
-
-if __name__ == "__main__":
-    main()
-  

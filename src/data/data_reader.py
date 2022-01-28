@@ -90,10 +90,14 @@ def load_training_set():
 
 
 def data_reader():
-    glove_file = download_glove()
-    glove = load_glove(glove_file)
     df = load_training_set()
-    return df, glove
+    return df
+
+
+def glove_reader(glove_dim):
+    glove_file = download_glove(glove_dim)
+    glove = load_glove(glove_file)
+    return glove
 
 
 def main():

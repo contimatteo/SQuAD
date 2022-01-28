@@ -42,6 +42,4 @@ class OneHotEncoder:
         self.one_hot_dict = {}
         self.cache_dict = {}
 
-    def reset(self):
-        self.one_hot_dict = {}
-        self.cache_dict = {}
+

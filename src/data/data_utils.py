@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
 import nltk
@@ -15,6 +16,9 @@ def nltk_download_utilities():
     # spacy.cli.download("en_core_web_sm")
 
 
+FINAL_DATA_FILE_NAME = "data.csv"
+
+
 def get_project_directory():
     return cd_parent(cd_parent(cd_parent(os.path.realpath(__file__))))
 
@@ -27,6 +31,10 @@ def download_url(drive_id, save_path):
 
 def get_data_dir():
     return os.path.join(get_project_directory(), "data", "raw")
+
+
+def get_processed_data_dir():
+    return os.path.join(get_project_directory(), "data", "processed")
 
 
 def get_tmp_data_dir():
@@ -49,9 +57,28 @@ def create_tmp_directories():
     if not os.path.exists(get_data_dir()):
         os.makedirs(get_data_dir())
 
+    if not os.path.exists(get_processed_data_dir()):
+        os.makedirs(get_processed_data_dir())
+
 
 def download_data(drive_id, zip_file_name, required_file_name):
     if not os.path.exists(required_file_name):
         if os.path.exists(zip_file_name):
             os.remove(zip_file_name)
         download_url(drive_id, zip_file_name)
+
+
+def save_processed_data(df: pd.DataFrame):
+    folder = get_processed_data_dir()
+    df.to_csv(os.path.join(folder, FINAL_DATA_FILE_NAME), index=True)
+
+
+def load_processed_data():
+    folder = get_processed_data_dir()
+    file = os.path.join(folder, FINAL_DATA_FILE_NAME)
+    if not os.path.exists(file):
+        return None
+
+    return pd.read_csv(file)
+
+

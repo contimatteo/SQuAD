@@ -35,7 +35,3 @@ class WordToIndex:
         self.index_dict = {}
         self.word_dict = {}
 
-    def reset(self):
-        self.index_dict = {}
-        self.word_dict = {}
-
