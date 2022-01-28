@@ -1,11 +1,10 @@
-from typing import Callable, Any, List, Tuple
+from typing import Callable, Any, List
 
 import tensorflow as tf
 
 from tensorflow.keras.layers import Dense, Dropout, Dot
 from tensorflow.keras.layers import Embedding, Bidirectional, LSTM
-from tensorflow.keras.layers import Softmax
-from tensorflow.keras.layers import Concatenate
+from tensorflow.keras.activations import softmax
 
 ###
 
@@ -19,7 +18,7 @@ class EmbeddingLayers():
         i_dim = 100  # size of the vocabulary
         o_dim = 50  # dimension of the dense embedding
 
-        # TODO: change params:
+        ### TODO: change params:
         #  - `trainable` --> `False`
         #  - `embeddings_initializer` --> `Constant(glove_matrix)`
 
@@ -111,59 +110,32 @@ class AttentionLayers():
 
     @staticmethod
     def question_encoding() -> Callable[[Any], Any]:
+        W = Dense(1, use_bias=False)
 
         def compatibility_func(keys, *_):
-            return Dense(1, use_bias=False)(keys)
+            return W(keys)
 
         def distribution_func(scores):
-            return Softmax()(scores)
+            return softmax(scores)
 
         def _nn(keys: Any) -> Any:
-            # energy_scores = compatibility_func(keys)
-            # attention_weights = distribution_func(energy_scores)
-            # weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
-            # return weighted_sum
             return AttentionLayers.core(compatibility_func, distribution_func)(keys, None)
 
         return _nn
 
     @staticmethod
-    def passage_embeddings() -> Callable[[Any, Any], Any]:
-
-        # pylint: disable=unused-argument
-        def compatibility_func(query: Any, keys: Any) -> Any:
-            # TODO: missing computation steps ...
-            # q_scores = Dense(1, activation="relu", use_bias=False)(query)
-            # k_scores = Dense(1, activation="relu", use_bias=False)(keys)
-            # return tf.matmul(q_scores, k_scores, transpose_b=True)
-            return Dense(1, activation="relu", use_bias=False)(query)
-
-        def distribution_func(scores):
-            return Softmax()(scores)
-
-        def _nn(query_and_keys: List[Any]) -> Any:
-            query, keys = query_and_keys[0], query_and_keys[1]
-            energy_scores = compatibility_func(query, keys)
-            attention_weights = distribution_func(energy_scores)
-            weighted_sum = AttentionLayers.weighted_sum(axis=1)([attention_weights, keys])
-            return weighted_sum
-
-        return _nn
-
-    #
-
-    @staticmethod
     def alignment() -> Callable[[Any, Any], Any]:
+        ### TODO: exploit the `AttentionLayers.core()` function instead of
+        ### replicating all the common steps of Attention core mechanism.
 
-        def _alpha() -> Callable[[Any], Any]:
-            return Dense(1, activation="relu")
+        _alpha = Dense(1, activation="relu")
 
-        def _compatibility_func(a: Any, b: Any) -> Any:
-            ### it's actually scalar product
+        def compatibility(a: Any, b: Any) -> Any:
+            ### TODO: use `Dot` layer ...
             return a * b
 
-        def _distribution_func() -> Callable[[Any], Any]:
-            return Softmax()
+        def distribution(scores: Any) -> Callable[[Any], Any]:
+            return softmax(scores)
 
         def _custom_core(query: Any, token_index: Any, alpha_keys: Any) -> Any:
             token_query = query[:, token_index, :]
@@ -171,12 +143,12 @@ class AttentionLayers():
             token_query = tf.expand_dims(token_query, axis=1)
             # (batch_size,1,token_length)
 
-            alpha_token_query = _alpha()(token_query)
+            alpha_token_query = _alpha(token_query)
             # (batch_size,1,1)
 
-            energy_scores = _compatibility_func(alpha_keys, alpha_token_query)
+            energy_scores = compatibility(alpha_keys, alpha_token_query)
             # (batch_size,keys_length,1)
-            attention_weights = _distribution_func()(energy_scores)
+            attention_weights = distribution(energy_scores)
             # (batch_size,keys_length,1)
 
             return attention_weights
@@ -184,7 +156,7 @@ class AttentionLayers():
         def _nn(passage_and_question: List[Any]) -> Any:
             passage, question = passage_and_question[0], passage_and_question[1]
 
-            alpha_question = _alpha()(question)
+            alpha_question = _alpha(question)
             aligned_tokens = []
 
             for i in range(passage.shape[1]):
@@ -209,75 +181,68 @@ class AttentionLayers():
 
         return _nn
 
-
-###
-
-
-class Customlayers():
+    #
 
     @staticmethod
-    def embeddings_similarity() -> Callable[[Any, Any], Any]:
-        ###
-        ### In the prof. slides this layer is called "Bilinear Attention".
-        ### TODO: try to investigate this definition ...
-        ###
-        ### There are one huge similarity between the below steps and the Attention mechanism:
-        ###   - the `cosine_similarity` is computed starting from 2 vectors and it's the Dot
-        ###     product between these ones. At the same level we have the `compatibility
-        ###     function` inside Attention computed between the `query` and the `keys` vectors.
-        ###
-        ### The only thing that is missing (in the steps below) is somenthing similar to the
-        ### `weighted_average` step of Attention. This lack could be justified by the fact that
-        ### inside the Attention layer we compute the relevance of each `key` vector respect
-        ### to the `query` vector and, as a consequence, at the end we have to average the relevance
-        ### (weighted vector of scores produced by the `compatibility function`) of the `query`
-        ### compared to all the `key` vectors in order to produce a single vector.
-        ###
-        ### Conversely, in this layer we have to compute the `attention/similarity` for each of the
-        ### output vectors of the Passage RNN.
-        ###
-        ### Summary of the similarities between this steps and the Attention mechanism:
-        ###  • `query` --> `q_encoding`
-        ###  • `keys` --> `p_tokens`
-        ###  • `compatibility_fun()` --> `_nn_similarity_classifier()`
-        ###  • `distribution_fun()` --> ?????
-        ###  • `weighted_sum()` --> ?????
-        ###
+    def bilinear_similarity() -> Callable[[Any, Any], Any]:
+        Ws = Dense(256, activation="exponential", use_bias=False)
+        We = Dense(256, activation="exponential", use_bias=False)
 
-        def _cosine_similarity(vect1, vect2):
-            return Dot(axes=1, normalize=True)([vect1, vect2])
+        def compatibility_start(key, query):
+            return Dot(axes=1)([key, Ws(query)])
 
-        def _similarity_features(q, p):
-            ### TODO: consider one possible improvement by passing to the similarity classifier not
-            ### only the similarity vector but also the original `q` and `p` vectors.
-            # features = Concatenate()[q, p, _cosine_similarity(q, p)]
-            features = _cosine_similarity(q, p)
-            return features
+        def compatibility_end(key, query):
+            return Dot(axes=1)([key, We(query)])
 
-        def _nn_similarity(q, p):
-            x = _similarity_features(q, p)
-
-            # x = Dense(128, activation="relu")(x)
-            x = Dense(32, activation="sigmoid")(x)
-            x = Dense(4, activation="sigmoid")(x)
-
-            return x
+        def distribution(scores):
+            return softmax(scores)
 
         def _nn(passage_and_question: List[Any]) -> Any:
-            _similarity_scores = []
-            p_tokens, q_encoding = passage_and_question[0], passage_and_question[1]
+            queries = passage_and_question[0]  ### --> (_, n_tokens, 256)
+            key = passage_and_question[1]  ### --> (_, 256)
 
-            for p_token_idx in range(p_tokens.shape[1]):
-                # --> (None, 1, 256)
-                p_token = p_tokens[:, p_token_idx, :]
-                # --> (None, 256)
-                similarity = _nn_similarity(q_encoding, p_token)
-                # --> (None, 4)
-                similarity = tf.expand_dims(similarity, axis=[1])
-                # --> (None, 1, 4)
-                _similarity_scores.append(similarity)
+            ### START
 
-            # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
-            return tf.concat(_similarity_scores, axis=1)
+            start_scores = []
+            for query_idx in range(queries.shape[1]):
+                query = queries[:, query_idx, :]
+                start_score = compatibility_start(key, query)
+                start_scores.append(start_score)
+
+            start_scores = tf.convert_to_tensor(start_scores)
+            ### --> (40, _, 1)
+            start_scores = tf.transpose(start_scores, perm=[1, 0, 2])
+            ### --> (_, 40, 1)
+            start_scores = tf.squeeze(start_scores, axis=[2])
+            ### --> (_, 40)
+
+            start_probability = distribution(start_scores)
+
+            ### START
+
+            end_scores = []
+
+            for query_idx in range(queries.shape[1]):
+                query = queries[:, query_idx, :]
+                score = compatibility_end(key, query)
+                end_scores.append(score)
+
+            end_scores = tf.convert_to_tensor(end_scores)
+            ### --> (40, _, 1)
+            end_scores = tf.transpose(end_scores, perm=[1, 0, 2])
+            ### --> (_, 40, 1)
+            end_scores = tf.squeeze(end_scores, axis=[2])
+            ### --> (_, 40)
+
+            end_probability = distribution(end_scores)
+
+            ###
+
+            probabilities = tf.convert_to_tensor([start_probability, end_probability])
+            ### --> (2, _, 40)
+            probabilities = tf.transpose(probabilities, perm=[1, 2, 0])
+            ### --> (_, 40, 2)
+
+            return probabilities
 
         return _nn

@@ -24,10 +24,8 @@ def X_train() -> np.ndarray:
 
 
 def Y_train() -> np.ndarray:
-    shape = (N_EXAMPLES, 4 * Configs.N_PASSAGE_TOKENS)
-    # shape = (N_EXAMPLES, Configs.N_PASSAGE_TOKENS, 4)
+    shape = (N_EXAMPLES, Configs.N_PASSAGE_TOKENS, 2)
 
-    # return np.random.random_sample(shape)
     return np.random.randint(2, size=shape, dtype=int)
 
 
@@ -36,7 +34,7 @@ def train():
     Y = Y_train()
 
     model = DRQA()
-    model.fit(X, Y, epochs=5, batch_size=50, callbacks=[WandbCallback()])
+    model.fit(X, Y, epochs=10, batch_size=50, callbacks=[WandbCallback()])
 
 
 ###
