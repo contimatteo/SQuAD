@@ -281,35 +281,3 @@ class Customlayers():
             return tf.concat(_similarity_scores, axis=1)
 
         return _nn
-
-
-###
-
-
-class Seq2SeqLayers():
-
-    @staticmethod
-    def encoder() -> Callable[[Any], Tuple[Any, List[Any]]]:
-        units = 128
-
-        def _rnn():
-            return LSTM(units, return_state=True)
-
-        def _nn(inp: Any) -> Tuple[Any, List[Any]]:
-            x, hidden_state, cell_state = _rnn()(inp)
-            return x, [hidden_state, cell_state]
-
-        return _nn
-
-    @staticmethod
-    def decoder() -> Callable[[Any, List[Any]], Tuple[Any, List[Any]]]:
-        units = 128
-
-        def _rnn():
-            return LSTM(units, return_sequences=True, return_state=True)
-
-        def _nn(inp: Any, encoder_states: List[Any]) -> Tuple[Any, List[Any]]:
-            x, hidden_state, cell_state = _rnn()(inp, initial_state=encoder_states)
-            return x, [hidden_state, cell_state]
-
-        return _nn
