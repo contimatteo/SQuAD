@@ -33,16 +33,6 @@ class EmbeddingLayers():
 ###
 
 
-class DenseLayers():
-
-    @staticmethod
-    def regularized() -> Dense:
-        return Dense(5)
-
-
-###
-
-
 class RnnLayers():
 
     @staticmethod

@@ -4,7 +4,8 @@ from tensorflow.keras.layers import Concatenate, Flatten
 from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
-from models.layers import EmbeddingLayers, RnnLayers, AttentionLayers
+
+from models.core import EmbeddingLayers, RnnLayers, AttentionLayers
 
 ###
 
