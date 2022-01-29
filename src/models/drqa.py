@@ -6,14 +6,14 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 import utils.configs as Configs
 
 from models.core import EmbeddingLayers, RnnLayers, AttentionLayers
+from models.core import drqa_categorical_crossentropy
 
 ###
 
 LEARNING_RATE = 1e-3
 
-LOSS = ['binary_crossentropy']
-# METRICS = ['categorical_accuracy']
-METRICS = ['categorical_accuracy', 'binary_accuracy']
+LOSS = [drqa_categorical_crossentropy]  # ['binary_crossentropy']
+METRICS = ['categorical_accuracy']
 
 ###
 
