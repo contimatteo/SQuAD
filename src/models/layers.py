@@ -131,7 +131,6 @@ class AttentionLayers():
         _alpha = Dense(1, activation="relu")
 
         def compatibility(a: Any, b: Any) -> Any:
-            ### TODO: use `Dot` layer ...
             return a * b
 
         def distribution(scores: Any) -> Callable[[Any], Any]:
@@ -139,17 +138,17 @@ class AttentionLayers():
 
         def _custom_core(query: Any, token_index: Any, alpha_keys: Any) -> Any:
             token_query = query[:, token_index, :]
-            # (batch_size,token_length)
+            # (batch_size, token_length)
             token_query = tf.expand_dims(token_query, axis=1)
-            # (batch_size,1,token_length)
+            # (batch_size, 1, token_length)
 
             alpha_token_query = _alpha(token_query)
-            # (batch_size,1,1)
+            # (batch_size, 1, 1)
 
             energy_scores = compatibility(alpha_keys, alpha_token_query)
-            # (batch_size,keys_length,1)
+            # (batch_size, keys_length,1)
             attention_weights = distribution(energy_scores)
-            # (batch_size,keys_length,1)
+            # (batch_size, keys_length,1)
 
             return attention_weights
 
@@ -188,9 +187,15 @@ class AttentionLayers():
         Ws = Dense(256, activation="exponential", use_bias=False)
         We = Dense(256, activation="exponential", use_bias=False)
 
+        ### ISSUE: USE THE COSINE SIMILARITY
+        ### ISSUE: invalid function definition: rewrite this one as
+        ### `compatibility_start(keys: Any, query: Any)`
         def compatibility_start(key, query):
             return Dot(axes=1)([key, Ws(query)])
 
+        ### ISSUE: USE THE COSINE SIMILARITY
+        ### ISSUE: invalid function definition: rewrite this one as
+        ### `compatibility_start(keys: Any, query: Any)`
         def compatibility_end(key, query):
             return Dot(axes=1)([key, We(query)])
 
