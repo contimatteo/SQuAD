@@ -23,7 +23,7 @@ def _optimizer() -> Optimizer:
 
 
 def _compile(model) -> Model:
-    model.compile(loss=LOSS, optimizer=_optimizer(), metrics=METRICS)  # run_eagerly=True
+    model.compile(loss=LOSS, optimizer=_optimizer(), metrics=METRICS)
     return model
 
 
@@ -32,43 +32,53 @@ def _compile(model) -> Model:
 
 # pylint: disable=invalid-name
 def DRQA() -> Model:
-    n_q_tokens = Configs.N_QUESTION_TOKENS
-    n_p_tokens = Configs.N_PASSAGE_TOKENS
+    N_Q_TOKENS = Configs.N_QUESTION_TOKENS
+    N_P_TOKENS = Configs.N_PASSAGE_TOKENS
+    DIM_EXACT_MATCH = Configs.DIM_EXACT_MATCH
+    N_POS_CLASSES = Configs.N_POS_CLASSES
+    N_NER_CLASSES = Configs.N_NER_CLASSES
+    DIM_TOKEN_TF = Configs.DIM_TOKEN_TF
 
     def _build() -> Model:
+        q_tokens = Input(shape=(N_Q_TOKENS, ))
+        p_tokens = Input(shape=(N_P_TOKENS, ))
 
-        q_xi = Input(shape=(n_q_tokens, ))
-        p_xi = Input(shape=(n_p_tokens, ))
+        p_match = Input(shape=(N_P_TOKENS, DIM_EXACT_MATCH))
+        p_pos = Input(shape=(N_P_TOKENS, N_POS_CLASSES))
+        p_ner = Input(shape=(N_P_TOKENS, N_NER_CLASSES))
+        p_tf = Input(shape=(N_P_TOKENS, DIM_TOKEN_TF))
 
         ### QUESTION ##############################################################
 
         ### embeddings
-        q_embd = EmbeddingLayers.glove(n_q_tokens)(q_xi)
+        q_embeddings = EmbeddingLayers.glove(N_Q_TOKENS)(q_tokens)
 
         ### lstm
-        q_rnn = RnnLayers.drqa()(q_embd)
+        q_rnn = RnnLayers.drqa()(q_embeddings)
 
         ### self-attention (simplfied version)
-        q_enc = AttentionLayers.question_encoding()(q_rnn)
+        q_encoding = AttentionLayers.question_encoding()(q_rnn)
 
         ### PASSAGE ###############################################################
 
         ### embeddings
-        p_embd = EmbeddingLayers.glove(n_p_tokens)(p_xi)
+        p_embeddings = EmbeddingLayers.glove(N_P_TOKENS)(p_tokens)
 
         ### aligend-attention
-        p_att = AttentionLayers.alignment()([p_embd, q_embd])
+        p_attention = AttentionLayers.alignment()([p_embeddings, q_embeddings])
 
-        ### lstm (features)
-        p_embd_att = Concatenate(axis=2)([p_embd, p_att])
         ### lstm
-        p_rnn = RnnLayers.drqa()(p_embd_att)
+        p_rnn = RnnLayers.drqa()(
+            Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])
+        )
 
         ### OUTPUT ################################################################
 
         ### similarity
-        out = AttentionLayers.bilinear_similarity()([p_rnn, q_enc])
+        out = AttentionLayers.bilinear_similarity()([p_rnn, q_encoding])
 
-        return Model([q_xi, p_xi], out)
+        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out)
+
+    #
 
     return _compile(_build())
