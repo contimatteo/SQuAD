@@ -12,8 +12,8 @@ from tensorflow.keras.activations import softmax
 def AttentionCore(compatibility: Callable[[Any, Any], Any],
                   distribution: Callable[[Any], Any]) -> Callable[[List[Any]], Any]:
 
-    def _nn(K_q: List[Any]) -> Any:
-        keys, query = K_q[0], K_q[1]
+    def _nn(keys_and_query: List[Any]) -> Any:
+        keys, query = keys_and_query[0], keys_and_query[1]
 
         energy_scores = compatibility(keys, query)
 
@@ -28,8 +28,8 @@ def AttentionCore(compatibility: Callable[[Any, Any], Any],
 def AttentionModel(compatibility: Callable[[Any, Any], Any],
                    distribution: Callable[[Any], Any]) -> Callable[[List[Any]], Any]:
 
-    def _nn(K_q: List[Any]) -> Any:
-        keys, query = K_q[0], K_q[1]
+    def _nn(keys_and_query: List[Any]) -> Any:
+        keys, query = keys_and_query[0], keys_and_query[1]
 
         attention_weights = AttentionCore(compatibility, distribution)([keys, query])
 
@@ -93,3 +93,33 @@ def BiLinearSimilarityAttention():
     # return probabilities
 
     pass
+
+
+def AlignedAttention():
+    alpha = Dense(1, use_bias=False)
+
+    def compatibility(keys: Any, query: Any) -> Any:
+        _alpha_query = alpha(query)
+
+        scores = []
+        for idx in keys.shape[1]:
+            key = key[:, idx, :]
+            _alpha_key = alpha(key)
+            scores.append(_alpha_key * _alpha_query)
+
+        return tf.convert_to_tensor(scores)
+
+    def distribution(scores: Any) -> Any:
+        return softmax(scores)
+
+    def _nn(keys_and_queries: List[Any]):
+        keys, queries = keys_and_queries[0], keys_and_queries[1]
+
+        weights = []
+        for idx in queries.shape[1]:
+            query = queries[:, idx, :]
+            weights.append(AttentionModel(compatibility, distribution)([keys, query]))
+
+        return tf.convert_to_tensor(weights)
+
+    return _nn
