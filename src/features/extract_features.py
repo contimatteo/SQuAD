@@ -47,17 +47,17 @@ def drop_useless_columns(df: pd.DataFrame):
 
 
 def extract_features(df: pd.DataFrame):
-    print("applying POS")
+    print("Applying POS")
     df = apply_pos_tag(df)
     df, OHE_pos = apply_pos_one_hot(df)
-    print("applying NER")
+    print("Applying NER")
     df = apply_ner(df)
     df, OHE_ner = apply_ner_one_hot(df)
-    print("applying TF")
+    print("Applying TF")
     df = apply_term_frequency(df)
-    print("applying LEMMATIZATION")
+    print("Applying LEMMATIZATION")
     df = apply_lemmatize(df)
-    print("applying EXACT MATCH")
+    print("Applying EXACT MATCH")
     df = apply_exact_match(df)
     df = drop_useless_columns(df)
     return df, OHE_pos, OHE_ner

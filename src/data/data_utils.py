@@ -18,7 +18,7 @@ def nltk_download_utilities():
     # spacy.cli.download("en_core_web_sm")
 
 
-FINAL_DATA_FILE_NAME = "data.csv"
+FINAL_DATA_FILE_NAME = "data.json"
 GLOVE_MATRIX_FILE_NAME = "glove_matrix.pkl"
 WORD_TO_INDEX_FILE_NAME = "word_to_index.pkl"
 
@@ -88,19 +88,37 @@ def download_data(drive_id, zip_file_name, required_file_name):
 #     return pd.read_pickle(file)
 
 
-def dataframe_array_to_string(df: pd.DataFrame):
-    COL_TO_EXCLUDE = ["title", "answer", "passage_index", "question_index", "chunk_index"]
-    for col in df.columns:
-        if col not in COL_TO_EXCLUDE:
-            df[col] = df[col].apply(lambda a: np.array2string(a))
-    return df
+# def string_to_array(cell):
+#     if isinstance(cell, str):
+#         return cell.replace("\n", "")
+#     else:
+#         return cell
+
+
+# def decode_string_csv(df: pd.DataFrame):
+#     df = df.applymap(string_to_array)
+#     COL_TO_EXCLUDE = ["title", "answer", "passage_index", "question_index", "chunk_index"]
+#     # for col in df.columns:
+#     #     if col not in COL_TO_EXCLUDE:
+#     #         df[col] = df[col].apply(lambda a: np.array2string(a))
+#     return df
+
+
+# def array_to_string(cell):
+#     if isinstance(cell, np.ndarray):
+#         return np.array2string(cell, separator=",")
+#
+#
+# def dataframe_array_to_string(df: pd.DataFrame):
+#     df = df.applymap(array_to_string)
+#     return df
 
 
 def save_processed_data(df: pd.DataFrame, glove_dim: str):
     # df = dataframe_array_to_string(df)
     name = add_glove_dim_to_name(FINAL_DATA_FILE_NAME, glove_dim)
     folder = get_processed_data_dir()
-    df.to_csv(os.path.join(folder, name))
+    df.to_json(os.path.join(folder, name))
 
 
 def load_processed_data(glove_dim: str):
@@ -109,8 +127,8 @@ def load_processed_data(glove_dim: str):
     file = os.path.join(folder, name)
     if not os.path.exists(file):
         return None
-
-    return pd.read_csv(file)
+    # return decode_string_csv(pd.read_csv(file))
+    return pd.read_json(file)
 
 
 def save_pickle(obj, file_name: str, folder: str):
