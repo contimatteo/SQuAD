@@ -123,63 +123,7 @@ class AttentionLayers():
 
         return _nn
 
-    # @staticmethod
-    # def alignment() -> Callable[[Any, Any], Any]:
-    #     ### TODO: exploit the `AttentionLayers.core()` function instead of
-    #     ### replicating all the common steps of Attention core mechanism.
-
-    #     _alpha = Dense(1, activation="relu")
-
-    #     def compatibility(a: Any, b: Any) -> Any:
-    #         ### TODO: use `Dot` layer ...
-    #         return a * b
-
-    #     def distribution(scores: Any) -> Callable[[Any], Any]:
-    #         return softmax(scores)
-
-    #     def _custom_core(query: Any, token_index: Any, alpha_keys: Any) -> Any:
-    #         token_query = query[:, token_index, :]
-    #         # (batch_size,token_length)
-    #         token_query = tf.expand_dims(token_query, axis=1)
-    #         # (batch_size,1,token_length)
-
-    #         alpha_token_query = _alpha(token_query)
-    #         # (batch_size,1,1)
-
-    #         energy_scores = compatibility(alpha_keys, alpha_token_query)
-    #         # (batch_size,keys_length,1)
-    #         attention_weights = distribution(energy_scores)
-    #         # (batch_size,keys_length,1)
-
-    #         return attention_weights
-
-    #     def _nn(passage_and_question: List[Any]) -> Any:
-    #         passage, question = passage_and_question[0], passage_and_question[1]
-
-    #         alpha_question = _alpha(question)
-    #         aligned_tokens = []
-
-    #         for i in range(passage.shape[1]):
-    #             attention_weights = _custom_core(passage, i, alpha_question)
-    #             ### (batch_size, question_length, 1)
-
-    #             context_vector = attention_weights * question
-    #             ### (batch_size, question_length,token_length)
-    #             context_vector = tf.reduce_sum(context_vector, axis=1)
-    #             ### (batch_size, token_length)
-
-    #             context_vector = tf.expand_dims(context_vector, axis=1)
-    #             ### (batch_size, 1, token_length)
-
-    #             aligned_tokens.append(context_vector)
-
-    #         # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
-    #         aligned_passage = tf.concat(aligned_tokens, axis=1)
-    #         ### (batch_size, passage_length, token_length)
-
-    #         return aligned_passage
-
-    #     return _nn
+    #
 
     @staticmethod
     def alignment() -> Callable[[Any, Any], Any]:
