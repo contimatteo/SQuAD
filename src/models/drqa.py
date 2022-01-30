@@ -66,8 +66,8 @@ def DRQA() -> Model:
         p_embeddings = EmbeddingLayers.glove(N_P_TOKENS)(p_tokens)
 
         ### aligend-attention
-        # p_attention = attention.AlignmentModel(units=7)([p_embeddings, q_embeddings])
-        p_attention = AttentionLayers.alignment()([p_embeddings, q_embeddings])
+        p_attention = attention.AlignmentModel(units=13)([p_embeddings, q_embeddings])
+        # p_attention = AttentionLayers.alignment()([p_embeddings, q_embeddings])
 
         ### lstm
         p_rnn = RnnLayers.drqa()(
