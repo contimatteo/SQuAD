@@ -78,7 +78,7 @@ def train():
 
     model = DRQA()
 
-    model.fit(X, Y, epochs=5, batch_size=100, callbacks=[WandbCallback()])
+    model.fit(X, Y, epochs=1, batch_size=N_ROWS, callbacks=[WandbCallback()])
 
     model.predict(X)
 

@@ -177,67 +177,47 @@ class AttentionLayers():
         Ws = Dense(256, activation="exponential", use_bias=False)
         We = Dense(256, activation="exponential", use_bias=False)
 
-        ### ISSUE: USE THE COSINE SIMILARITY
-        ### ISSUE: invalid function definition: rewrite this one as
-        ### `compatibility_start(keys: Any, query: Any)`
-        def compatibility_start(key, query):
-            return Dot(axes=1)([key, Ws(query)])
+        def compatibility(w_type: str) -> Callable[[Any, Any], Any]:
+            W = Ws if w_type == "start" else We
 
-        ### ISSUE: USE THE COSINE SIMILARITY
-        ### ISSUE: invalid function definition: rewrite this one as
-        ### `compatibility_start(keys: Any, query: Any)`
-        def compatibility_end(key, query):
-            return Dot(axes=1)([key, We(query)])
+            def _scores(keys, query) -> Any:
+                scores = []
+                for key_idx in range(keys.shape[1]):
+                    k = keys[:, key_idx, :]  ### --> (_, 256)
+                    q = W(query)
+                    score = Dot(axes=1, normalize=True)([k, q])  ### --> (_, 1)
+                    scores.append(score)
+
+                ### --> (n_tokens, _, 1)
+                scores = tf.convert_to_tensor(scores)
+                ### --> (n_tokens, _, 1)
+                scores = tf.transpose(scores, perm=[1, 0, 2])
+                ### --> (_, n_tokens, 1)
+                scores = tf.squeeze(scores, axis=[2])
+                ### --> (_, n_tokens)
+
+                return scores
+
+            return _scores
 
         def distribution(scores):
             return softmax(scores)
 
-        def _nn(passage_and_question: List[Any]) -> Any:
-            queries = passage_and_question[0]  ### --> (_, n_tokens, 256)
-            key = passage_and_question[1]  ### --> (_, 256)
+        def _nn(keys_and_queries: List[Any]) -> Any:
+            keys = keys_and_queries[0]  ### --> (_, n_tokens, 256)
+            query = keys_and_queries[1]  ### --> (_, 256)
 
-            ### START
+            s_scores = compatibility("start")(keys, query)
+            s_weights = distribution(s_scores)
 
-            start_scores = []
-            for query_idx in range(queries.shape[1]):
-                query = queries[:, query_idx, :]
-                start_score = compatibility_start(key, query)
-                start_scores.append(start_score)
+            e_scores = compatibility("end")(keys, query)
+            e_weights = distribution(e_scores)
 
-            start_scores = tf.convert_to_tensor(start_scores)
-            ### --> (40, _, 1)
-            start_scores = tf.transpose(start_scores, perm=[1, 0, 2])
-            ### --> (_, 40, 1)
-            start_scores = tf.squeeze(start_scores, axis=[2])
-            ### --> (_, 40)
-
-            start_probability = distribution(start_scores)
-
-            ### START
-
-            end_scores = []
-
-            for query_idx in range(queries.shape[1]):
-                query = queries[:, query_idx, :]
-                score = compatibility_end(key, query)
-                end_scores.append(score)
-
-            end_scores = tf.convert_to_tensor(end_scores)
-            ### --> (40, _, 1)
-            end_scores = tf.transpose(end_scores, perm=[1, 0, 2])
-            ### --> (_, 40, 1)
-            end_scores = tf.squeeze(end_scores, axis=[2])
-            ### --> (_, 40)
-
-            end_probability = distribution(end_scores)
-
-            ###
-
-            probabilities = tf.convert_to_tensor([start_probability, end_probability])
+            probs = tf.convert_to_tensor([s_weights, e_weights])
             ### --> (2, _, 40)
-            probabilities = tf.transpose(probabilities, perm=[1, 2, 0])
+            probs = tf.transpose(probs, perm=[1, 2, 0])
             ### --> (_, 40, 2)
 
-            return probabilities
+            return probs
 
         return _nn
