@@ -7,6 +7,7 @@ import utils.configs as Configs
 
 from models.core import EmbeddingLayers, RnnLayers, AttentionLayers
 from models.core import drqa_categorical_crossentropy
+from models.core import attention
 
 ###
 
@@ -65,6 +66,7 @@ def DRQA() -> Model:
         p_embeddings = EmbeddingLayers.glove(N_P_TOKENS)(p_tokens)
 
         ### aligend-attention
+        # p_attention = attention.AlignmentModel(units=7)([p_embeddings, q_embeddings])
         p_attention = AttentionLayers.alignment()([p_embeddings, q_embeddings])
 
         ### lstm

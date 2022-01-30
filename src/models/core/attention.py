@@ -43,6 +43,62 @@ def AttentionModel(compatibility: Callable[[Any, Any], Any],
 ###
 
 
+def AlignmentModel(units=1) -> Callable[[Any, Any], Any]:
+    ### TODO: exploit the `AttentionLayers.core()` function instead of
+    ### replicating all the common steps of Attention core mechanism.
+
+    _alpha = Dense(units, activation="relu")
+
+    def compatibility(a: Any, b: Any) -> Any:
+        # dot product
+        return a @ b
+
+    def distribution(scores: Any) -> Callable[[Any], Any]:
+        return softmax(scores)
+
+    def _nn(passage_and_question: List[Any]) -> Any:
+        passage, question = passage_and_question[0], passage_and_question[1]
+
+        alpha_question = _alpha(question)  # K
+        # (batch_size,question_length,units)
+        aligned_tokens = []
+
+        for i in range(passage.shape[1]):
+
+            token_passage = passage[:, i, :]  # raw Query
+            # (batch_size,token_length)
+            token_passage = tf.expand_dims(token_passage, axis=1)
+            # (batch_size,1,token_length)
+
+            alpha_token_passage = _alpha(token_passage)  #Query
+            # (batch_size,1,units)
+
+            shape = alpha_token_passage.shape
+            shape = [-1, shape[2], shape[1]]
+            alpha_token_passage = tf.reshape(alpha_token_passage, shape)
+            # (batch_size,units,1)
+
+            attention_weights = AttentionCore(compatibility,
+                                              distribution)([alpha_question, alpha_token_passage])
+            # (batch_size,keys_length,1)
+
+            context_vector = attention_weights * question  # scalar product
+            ### (batch_size, question_length,token_length)
+            context_vector = tf.reduce_sum(context_vector, axis=1)
+            ### (batch_size, token_length)
+            context_vector = tf.expand_dims(context_vector, axis=1)
+            ### (batch_size, 1, token_length)
+            aligned_tokens.append(context_vector)
+
+        # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
+        aligned_passage = tf.concat(aligned_tokens, axis=1)
+        ### (batch_size, passage_length, token_length)
+
+        return aligned_passage
+
+    return _nn
+
+
 # pylint: disable=invalid-name
 def WeightedSumSelfAttention():
     W = Dense(1, use_bias=False)
