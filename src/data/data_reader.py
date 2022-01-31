@@ -1,0 +1,112 @@
+import os
+import sys
+import data_utils
+import json
+import pandas as pd
+from data_utils import create_tmp_directories, download_data, get_data_dir, get_tmp_data_dir
+from glove_reader import load_glove, download_glove
+
+# if glove_embeddings is None:
+#   if not os.path.exists(GLOVE_LOCAL_DIR):
+#     os.makedirs(GLOVE_LOCAL_DIR)
+#
+#   if not os.path.exists(GLOVE_LOCAL_FILE_ZIP):
+#     urllib.request.urlretrieve(GLOVE_REMOTE_URL, GLOVE_LOCAL_FILE_ZIP)
+#     print("Successful download")
+#     tmp = Path(GLOVE_LOCAL_FILE_ZIP)
+#     tmp.rename(tmp.with_suffix(".zip"))
+#
+#   with zipfile.ZipFile(f"{GLOVE_LOCAL_FILE_ZIP}.zip", 'r') as zip_ref:
+#     zip_ref.extractall(path=GLOVE_LOCAL_DIR)
+#     print("Successful extraction")
+
+
+# TRAINING_DATA_LOCAL_DIR = os.path.join(data_utils.get_project_directory(), "data", "raw")
+# TMP_TRAIN_DATA_DIR = os.path.join(data_utils.get_project_directory(), "tmp")
+
+
+def download_training_set():
+    DRIVE_ID = "19byT_6Hhx4Di1pzbd6bmxQ8sKwCSPhqg"
+    RAW_FILE = os.path.join(get_data_dir(), "training_set.json")
+    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "training_set.json")
+    ZIP_FILE = os.path.join(get_tmp_data_dir(), "training_set.zip")
+
+    create_tmp_directories()
+    download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
+    data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+    return RAW_FILE
+
+
+# def download_glove():
+#     DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
+#     RAW_FILE = os.path.join(get_data_dir(), "GloVe.txt")
+#     REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.50d.txt")
+#     ZIP_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.zip")
+#
+#     create_tmp_directories()
+#     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
+#     data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+#     return RAW_FILE
+
+
+def load_training_set():
+    print("Data downloading")
+    raw_file = ""
+    if len(sys.argv) <= 1:
+        raw_file = download_training_set()
+    else:
+        raw_file = sys.argv[1]
+    if not os.path.exists(raw_file):
+        raise Exception(raw_file+" does not exists.")
+    print("Data downloaded at position: " + raw_file + "\n")
+    print("Converting json to dataframe")
+
+    with open(raw_file, 'r', encoding="utf8", errors='ignore') as j:
+        contents = json.loads(j.read().encode('utf-8').strip(), encoding='unicode_escape')
+
+    # pc=['data','paragraphs','qas','answers']
+    # js = pd.io.json.json_normalize(contents , pc )
+    # m = pd.io.json.json_normalize(contents, pc[:-1] )
+    # r = pd.io.json.json_normalize(contents,pc[:-2])
+    #
+    # idx = np.repeat(r['context'].values, r.qas.str.len())
+    # ndx  = np.repeat(m['id'].values,m['answers'].str.len())
+    # m['context'] = idx
+    # js['q_idx'] = ndx
+    # main = pd.concat([ m[['id','question','context']].set_index('id'),js.set_index('q_idx')],1,sort=False).reset_index()
+    # main['c_id'] = main['context'].factorize()[0]
+    #
+    # print(main.head())
+    # print(main.columns)
+
+    contents = contents["data"]
+    df = pd.json_normalize(contents, ['paragraphs', 'qas', 'answers'], ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"]])
+    df = df[["title", "paragraphs.context", "paragraphs.qas.question", "text", "answer_start"]]
+
+    df.rename(columns={'title': 'title', 'paragraphs.context': 'passage',
+                       'paragraphs.qas.question': 'question', 'text': 'answer', 'answer_start': 'answer_start'}, inplace=True)
+    print("Converted json to dataframe \n")
+    return df
+
+
+def data_reader():
+    df = load_training_set()
+    return df
+
+
+def glove_reader(glove_dim):
+    glove_file = download_glove(glove_dim)
+    glove = load_glove(glove_file)
+    return glove
+
+
+def main():
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_colwidth', None)
+    df = load_training_set()
+    print(df.columns)
+    print(df[0:1])
+
+
+if __name__ == "__main__":
+    main()

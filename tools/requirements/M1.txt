@@ -19,6 +19,8 @@ python-dotenv
 #############################
 ## Not-Versioned
 
+googledrivedownloader
+nltk
 scikit-learn
 tensorflow-macos
 tensorflow-metal

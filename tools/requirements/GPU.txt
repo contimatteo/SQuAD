@@ -20,6 +20,8 @@ python-dotenv
 #############################
 ## Not-Versioned
 
+googledrivedownloader
+nltk
 pandas
 scikit-learn
 wandb
