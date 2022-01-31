@@ -19,24 +19,19 @@ N_ROWS = 500
 
 def X_train() -> np.ndarray:
     ### [Q] tokens
-    Q_tokens = np.random.random_sample((N_ROWS, Configs.N_QUESTION_TOKENS))
-
+    q_tokens = np.random.random_sample((N_ROWS, Configs.N_QUESTION_TOKENS))
     ### [P] tokens
-    P_tokens = np.random.random_sample((N_ROWS, Configs.N_PASSAGE_TOKENS))
-
+    p_tokens = np.random.random_sample((N_ROWS, Configs.N_PASSAGE_TOKENS))
     ### [P] exact match
-    P_match = np.zeros((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.DIM_EXACT_MATCH)).astype(np.float)
-
+    p_match = np.zeros((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.DIM_EXACT_MATCH)).astype(np.float)
     ### [P] POS tags
-    P_pos = np.zeros((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.N_POS_CLASSES)).astype(np.float)
-
+    p_pos = np.zeros((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.N_POS_CLASSES)).astype(np.float)
     ### [P] NER annotations
-    P_ner = np.random.random_sample((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.N_NER_CLASSES))
-
+    p_ner = np.random.random_sample((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.N_NER_CLASSES))
     ### [P] TF
-    P_tf = np.zeros((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.DIM_TOKEN_TF)).astype(np.float)
+    p_tf = np.zeros((N_ROWS, Configs.N_PASSAGE_TOKENS, Configs.DIM_TOKEN_TF)).astype(np.float)
 
-    return [Q_tokens, P_tokens, P_match, P_pos, P_ner, P_tf]
+    return [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
 
 
 def Y_train() -> np.ndarray:
@@ -78,7 +73,7 @@ def train():
 
     model = DRQA()
 
-    model.fit(X, Y, epochs=5, batch_size=100, callbacks=[WandbCallback()])
+    model.fit(X, Y, epochs=1, batch_size=N_ROWS, callbacks=[WandbCallback()])
 
     model.predict(X)
 

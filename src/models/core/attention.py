@@ -107,43 +107,47 @@ def WeightedSumSelfAttention():
 
 # pylint: disable=invalid-name
 def BiLinearSimilarityAttention():
-    # W_start = Dense(256, activation="exponential", use_bias=False)
-    # W_end = Dense(256, activation="exponential", use_bias=False)
-    #
-    # ISSUE: the `compatibility` function MUST take as input `K, q` where `K` is a matrix.
-    # def compatibility(W: Any) -> Callable[[Any], Callable[[Any, Any], Any]]:
-    #     def _W_compatibility(key: Any, queries: Any) -> Any:
-    #         scores = []
-    #         for idx in range(queries.shape[1]):
-    #             query = queries[:, idx, :]
-    #             ### --> (_, 256)
-    #             score = Dot(axes=1)([key, W(query)])
-    #             ### --> (_, 1)
-    #             scores.append(score)
-    #         scores = tf.convert_to_tensor(scores)
-    #         ### --> (40, _, 1)
-    #         scores = tf.transpose(scores, perm=[1, 0, 2])
-    #         ### --> (_, 40, 1)
-    #         scores = tf.squeeze(scores, axis=[2])
-    #         ### --> (_, 40)
-    #         return scores
-    #     return _W_compatibility
-    # def distribution(scores: Any) -> Any:
-    #     return softmax(scores)
-    #
-    # start_probability = AttentionCore(compatibility(W_start), distribution)
-    # end_probability = AttentionCore(compatibility(W_end), distribution)
-    #
-    # probabilities = tf.convert_to_tensor([start_probability, end_probability])
-    # ### --> (2, _, 40)
-    # probabilities = tf.transpose(probabilities, perm=[1, 2, 0])
-    # ### --> (_, 40, 2)
-    #
-    # return probabilities
+    Ws = Dense(256, activation="exponential", use_bias=False)
+    We = Dense(256, activation="exponential", use_bias=False)
 
-    pass
+    def compatibility(w_type: str) -> Callable[[Any, Any], Any]:
+        W = Ws if w_type == "start" else We
+
+        def _similarity(a: Any, b: Any) -> Any:
+            return Dot(axes=1, normalize=True)([a, b])
+
+        def _scores(keys, query) -> Any:
+            scores = []
+            for key_idx in range(keys.shape[1]):
+                k = keys[:, key_idx, :]  ### --> (_, 256)
+                q = W(query)  ### --> (_, 256)
+                score = _similarity(k, q)  ### --> (_, 1)
+                scores.append(score)
+
+            scores = tf.convert_to_tensor(scores)  ### --> (n_tokens, _, 1)
+            scores = tf.transpose(scores, perm=[1, 0, 2])  ### --> (_, n_tokens, 1)
+            scores = tf.squeeze(scores, axis=[2])  ### --> (_, n_tokens)
+
+            return scores
+
+        return _scores
+
+    def distribution(scores):
+        return softmax(scores)
+
+    def _nn(keys_and_queries: List[Any]) -> Any:
+        s_weights = AttentionCore(compatibility("start"), distribution)(keys_and_queries)
+        e_weights = AttentionCore(compatibility("end"), distribution)(keys_and_queries)
+
+        probs = tf.convert_to_tensor([s_weights, e_weights])  ### --> (2, _, n_tokens)
+        probs = tf.transpose(probs, perm=[1, 2, 0])  ### --> (_, n_tokens, 2)
+
+        return probs
+
+    return _nn
 
 
+# pylint: disable=invalid-name
 def AlignedAttention():
     alpha = Dense(1, use_bias=False)
 
