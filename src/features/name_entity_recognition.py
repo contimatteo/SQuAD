@@ -1,16 +1,9 @@
-import sys
-from typing import Union, List
 import pandas as pd
-from nltk import ne_chunk
-import os
-from nltk.chunk import conlltags2tree, tree2conlltags, ieerstr2tree
-from pprint import pprint
-from one_hot_encoder import OneHotEncoder
-from collections import Counter
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
-from data_preprocessing import data_preprocessing
-from lemmatize import apply_lemmatize
+from nltk import ne_chunk
+from nltk.chunk import tree2conlltags
+
+from .one_hot_encoder import OneHotEncoder
 
 ###
 

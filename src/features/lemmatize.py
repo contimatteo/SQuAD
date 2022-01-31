@@ -1,13 +1,9 @@
-import sys
+import pandas as pd
+
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
-from nltk import word_tokenize
-# from nltk import pos_tag
-import pandas as pd
-import os
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
-from data_preprocessing import data_preprocessing
+from data.data_preprocessing import data_preprocessing
 
 ###
 
