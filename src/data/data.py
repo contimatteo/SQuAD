@@ -9,10 +9,15 @@ from data_utils import save_processed_data, load_processed_data, save_WTI, save_
 from data_preprocessing import data_preprocessing
 from data_reader import data_reader, glove_reader
 from glove_reader import glove_embedding
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'features'))
+
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'features')
+)
 from features import add_features
 
 from ast import literal_eval
+
+###
 
 
 def data_to_numpy(df: pd.DataFrame):
@@ -55,7 +60,7 @@ def get_data(glove_dim, debug=False):
 
     if df is None:
         if debug:
-            df = data_reader()[0: 100].copy()
+            df = data_reader()[0:100].copy()
         else:
             df = data_reader()
         df = data_preprocessing(df, WTI)
@@ -84,9 +89,7 @@ def main():
     print(f'GLOVE MATRIX\n{glove_matrix.shape,glove_matrix.dtype}')
 
 
+###
+
 if __name__ == "__main__":
     main()
-
-
-
-

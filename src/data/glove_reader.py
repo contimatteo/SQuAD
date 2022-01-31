@@ -8,6 +8,8 @@ from data_utils import create_tmp_directories, download_data, get_data_dir, get_
 from copy import copy
 from word_to_index import WordToIndex
 
+###
+
 
 def download_glove(glove_dim: int):
     DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
@@ -69,7 +71,8 @@ def glove_embedding(glove_embeddings, glove_dim):
     WTI = WordToIndex()
     WTI.fit_on_list(glove_embeddings.keys())
 
-    TOKENIZER_MAX_WORD_INDEX = WTI.get_index_len()  # np.array(list(tokenizer.word_index.values())).max()
+    TOKENIZER_MAX_WORD_INDEX = WTI.get_index_len(
+    )  # np.array(list(tokenizer.word_index.values())).max()
     embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, glove_dim))
 
     for token in glove_embeddings.keys():
@@ -83,6 +86,8 @@ def main():
     glove = download_glove()
     load_glove(glove)
 
+
+###
 
 if __name__ == "__main__":
     main()

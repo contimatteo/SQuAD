@@ -13,10 +13,13 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__
 from preprocessing_utils import get_dict, insert_dict
 from data_utils import nltk_download_utilities
 
+###
+
 span_tokenize_dict = {}
 sentence_tokenize_dict = {}
 passage_index_dict = {}
 
+###
 
 # def __regex_separator(text,separator):
 #   # separator =["�"]#["�"]
@@ -59,7 +62,7 @@ def group_tokens(t, t_with_spaces):
 
         if correspondence_not_found:
             if first_item_found:
-                t1[j-1] = t1[j-1] + el
+                t1[j - 1] = t1[j - 1] + el
             else:
                 first_string += el
 
@@ -79,6 +82,7 @@ def tokenize_sentence(sentence):
 
     return sentence_tokenize_dict[sentence]
 
+
 # def tokenize_sentence(sentence):
 #    t1,_ = tokenizers()
 #    if sentence not in get_dict()["sentence_tokenize_dict"].keys():
@@ -94,6 +98,7 @@ def tokenize_with_spaces(sentence):
     sentence_tokenized_with_spaces = t2.tokenize(sentence)
     t_grouped = group_tokens(sentence_tokenized, sentence_tokenized_with_spaces)
     return t_grouped
+
 
 # def split_into_words(df):
 #     df["word_tokens_passage"] = df_apply_function_with_dict(df,tokenize_sentence_df,"sentence_tokenize_dict","passage",sentence_name="passage")
@@ -132,7 +137,10 @@ def get_answer_start_end(passage, answer_text, answer_start):
     if passage not in span_tokenize_dict.keys():
         span_tokenize_dict[passage] = span_tokenize(passage)
 
-    interval = [i for i, (s, e) in enumerate(span_tokenize_dict[passage]) if e >= answer_start and s <= answer_end]
+    interval = [
+        i for i, (s, e) in enumerate(span_tokenize_dict[passage])
+        if e >= answer_start and s <= answer_end
+    ]
     if len(interval) < 1:
         # raise Exception(interval + " is empty.")
         at = [answer_text]  # [str(passage)[96]]
@@ -143,7 +151,9 @@ def get_answer_start_end(passage, answer_text, answer_start):
 
 
 def add_labels(df):
-    df["label"] = df.apply(lambda x: get_answer_start_end(x["passage"], x["answer"], x["answer_start"]), axis=1)
+    df["label"] = df.apply(
+        lambda x: get_answer_start_end(x["passage"], x["answer"], x["answer_start"]), axis=1
+    )
     return df
 
 
@@ -200,6 +210,8 @@ def main():
     print(span_tokenize(s))
     print(get_dict())
 
+
+###
 
 if __name__ == "__main__":
     main()

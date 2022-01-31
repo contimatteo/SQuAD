@@ -1,6 +1,8 @@
 from typing import List
 import numpy as np
 
+###
+
 
 class OneHotEncoder:
     # one_hot_dict = {}
@@ -41,5 +43,3 @@ class OneHotEncoder:
     def __init__(self):
         self.one_hot_dict = {}
         self.cache_dict = {}
-
-

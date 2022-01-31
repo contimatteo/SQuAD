@@ -133,7 +133,7 @@ dmypy.json
 #######################################
 
 **/tmp/
-
+wandb/
 data/
 !src/data
 .idea

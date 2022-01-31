@@ -3,7 +3,7 @@ from pathlib import Path
 ###
 
 
-class LocalStorageDirectoriesManager():
+class LocalStorageDirectoryManager():
 
     def __init__(self) -> None:
         self.root = None
@@ -57,4 +57,4 @@ class LocalStorageDirectoriesManager():
 class LocalStorageManager():
 
     def __init__(self) -> None:
-        self.dirs = LocalStorageDirectoriesManager()
+        self.dirs = LocalStorageDirectoryManager()
