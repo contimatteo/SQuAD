@@ -1,4 +1,27 @@
 
+
+ISSUES
+  [ ] dataset size
+
+
+TODO
+  [ ] model weights
+  [ ] adaptive batch-size 
+  [ ] split in multiple files
+  [ ] merge strategies for custom loss function
+  [ ] network plots
+  [ ] dataset plots
+
+
+TO-DISCUSS
+  [ ] tuning
+  [ ] Keras (generator)
+
+
+--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+
 IMPROVEMENTS
   [ ] BERT 
   [ ] Character-Level Word Embeddings (slide 10, page 43-44)
+
