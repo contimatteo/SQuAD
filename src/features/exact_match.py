@@ -11,6 +11,8 @@ from data_preprocessing import data_preprocessing
 # sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
 from preprocessing_utils import df_apply_function_with_dict
 
+###
+
 
 def find_match(passage: List[str], question: List[str]):
     return [p in question for p in passage]
@@ -28,7 +30,9 @@ def lower_case_match(passage: List[str], question: List[str]):
     return find_match(passage, question)
 
 
-def passage_question_match(passage: List[str], question: List[str], passage_lemm: List[str], question_lem: List[str]):
+def passage_question_match(
+    passage: List[str], question: List[str], passage_lemm: List[str], question_lem: List[str]
+):
     exact = original_form(passage, question)
     lower = lower_case_match(passage, question)
     lemm = lower_case_match(passage_lemm, question_lem)
@@ -37,8 +41,12 @@ def passage_question_match(passage: List[str], question: List[str], passage_lemm
 
 def apply_exact_match(df: pd.DataFrame):
     df["exact_match"] = df.apply(
-        lambda x: passage_question_match(x["word_tokens_passage"], x["word_tokens_question"],
-                                         x["lemmatized_passage"], x["lemmatized_question"]), axis=1)
+        lambda x: passage_question_match(
+            x["word_tokens_passage"], x["word_tokens_question"], x["lemmatized_passage"], x[
+                "lemmatized_question"]
+        ),
+        axis=1
+    )
     return df
 
 
@@ -51,7 +59,6 @@ def apply_exact_match(df: pd.DataFrame):
 #     print("Applied exact match")
 #     return df
 
-
 # def mayfun2(arg1, arg2):
 #     print(arg1)
 #     print(arg2)
@@ -59,7 +66,6 @@ def apply_exact_match(df: pd.DataFrame):
 #
 # def my_fun(**kwargs):
 #     mayfun2(**kwargs)
-
 
 # def main_test():
 #     pd.set_option('display.max_columns', None)

@@ -7,11 +7,16 @@ from nltk.chunk import conlltags2tree, tree2conlltags, ieerstr2tree
 from pprint import pprint
 from one_hot_encoder import OneHotEncoder
 from collections import Counter
+
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
 from data_preprocessing import data_preprocessing
 from lemmatize import apply_lemmatize
 
+###
+
 ner_dict = {}
+
+###
 
 
 def ner(pos, passage_index: int):
@@ -24,7 +29,8 @@ def ner(pos, passage_index: int):
 
 def apply_ner(df: pd.DataFrame):
     df["ner"] = df.apply(
-        lambda x: ner(list(zip(x["word_tokens_passage"], x["pos"])), x["passage_index"]), axis=1)
+        lambda x: ner(list(zip(x["word_tokens_passage"], x["pos"])), x["passage_index"]), axis=1
+    )
     return df
 
 
@@ -38,7 +44,5 @@ def apply_ner_one_hot(df: pd.DataFrame):
             ner_list.append(pref + ent)
     OHE = OneHotEncoder()
     OHE.fit(ner_list)
-    df["ner_onehot"] = df.apply(
-        lambda x: OHE.transform(x["ner"], x["passage_index"]), axis=1)
+    df["ner_onehot"] = df.apply(lambda x: OHE.transform(x["ner"], x["passage_index"]), axis=1)
     return df, OHE
-

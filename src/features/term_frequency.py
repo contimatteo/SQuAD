@@ -1,8 +1,10 @@
-import sys
-import pandas as pd
-import os
 from typing import List
+import sys
+import os
 
+import pandas as pd
+
+###
 
 # class WordCounting:
 #     passage_dict = {}
@@ -53,7 +55,8 @@ def get_term_freq_normalized(token_list: List[str], passage_index: int):
 def apply_term_frequency(df: pd.DataFrame, is_training=True):
     # if is_training:
     # WC.count_words(df)
-    df["term_frequency"] = df.apply(lambda x: get_term_freq_normalized(x["word_tokens_passage"], x["passage_index"]), axis=1)
+    df["term_frequency"] = df.apply(
+        lambda x: get_term_freq_normalized(x["word_tokens_passage"], x["passage_index"]), axis=1
+    )
     # df["term_frequency"] = df.apply(lambda x: WC.get_term_freq_normalized(x["word_tokens_passage"]), axis=1)
     return df
-
