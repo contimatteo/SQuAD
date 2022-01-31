@@ -1,0 +1,4 @@
+
+IMPROVEMENTS
+  [ ] BERT 
+  [ ] Character-Level Word Embeddings (slide 10, page 43-44)
