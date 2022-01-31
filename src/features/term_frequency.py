@@ -42,7 +42,7 @@ def get_term_freq_normalized(token_list: List[str], passage_index: int):
                 word_count_dict[token] += 1
         tf = []
         for token in token_list:
-            tf.append(word_count_dict[token] / total_sum)
+            tf.append(float('%.5f' % (word_count_dict[token] / total_sum)))
         ter_freq_dict[passage_index] = tf
     return ter_freq_dict[passage_index]
 
