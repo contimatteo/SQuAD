@@ -5,17 +5,17 @@ ISSUES
 
 
 TODO
-  [ ] model weights
+  [ ] save model weights
   [ ] adaptive batch-size 
   [ ] split in multiple files
-  [ ] merge strategies for custom loss function
   [ ] network plots
   [ ] dataset plots
+  [ ] create Keras (generator)
+  [ ] support Keras (generator)
 
 
 TO-DISCUSS
   [ ] tuning
-  [ ] Keras (generator)
 
 
 --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
