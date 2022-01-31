@@ -1,19 +1,13 @@
-import sys
-import nltk
-from nltk import pos_tag
 import pandas as pd
-import os
-from sklearn import preprocessing
-import numpy as np
-from one_hot_encoder import OneHotEncoder
-from padding import apply_padding_to
-from exact_match import apply_exact_match
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
-from data_preprocessing import data_preprocessing
-from lemmatize import apply_lemmatize
-from name_entity_recognition import apply_ner, apply_ner_one_hot
-from term_frequency import apply_term_frequency
+from nltk import pos_tag
+from data.data_preprocessing import data_preprocessing
+
+from .one_hot_encoder import OneHotEncoder
+from .exact_match import apply_exact_match
+from .lemmatize import apply_lemmatize
+from .name_entity_recognition import apply_ner, apply_ner_one_hot
+from .term_frequency import apply_term_frequency
 
 ###
 

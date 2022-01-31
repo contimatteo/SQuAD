@@ -1,15 +1,6 @@
-import sys
 from typing import List
+
 import pandas as pd
-from lemmatize import apply_lemmatize
-import os
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'data'))
-from data_preprocessing import data_preprocessing
-# from extract_features import extract_features
-
-# sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
-from preprocessing_utils import df_apply_function_with_dict
 
 ###
 
@@ -20,7 +11,6 @@ def find_match(passage: List[str], question: List[str]):
 
 def original_form(passage: List[str], question: List[str]):
     # exact match in original form
-
     return find_match(passage, question)
 
 
