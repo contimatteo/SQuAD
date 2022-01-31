@@ -43,11 +43,31 @@ def AttentionModel(compatibility: Callable[[Any, Any], Any],
 ###
 
 
-def AlignmentModel(units=1) -> Callable[[Any, Any], Any]:
+# pylint: disable=invalid-name
+def WeightedSumSelfAttention():
+    W = Dense(1, use_bias=False)
+
+    def compatibility(keys: Any, *_) -> Any:
+        return W(keys)
+
+    def distribution(scores: Any) -> Any:
+        return softmax(scores)
+
+    def _nn(keys: Any):
+        return AttentionModel(compatibility, distribution)([keys, None])
+
+    return _nn
+
+
+###
+
+
+# pylint: disable=invalid-name
+def AlignedAttention() -> Callable[[Any, Any], Any]:
     ### TODO: exploit the `AttentionLayers.core()` function instead of
     ### replicating all the common steps of Attention core mechanism.
 
-    _alpha = Dense(units, activation="relu")
+    _alpha = Dense(1, activation="relu")
 
     def compatibility(a: Any, b: Any) -> Any:
         alpha_a = _alpha(a)
@@ -68,10 +88,9 @@ def AlignmentModel(units=1) -> Callable[[Any, Any], Any]:
 
     def _nn(passage_and_question: List[Any]) -> Any:
         passage, question = passage_and_question[0], passage_and_question[1]
+
         aligned_tokens = []
-
         for i in range(passage.shape[1]):
-
             token_passage = passage[:, i, :]  # raw Query
             # (batch_size,token_length)
             token_passage = tf.expand_dims(token_passage, axis=1)
@@ -92,17 +111,7 @@ def AlignmentModel(units=1) -> Callable[[Any, Any], Any]:
     return _nn
 
 
-# pylint: disable=invalid-name
-def WeightedSumSelfAttention():
-    W = Dense(1, use_bias=False)
-
-    def compatibility(keys: Any, *_) -> Any:
-        return W(keys)
-
-    def distribution(scores: Any) -> Any:
-        return softmax(scores)
-
-    return AttentionModel(compatibility, distribution)
+###
 
 
 # pylint: disable=invalid-name
@@ -143,36 +152,5 @@ def BiLinearSimilarityAttention():
         probs = tf.transpose(probs, perm=[1, 2, 0])  ### --> (_, n_tokens, 2)
 
         return probs
-
-    return _nn
-
-
-# pylint: disable=invalid-name
-def AlignedAttention():
-    alpha = Dense(1, use_bias=False)
-
-    def compatibility(keys: Any, query: Any) -> Any:
-        _alpha_query = alpha(query)
-
-        scores = []
-        for idx in keys.shape[1]:
-            key = key[:, idx, :]
-            _alpha_key = alpha(key)
-            scores.append(_alpha_key * _alpha_query)
-
-        return tf.convert_to_tensor(scores)
-
-    def distribution(scores: Any) -> Any:
-        return softmax(scores)
-
-    def _nn(keys_and_queries: List[Any]):
-        keys, queries = keys_and_queries[0], keys_and_queries[1]
-
-        weights = []
-        for idx in queries.shape[1]:
-            query = queries[:, idx, :]
-            weights.append(AttentionModel(compatibility, distribution)([keys, query]))
-
-        return tf.convert_to_tensor(weights)
 
     return _nn
