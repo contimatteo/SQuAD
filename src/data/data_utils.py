@@ -7,6 +7,8 @@ from shutil import copyfile
 import nltk
 import pickle as pkl
 
+###
+
 
 def nltk_download_utilities():
     # nltk.download('tagsets')
@@ -28,9 +30,7 @@ def get_project_directory():
 
 
 def download_url(drive_id, save_path):
-    gdd.download_file_from_google_drive(file_id=drive_id,
-                                        dest_path=save_path,
-                                        unzip=True)
+    gdd.download_file_from_google_drive(file_id=drive_id, dest_path=save_path, unzip=True)
 
 
 def get_data_dir():
@@ -87,13 +87,11 @@ def download_data(drive_id, zip_file_name, required_file_name):
 #
 #     return pd.read_pickle(file)
 
-
 # def string_to_array(cell):
 #     if isinstance(cell, str):
 #         return cell.replace("\n", "")
 #     else:
 #         return cell
-
 
 # def decode_string_csv(df: pd.DataFrame):
 #     df = df.applymap(string_to_array)
@@ -102,7 +100,6 @@ def download_data(drive_id, zip_file_name, required_file_name):
 #     #     if col not in COL_TO_EXCLUDE:
 #     #         df[col] = df[col].apply(lambda a: np.array2string(a))
 #     return df
-
 
 # def array_to_string(cell):
 #     if isinstance(cell, np.ndarray):
@@ -169,4 +166,3 @@ def load_WTI(glove_dim: str):
 
 def add_glove_dim_to_name(file_name, glove_dim: str):
     return file_name.replace(".", f"_{glove_dim}.")
-
