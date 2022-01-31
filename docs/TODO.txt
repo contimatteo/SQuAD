@@ -1,4 +1,27 @@
 
+
+ISSUES
+  [ ] dataset size
+
+
+TODO
+  [ ] save model weights
+  [ ] adaptive batch-size 
+  [ ] split in multiple files
+  [ ] network plots
+  [ ] dataset plots
+  [ ] create Keras (generator)
+  [ ] support Keras (generator)
+
+
+TO-DISCUSS
+  [ ] tuning
+
+
+--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
+
 IMPROVEMENTS
   [ ] BERT 
   [ ] Character-Level Word Embeddings (slide 10, page 43-44)
+

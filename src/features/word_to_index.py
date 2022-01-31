@@ -1,5 +1,7 @@
 from typing import List
 
+###
+
 
 class WordToIndex:
     index_dict = {}
@@ -34,4 +36,3 @@ class WordToIndex:
     def __init__(self):
         self.index_dict = {}
         self.word_dict = {}
-

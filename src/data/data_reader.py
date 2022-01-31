@@ -6,6 +6,8 @@ import pandas as pd
 from data_utils import create_tmp_directories, download_data, get_data_dir, get_tmp_data_dir
 from glove_reader import load_glove, download_glove
 
+###
+
 # if glove_embeddings is None:
 #   if not os.path.exists(GLOVE_LOCAL_DIR):
 #     os.makedirs(GLOVE_LOCAL_DIR)
@@ -19,7 +21,6 @@ from glove_reader import load_glove, download_glove
 #   with zipfile.ZipFile(f"{GLOVE_LOCAL_FILE_ZIP}.zip", 'r') as zip_ref:
 #     zip_ref.extractall(path=GLOVE_LOCAL_DIR)
 #     print("Successful extraction")
-
 
 # TRAINING_DATA_LOCAL_DIR = os.path.join(data_utils.get_project_directory(), "data", "raw")
 # TMP_TRAIN_DATA_DIR = os.path.join(data_utils.get_project_directory(), "tmp")
@@ -57,7 +58,7 @@ def load_training_set():
     else:
         raw_file = sys.argv[1]
     if not os.path.exists(raw_file):
-        raise Exception(raw_file+" does not exists.")
+        raise Exception(raw_file + " does not exists.")
     print("Data downloaded at position: " + raw_file + "\n")
     print("Converting json to dataframe")
 
@@ -80,11 +81,22 @@ def load_training_set():
     # print(main.columns)
 
     contents = contents["data"]
-    df = pd.json_normalize(contents, ['paragraphs', 'qas', 'answers'], ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"]])
+    df = pd.json_normalize(
+        contents, ['paragraphs', 'qas', 'answers'],
+        ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"]]
+    )
     df = df[["title", "paragraphs.context", "paragraphs.qas.question", "text", "answer_start"]]
 
-    df.rename(columns={'title': 'title', 'paragraphs.context': 'passage',
-                       'paragraphs.qas.question': 'question', 'text': 'answer', 'answer_start': 'answer_start'}, inplace=True)
+    df.rename(
+        columns={
+            'title': 'title',
+            'paragraphs.context': 'passage',
+            'paragraphs.qas.question': 'question',
+            'text': 'answer',
+            'answer_start': 'answer_start'
+        },
+        inplace=True
+    )
     print("Converted json to dataframe \n")
     return df
 
@@ -107,6 +119,8 @@ def main():
     print(df.columns)
     print(df[0:1])
 
+
+###
 
 if __name__ == "__main__":
     main()

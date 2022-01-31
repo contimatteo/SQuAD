@@ -1,13 +1,13 @@
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import Concatenate, Flatten
+from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
-from models.core import EmbeddingLayers, RnnLayers, AttentionLayers
+from models.core import EmbeddingLayers, RnnLayers
 from models.core import drqa_categorical_crossentropy
-from models.core import attention
+from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
 
 ###
 
@@ -58,7 +58,7 @@ def DRQA() -> Model:
         q_rnn = RnnLayers.drqa()(q_embeddings)
 
         ### self-attention (simplfied version)
-        q_encoding = AttentionLayers.question_encoding()(q_rnn)
+        q_encoding = WeightedSumSelfAttention()(q_rnn)
 
         ### PASSAGE ###############################################################
 
@@ -66,8 +66,7 @@ def DRQA() -> Model:
         p_embeddings = EmbeddingLayers.glove(N_P_TOKENS)(p_tokens)
 
         ### aligend-attention
-        p_attention = attention.AlignmentModel(units=13)([p_embeddings, q_embeddings])
-        # p_attention = AttentionLayers.alignment()([p_embeddings, q_embeddings])
+        p_attention = AlignedAttention()([p_embeddings, q_embeddings])
 
         ### lstm
         p_rnn = RnnLayers.drqa()(
@@ -77,7 +76,7 @@ def DRQA() -> Model:
         ### OUTPUT ################################################################
 
         ### similarity
-        out = AttentionLayers.bilinear_similarity()([p_rnn, q_encoding])
+        out = BiLinearSimilarityAttention()([p_rnn, q_encoding])
 
         return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out)
 
