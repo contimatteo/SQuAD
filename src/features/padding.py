@@ -1,8 +1,10 @@
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pandas as pd
-from word_to_index import WordToIndex
-from one_hot_encoder import OneHotEncoder
+
 from nltk import pos_tag
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+from .word_to_index import WordToIndex
+from .one_hot_encoder import OneHotEncoder
 
 ###
 

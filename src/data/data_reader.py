@@ -1,10 +1,12 @@
 import os
 import sys
-import data_utils
 import json
 import pandas as pd
-from data_utils import create_tmp_directories, download_data, get_data_dir, get_tmp_data_dir
-from glove_reader import load_glove, download_glove
+
+from .data_utils import copy_data, get_project_directory
+from .data_utils import create_tmp_directories, download_data
+from .data_utils import get_data_dir, get_tmp_data_dir
+from .glove_reader import load_glove, download_glove
 
 ###
 
@@ -22,8 +24,8 @@ from glove_reader import load_glove, download_glove
 #     zip_ref.extractall(path=GLOVE_LOCAL_DIR)
 #     print("Successful extraction")
 
-# TRAINING_DATA_LOCAL_DIR = os.path.join(data_utils.get_project_directory(), "data", "raw")
-# TMP_TRAIN_DATA_DIR = os.path.join(data_utils.get_project_directory(), "tmp")
+# TRAINING_DATA_LOCAL_DIR = os.path.join(get_project_directory(), "data", "raw")
+# TMP_TRAIN_DATA_DIR = os.path.join(get_project_directory(), "tmp")
 
 
 def download_training_set():
@@ -34,7 +36,7 @@ def download_training_set():
 
     create_tmp_directories()
     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
-    data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+    copy_data(REQUIRED_FILE, RAW_FILE)
     return RAW_FILE
 
 
@@ -46,7 +48,7 @@ def download_training_set():
 #
 #     create_tmp_directories()
 #     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
-#     data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+#     copy_data(REQUIRED_FILE, RAW_FILE)
 #     return RAW_FILE
 
 

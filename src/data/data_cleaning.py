@@ -1,17 +1,13 @@
-from typing import List, Tuple
+from typing import Tuple
 
-import pandas as pd
-from nltk.tokenize import RegexpTokenizer
-from copy import deepcopy
-import sys
-import os
 import numpy as np
+import pandas as pd
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'utils'))
-# from preprocessing_utils import df_apply_function_with_dict
-# from preprocessing_utils import df_apply_function_with_dict_2
-from preprocessing_utils import get_dict, insert_dict
-from data_utils import nltk_download_utilities
+from copy import deepcopy
+from nltk.tokenize import RegexpTokenizer
+from utils.preprocessing import get_dict, insert_dict
+
+from .data_utils import nltk_download_utilities
 
 ###
 

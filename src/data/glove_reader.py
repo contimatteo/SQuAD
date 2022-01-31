@@ -1,12 +1,13 @@
 import os
-import sys
-import data_utils
-import json
 import pandas as pd
 import numpy as np
-from data_utils import create_tmp_directories, download_data, get_data_dir, get_tmp_data_dir
+
 from copy import copy
-from word_to_index import WordToIndex
+from features.word_to_index import WordToIndex
+
+from .data_utils import copy_data
+from .data_utils import create_tmp_directories, download_data
+from .data_utils import get_data_dir, get_tmp_data_dir
 
 ###
 
@@ -19,7 +20,7 @@ def download_glove(glove_dim: int):
 
     create_tmp_directories()
     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
-    data_utils.copy_data(REQUIRED_FILE, RAW_FILE)
+    copy_data(REQUIRED_FILE, RAW_FILE)
     return RAW_FILE
 
 

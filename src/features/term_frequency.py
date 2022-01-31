@@ -1,6 +1,4 @@
 from typing import List
-import sys
-import os
 
 import pandas as pd
 

@@ -1,7 +1,8 @@
 import pandas as pd
-from extract_features import extract_features
-from padding import apply_padding_to
-from word_to_index import WordToIndex
+
+from .extract_features import extract_features
+from .padding import apply_padding_to
+from .word_to_index import WordToIndex
 
 ###
 
