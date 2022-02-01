@@ -1,10 +1,14 @@
 from typing import Callable, Any, List
 
 import tensorflow as tf
+import numpy as np
+
+import utils.configs as Configs
 
 from tensorflow.keras.layers import Dense, Dropout, Dot
 from tensorflow.keras.layers import Embedding, Bidirectional, LSTM
 from tensorflow.keras.activations import softmax
+from tensorflow.keras.initializers import Constant
 
 ###
 
@@ -12,18 +16,20 @@ from tensorflow.keras.activations import softmax
 class EmbeddingLayers():
 
     @staticmethod
-    def glove(input_length: int) -> Callable[[Any], Any]:
+    def glove(input_length: int, glove_matrix: np.ndarray) -> Callable[[Any], Any]:
         assert isinstance(input_length, int)
 
-        i_dim = 100  # size of the vocabulary
-        o_dim = 50  # dimension of the dense embedding
-
-        ### TODO: change params:
-        #  - `trainable` --> `False`
-        #  - `embeddings_initializer` --> `Constant(glove_matrix)`
+        i_dim = glove_matrix.shape[0]  # size of the vocabulary
+        o_dim = Configs.DIM_EMBEDDING  # dimension of the 'dense' embedding
 
         def _nn(inp: Any) -> Any:
-            x = Embedding(i_dim, o_dim, input_length=input_length, trainable=True)(inp)
+            x = Embedding(
+                i_dim,
+                o_dim,
+                input_length=input_length,
+                embeddings_initializer=Constant(glove_matrix),
+                trainable=False
+            )(inp)
             x = Dropout(.3)(x)
             return x
 

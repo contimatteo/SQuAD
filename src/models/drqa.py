@@ -1,3 +1,5 @@
+import numpy as np
+
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Concatenate
@@ -6,15 +8,15 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 import utils.configs as Configs
 
 from models.core import EmbeddingLayers, RnnLayers
-from models.core import drqa_categorical_crossentropy
+from models.core import drqa_accuracy_metric, drqa_crossentropy_loss
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
 
 ###
 
 LEARNING_RATE = 1e-3
 
-LOSS = [drqa_categorical_crossentropy]  # ['binary_crossentropy']
-METRICS = ['categorical_accuracy']
+LOSS = [drqa_crossentropy_loss]
+METRICS = ['categorical_accuracy']  # drqa_accuracy_metric
 
 ###
 
@@ -32,7 +34,7 @@ def _compile(model) -> Model:
 
 
 # pylint: disable=invalid-name
-def DRQA() -> Model:
+def DRQA(embeddings_initializer: np.ndarray) -> Model:
     N_Q_TOKENS = Configs.N_QUESTION_TOKENS
     N_P_TOKENS = Configs.N_PASSAGE_TOKENS
     DIM_EXACT_MATCH = Configs.DIM_EXACT_MATCH
@@ -52,7 +54,7 @@ def DRQA() -> Model:
         ### QUESTION ##############################################################
 
         ### embeddings
-        q_embeddings = EmbeddingLayers.glove(N_Q_TOKENS)(q_tokens)
+        q_embeddings = EmbeddingLayers.glove(N_Q_TOKENS, embeddings_initializer)(q_tokens)
 
         ### lstm
         q_rnn = RnnLayers.drqa()(q_embeddings)
@@ -63,7 +65,7 @@ def DRQA() -> Model:
         ### PASSAGE ###############################################################
 
         ### embeddings
-        p_embeddings = EmbeddingLayers.glove(N_P_TOKENS)(p_tokens)
+        p_embeddings = EmbeddingLayers.glove(N_P_TOKENS, embeddings_initializer)(p_tokens)
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])

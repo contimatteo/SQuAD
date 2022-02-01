@@ -8,4 +8,5 @@ from .attention import AlignedAttention
 from .attention import BiLinearSimilarityAttention
 from .attention import WeightedSumSelfAttention
 
-from .loss import drqa_categorical_crossentropy
+from .loss import drqa_crossentropy_loss
+from .metric import drqa_accuracy_metric

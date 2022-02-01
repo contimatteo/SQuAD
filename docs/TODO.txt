@@ -4,14 +4,23 @@ ISSUES
   [ ] dataset size
 
 
-TODO
+FRA-MATTEO
+  [ ] variable batch-size 
+  [ ] network plots
+  [ ] support Keras (generator)
+  [ ] Early Stopping
+  [ ] progressive LearningRate
   [ ] save model weights
+  [ ] save weights only for the best epoch
+  [ ] K-Fold evaluation strategy
+
+
+PRIMIANO-LUCIANO
   [ ] adaptive batch-size 
   [ ] split in multiple files
-  [ ] network plots
   [ ] dataset plots
   [ ] create Keras (generator)
-  [ ] support Keras (generator)
+  [ ] K-Fold evaluation strategy
 
 
 TO-DISCUSS
