@@ -22,9 +22,9 @@ def drqa_categorical_crossentropy(y_true, y_pred):
     #
 
     y_true_start = y_true[:, :, 0]
-    y_pred_start = y_true[:, :, 0]
+    y_pred_start = y_pred[:, :, 0]
 
-    y_true_end = y_pred[:, :, 1]
+    y_true_end = y_true[:, :, 1]
     y_pred_end = y_pred[:, :, 1]
 
     loss_start = _loss(y_true_start, y_pred_start)
