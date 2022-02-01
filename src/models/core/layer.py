@@ -51,8 +51,8 @@ class RnnLayers():
 
         def _nn(inp: Any) -> Any:
             x = Bidirectional(_lstm(), merge_mode="concat")(inp)
-            # x = Bidirectional(_lstm(), merge_mode="concat")(x)
-            # x = Bidirectional(_lstm(), merge_mode="concat")(x)
+            x = Bidirectional(_lstm(), merge_mode="concat")(x)
+            x = Bidirectional(_lstm(), merge_mode="concat")(x)
             return x
 
         return _nn
@@ -152,8 +152,8 @@ class AttentionLayers():
             passage, question = passage_and_question[0], passage_and_question[1]
 
             alpha_question = _alpha(question)
-            aligned_tokens = []
 
+            aligned_tokens = []
             for i in range(passage.shape[1]):
                 attention_weights = _custom_core(passage, i, alpha_question)
                 ### (batch_size, question_length, 1)

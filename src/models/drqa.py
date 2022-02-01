@@ -8,15 +8,16 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 import utils.configs as Configs
 
 from models.core import EmbeddingLayers, RnnLayers
-from models.core import drqa_accuracy_metric, drqa_crossentropy_loss
+from models.core import drqa_crossentropy
+from models.core import drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
 
 ###
 
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 1e-4
 
-LOSS = [drqa_crossentropy_loss]
-METRICS = ['categorical_accuracy']  # drqa_accuracy_metric
+LOSS = [drqa_crossentropy]
+METRICS = ['categorical_accuracy', drqa_accuracy_start, drqa_accuracy_end]
 
 ###
 
