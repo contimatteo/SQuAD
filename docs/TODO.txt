@@ -13,6 +13,7 @@ FRA-MATTEO
   [ ] save model weights
   [ ] save weights only for the best epoch
   [ ] K-Fold evaluation strategy
+  [ ] aggiungere `N+1` bit al one-hot encoding delle Y label
 
 
 PRIMIANO-LUCIANO
