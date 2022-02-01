@@ -21,17 +21,11 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 def dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
     X, Y = None, None
 
-    _, data, glove, wti = get_data(300, debug=True)
+    _, data, glove, _ = get_data(300, debug=True)
 
     _, p_tokens, q_tokens, Y, p_pos, p_ner, p_tf, p_match = data
 
     X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
-
-    print()
-    print()
-    print("glove = ", glove.shape)
-    print()
-    print()
 
     return X, Y, glove
 
