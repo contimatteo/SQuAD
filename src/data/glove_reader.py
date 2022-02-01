@@ -5,9 +5,9 @@ import numpy as np
 from copy import copy
 from features.word_to_index import WordToIndex
 
-from .data_utils import copy_data
-from .data_utils import create_tmp_directories, download_data
-from .data_utils import get_data_dir, get_tmp_data_dir
+from utils.data import copy_data
+from utils.data import create_tmp_directories, download_data
+from utils.data import get_data_dir, get_tmp_data_dir
 
 ###
 
@@ -60,14 +60,6 @@ def inject_OOV_embeddings(df: pd.DataFrame, dictionary):
     return emb_dict
 
 
-# def prepare_tokenizer():
-#   filters = '\t\n'
-#   split = " "
-#   oov_token = 'oov'
-#   return Tokenizer(num_words=None, filters=filters, lower=True,
-#                    split=split, char_level=False, oov_token=oov_token)
-
-
 def glove_embedding(glove_embeddings, glove_dim):
     WTI = WordToIndex()
     WTI.fit_on_list(glove_embeddings.keys())
@@ -81,14 +73,3 @@ def glove_embedding(glove_embeddings, glove_dim):
         embeddings_matrix[word_index] = glove_embeddings[token]
 
     return embeddings_matrix, WTI
-
-
-def main():
-    glove = download_glove()
-    load_glove(glove)
-
-
-###
-
-if __name__ == "__main__":
-    main()
