@@ -7,17 +7,17 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
-from models.core import EmbeddingLayers, RnnLayers
-from models.core import drqa_crossentropy
-from models.core import drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end
+from models.core import GloveEmbeddings, DrqaRnn
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
+from models.core import drqa_crossentropy
+# from models.core import drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end
 
 ###
 
 LEARNING_RATE = 1e-4
 
 LOSS = [drqa_crossentropy]
-METRICS = ['categorical_accuracy', drqa_accuracy_start, drqa_accuracy_end]
+METRICS = ['categorical_accuracy']  # drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end]
 
 ###
 
@@ -55,10 +55,10 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### QUESTION ##############################################################
 
         ### embeddings
-        q_embeddings = EmbeddingLayers.glove(N_Q_TOKENS, embeddings_initializer)(q_tokens)
+        q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
 
         ### lstm
-        q_rnn = RnnLayers.drqa()(q_embeddings)
+        q_rnn = DrqaRnn()(q_embeddings)
 
         ### self-attention (simplfied version)
         q_encoding = WeightedSumSelfAttention()(q_rnn)
@@ -66,13 +66,13 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### PASSAGE ###############################################################
 
         ### embeddings
-        p_embeddings = EmbeddingLayers.glove(N_P_TOKENS, embeddings_initializer)(p_tokens)
+        p_embeddings = GloveEmbeddings(N_P_TOKENS, embeddings_initializer)(p_tokens)
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
 
         ### lstm
-        p_rnn = RnnLayers.drqa()(
+        p_rnn = DrqaRnn()(
             Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])
         )
 
