@@ -2,6 +2,7 @@
 
 from .base_layer import GloveEmbeddings
 from .base_layer import DrqaRnn
+from .base_layer import LastBit
 
 from .attention_layer import AlignedAttention
 from .attention_layer import BiLinearSimilarityAttention
