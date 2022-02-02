@@ -18,7 +18,7 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 ###
 
 
-def dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
+def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
     X, Y = None, None
 
     _, data, glove, _ = get_data(300, debug=True)
@@ -30,29 +30,35 @@ def dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
     return X, Y, glove
 
 
-def callbacks():
-    early_stopping = EarlyStopping(monitor='loss', patience=3)
-
-    # model_checkpoint = ModelCheckpoint(
-    #     filepath=checkpoint_filepath,
-    #     save_weights_only=True,
-    #     monitor='val_accuracy',
-    #     mode='max',
-    #     save_best_only=True
-    # )
-
-    return [early_stopping]
+def __callbacks():
+    return [
+        WandbCallback(),
+        EarlyStopping(
+            monitor='loss',
+            patience=3,
+            mode='min',
+            min_delta=1e-3,
+            restore_best_weights=True,
+        ),
+        # ModelCheckpoint(
+        #     filepath=checkpoint_filepath,
+        #     save_weights_only=True,
+        #     monitor='val_accuracy',
+        #     mode='max',
+        #     save_best_only=True
+        # )
+    ]
 
 
 ###
 
 
 def train():
-    X, Y, glove = dataset()
+    X, Y, glove = __dataset()
 
     model = DRQA(glove)
 
-    model.fit(X, Y, epochs=5, batch_size=128, callbacks=[WandbCallback()])
+    model.fit(X, Y, epochs=10, batch_size=128, callbacks=__callbacks())
 
     model.predict(X)
 
