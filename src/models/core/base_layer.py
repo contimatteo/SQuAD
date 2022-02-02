@@ -59,26 +59,26 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
     def __nn1(output: Any):
         out_start = output[:, :, 0]
-        ### --> (batch_size, passage_len)
+        ### --> (_, n_tokens)
         out_end = output[:, :, 1]
-        ### --> (batch_size, passage_len)
+        ### --> (_, n_tokens)
 
         out_bit_start = Dense(1, activation="sigmoid")(out_start)
-        ### --> (batch_size,1)
+        ### --> (_, 1)
         out_bit_end = Dense(1, activation="sigmoid")(out_end)
-        ### --> (batch_size,1)
+        ### --> (_, 1)
 
         out_bits = tf.concat([out_bit_start, out_bit_end], axis=1)
-        ### --> (batch_size,2)
+        ### --> (_,2)
 
         out_bits = tf.expand_dims(out_bits, axis=1)
-        ### --> (batch_size, 1, 2)
+        ### --> (_, 1, 2)
 
         output_new = tf.concat([output, out_bits], axis=1)
-        ### --> (batch_size, passage_len +1, 2)
+        ### --> (_, n_tokens+1, 2)
 
         output_new = softmax(output_new)
-        ### --> (batch_size, passage_len +1, 2)
+        ### --> (_, n_tokens+1, 2)
 
         return output_new
 
@@ -86,21 +86,21 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         units = Configs.N_PASSAGE_TOKENS + 1
 
         out_start = output[:, :, 0]
-        ### --> (batch_size, passage_len)
+        ### --> (_, n_tokens)
         out_end = output[:, :, 1]
-        ### --> (batch_size, passage_len)
+        ### --> (_, n_tokens)
 
         out_start = Dense(units, activation="softmax")(out_start)
         out_end = Dense(units, activation="softmax")(out_end)
 
         out_start = tf.expand_dims(out_start, axis=2)
-        ### --> (batch_size, passage_len +1, 1)
+        ### --> (_, n_tokens+1, 1)
         out_end = tf.expand_dims(out_end, axis=2)
-        ### --> (batch_size, passage_len +1, 1)
+        ### --> (_, n_tokens+1, 1)
 
         out_new = tf.concat([out_start, out_end], axis=2)
-        ### --> (batch_size, passage_len +1, 2)
+        ### --> (_, n_tokens+1, 2)
 
         return out_new
 
-    return __nn1
+    return __nn2

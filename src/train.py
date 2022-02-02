@@ -23,17 +23,6 @@ def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
 
     X, Y = XY_data_from_dataset(data)
 
-    # print()
-    # print()
-    # print("q_tokens = ", X[0].shape)
-    # print("p_tokens = ", X[1].shape)
-    # print("p_match = ", X[2].shape)
-    # print("p_pos = ", X[3].shape)
-    # print("p_ner = ", X[4].shape)
-    # print("p_tf = ", X[5].shape)
-    # print()
-    # print()
-
     return X, Y, glove
 
 
@@ -65,7 +54,7 @@ def train():
 
     model = DRQA(glove)
 
-    model.fit(X, Y, epochs=10, batch_size=128, callbacks=__callbacks())
+    model.fit(X, Y, epochs=5, batch_size=16, callbacks=__callbacks())
 
     model.predict(X)
 
