@@ -7,17 +7,17 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
-from models.core import GloveEmbeddings, DrqaRnn, LastBit
+from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
 from models.core import drqa_crossentropy
-# from models.core import drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end
+from models.core import start_accuracy, end_accuracy  # , tot_accuracy
 
 ###
 
 LEARNING_RATE = 1e-4
 
 LOSS = [drqa_crossentropy]
-METRICS = ['categorical_accuracy']  # drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end]
+METRICS = ['categorical_accuracy', start_accuracy, end_accuracy]  # tot_accuracy
 
 ###
 
@@ -79,12 +79,14 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### OUTPUT ################################################################
 
         ### similarity
-        out_similarity = BiLinearSimilarityAttention()([p_rnn, q_encoding])
+        out_probabilities = BiLinearSimilarityAttention()([p_rnn, q_encoding])
 
         ### last bit
-        out1 = LastBit()(out_similarity)
+        out_probabilities = EnhancedProbabilities()(out_probabilities)
 
-        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out1)
+        ###
+
+        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probabilities)
 
     #
 
