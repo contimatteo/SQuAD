@@ -7,7 +7,7 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
-from models.core import GloveEmbeddings, DrqaRnn
+from models.core import GloveEmbeddings, DrqaRnn, LastBit
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
 from models.core import drqa_crossentropy
 # from models.core import drqa_accuracy, drqa_accuracy_start, drqa_accuracy_end
@@ -79,9 +79,12 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### OUTPUT ################################################################
 
         ### similarity
-        out = BiLinearSimilarityAttention()([p_rnn, q_encoding])
+        out_similarity = BiLinearSimilarityAttention()([p_rnn, q_encoding])
 
-        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out)
+        ### last bit
+        out1 = LastBit()(out_similarity)
+
+        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out1)
 
     #
 
