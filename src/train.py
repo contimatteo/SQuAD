@@ -5,11 +5,11 @@ import numpy as np
 
 import utils.env_setup
 
-from models import DRQA
-from wandb.keras import WandbCallback
 from tensorflow.keras.callbacks import EarlyStopping
-
+from wandb.keras import WandbCallback
+from models import DRQA
 from data import get_data
+from utils import XY_data_from_dataset
 
 ###
 
@@ -19,13 +19,20 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    X, Y = None, None
-
     _, data, glove, _ = get_data(300, debug=True)
 
-    _, p_tokens, q_tokens, Y, p_pos, p_ner, p_tf, p_match = data
+    X, Y = XY_data_from_dataset(data)
 
-    X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
+    # print()
+    # print()
+    # print("q_tokens = ", X[0].shape)
+    # print("p_tokens = ", X[1].shape)
+    # print("p_match = ", X[2].shape)
+    # print("p_pos = ", X[3].shape)
+    # print("p_ner = ", X[4].shape)
+    # print("p_tf = ", X[5].shape)
+    # print()
+    # print()
 
     return X, Y, glove
 

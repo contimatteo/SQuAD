@@ -1,7 +1,8 @@
+from typing import Tuple
+
 from random import randint
 
 import numpy as np
-
 import utils.configs as Configs
 
 ###
@@ -62,3 +63,92 @@ def Y_train_faker() -> np.ndarray:
 
 
 ###
+
+
+def __trunc_X_feature_at_n_token(feature, n):
+    return feature[:, 0:n]
+
+
+def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
+    ### --> (n_examples, n_tokens, 2)
+    Y_transposed = np.transpose(Y, axes=[0, 2, 1])
+    ### --> (n_examples, 2, n_tokens)
+
+    ### existing at least one probability not equal to zero?
+    Y_onehot_label_missing = np.any(Y_transposed, axis=2)  ### --> (n_examples, 2)
+    ### invert each boolean value: now we have `1` where we have all zero probabilities.
+    Y_onehot_label_missing = np.invert(Y_onehot_label_missing)  ### --> (n_examples, 2)
+    ### cast `bool` values to `int`
+    Y_onehot_label_missing = Y_onehot_label_missing.astype(int)  ### --> (n_examples, 2)
+
+    ### (n_examples, n_tokens, 2) and (n_examples, 2) --> (n_tokens+1, n_examples, 2)
+    Y_onehot_with_additional_case = np.concatenate(
+        (np.transpose(Y, axes=[1, 0, 2]), np.expand_dims(Y_onehot_label_missing, axis=0))
+    )
+    Y_onehot_with_additional_case = np.transpose(Y_onehot_with_additional_case, axes=[1, 0, 2])
+
+    return Y_onehot_with_additional_case
+
+
+def XY_data_from_dataset(data) -> Tuple[np.ndarray]:
+
+    assert isinstance(data, tuple)
+    assert len(data) == 8
+
+    #
+
+    p_tokens = data[1]
+    p_tokens = __trunc_X_feature_at_n_token(p_tokens, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(p_tokens, np.ndarray)
+    assert len(p_tokens.shape) == 2
+    assert p_tokens.shape[1] == Configs.N_PASSAGE_TOKENS
+
+    q_tokens = data[2]
+    q_tokens = __trunc_X_feature_at_n_token(q_tokens, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(q_tokens, np.ndarray)
+    assert len(q_tokens.shape) == 2
+    assert q_tokens.shape[1] == Configs.N_QUESTION_TOKENS
+
+    labels = data[3]
+    labels = __trunc_X_feature_at_n_token(labels, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(labels, np.ndarray)
+    assert len(labels.shape) == 3
+    assert labels.shape[1] == Configs.N_PASSAGE_TOKENS
+    assert labels.shape[2] == 2
+
+    p_pos = data[4]
+    p_pos = __trunc_X_feature_at_n_token(p_pos, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(p_pos, np.ndarray)
+    assert len(p_pos.shape) == 3
+    assert p_pos.shape[1] == Configs.N_PASSAGE_TOKENS
+    assert p_pos.shape[2] == Configs.N_POS_CLASSES
+
+    p_ner = data[5]
+    p_ner = __trunc_X_feature_at_n_token(p_ner, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(p_ner, np.ndarray)
+    assert len(p_ner.shape) == 3
+    assert p_ner.shape[1] == Configs.N_PASSAGE_TOKENS
+    assert p_ner.shape[2] == Configs.N_NER_CLASSES
+
+    p_tf = data[6]
+    p_tf = __trunc_X_feature_at_n_token(p_tf, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(p_tf, np.ndarray)
+    assert len(p_tf.shape) == 2
+    assert p_tf.shape[1] == Configs.N_PASSAGE_TOKENS
+
+    p_match = data[7]
+    p_match = __trunc_X_feature_at_n_token(p_match, Configs.N_PASSAGE_TOKENS)
+    assert isinstance(p_match, np.ndarray)
+    assert len(p_match.shape) == 3
+    assert p_match.shape[1] == Configs.N_PASSAGE_TOKENS
+    assert p_match.shape[2] == Configs.DIM_EXACT_MATCH
+
+    #
+
+    X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
+
+    Y = __prepare_Y_true_onehot_encoding(labels)
+
+    #
+
+    return X, Y
