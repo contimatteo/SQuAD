@@ -65,8 +65,12 @@ def Y_train_faker() -> np.ndarray:
 ###
 
 
-def __trunc_X_feature_at_n_token(feature, n):
-    return feature[:, 0:n]
+def __X_feature_examples_subset(feature, n_examples):
+    return feature[0:n_examples]
+
+
+def __X_feature_tokens_subset(feature, n_tokens):
+    return feature[:, 0:n_tokens]
 
 
 def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
@@ -90,54 +94,68 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
     return Y_onehot_with_additional_case
 
 
-def XY_data_from_dataset(data) -> Tuple[np.ndarray]:
-
+def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
     assert isinstance(data, tuple)
     assert len(data) == 8
 
     #
 
     p_tokens = data[1]
-    p_tokens = __trunc_X_feature_at_n_token(p_tokens, Configs.N_PASSAGE_TOKENS)
+    q_tokens = data[2]
+    labels = data[3]
+    p_pos = data[4]
+    p_ner = data[5]
+    p_tf = data[6]
+    p_match = data[7]
+
+    #
+
+    if n_examples_subset is not None and isinstance(n_examples_subset, int):
+        p_tokens = __X_feature_examples_subset(p_tokens, n_examples_subset)
+        q_tokens = __X_feature_examples_subset(q_tokens, n_examples_subset)
+        labels = __X_feature_examples_subset(labels, n_examples_subset)
+        p_pos = __X_feature_examples_subset(p_pos, n_examples_subset)
+        p_ner = __X_feature_examples_subset(p_ner, n_examples_subset)
+        p_tf = __X_feature_examples_subset(p_tf, n_examples_subset)
+        p_match = __X_feature_examples_subset(p_match, n_examples_subset)
+
+    p_tokens = __X_feature_tokens_subset(p_tokens, Configs.N_PASSAGE_TOKENS)
+    q_tokens = __X_feature_tokens_subset(q_tokens, Configs.N_PASSAGE_TOKENS)
+    labels = __X_feature_tokens_subset(labels, Configs.N_PASSAGE_TOKENS)
+    p_pos = __X_feature_tokens_subset(p_pos, Configs.N_PASSAGE_TOKENS)
+    p_ner = __X_feature_tokens_subset(p_ner, Configs.N_PASSAGE_TOKENS)
+    p_tf = __X_feature_tokens_subset(p_tf, Configs.N_PASSAGE_TOKENS)
+    p_match = __X_feature_tokens_subset(p_match, Configs.N_PASSAGE_TOKENS)
+
+    #
+
     assert isinstance(p_tokens, np.ndarray)
     assert len(p_tokens.shape) == 2
     assert p_tokens.shape[1] == Configs.N_PASSAGE_TOKENS
 
-    q_tokens = data[2]
-    q_tokens = __trunc_X_feature_at_n_token(q_tokens, Configs.N_PASSAGE_TOKENS)
     assert isinstance(q_tokens, np.ndarray)
     assert len(q_tokens.shape) == 2
     assert q_tokens.shape[1] == Configs.N_QUESTION_TOKENS
 
-    labels = data[3]
-    labels = __trunc_X_feature_at_n_token(labels, Configs.N_PASSAGE_TOKENS)
     assert isinstance(labels, np.ndarray)
     assert len(labels.shape) == 3
     assert labels.shape[1] == Configs.N_PASSAGE_TOKENS
     assert labels.shape[2] == 2
 
-    p_pos = data[4]
-    p_pos = __trunc_X_feature_at_n_token(p_pos, Configs.N_PASSAGE_TOKENS)
     assert isinstance(p_pos, np.ndarray)
     assert len(p_pos.shape) == 3
     assert p_pos.shape[1] == Configs.N_PASSAGE_TOKENS
     assert p_pos.shape[2] == Configs.N_POS_CLASSES
 
-    p_ner = data[5]
-    p_ner = __trunc_X_feature_at_n_token(p_ner, Configs.N_PASSAGE_TOKENS)
     assert isinstance(p_ner, np.ndarray)
     assert len(p_ner.shape) == 3
     assert p_ner.shape[1] == Configs.N_PASSAGE_TOKENS
     assert p_ner.shape[2] == Configs.N_NER_CLASSES
 
-    p_tf = data[6]
-    p_tf = __trunc_X_feature_at_n_token(p_tf, Configs.N_PASSAGE_TOKENS)
     assert isinstance(p_tf, np.ndarray)
     assert len(p_tf.shape) == 2
     assert p_tf.shape[1] == Configs.N_PASSAGE_TOKENS
 
-    p_match = data[7]
-    p_match = __trunc_X_feature_at_n_token(p_match, Configs.N_PASSAGE_TOKENS)
     assert isinstance(p_match, np.ndarray)
     assert len(p_match.shape) == 3
     assert p_match.shape[1] == Configs.N_PASSAGE_TOKENS
