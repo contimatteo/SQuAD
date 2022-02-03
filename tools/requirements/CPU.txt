@@ -25,4 +25,5 @@ nltk
 pandas
 scikit-learn
 tensorflow
+tensorflow-addons
 wandb

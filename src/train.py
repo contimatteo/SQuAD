@@ -4,6 +4,7 @@ import os
 import numpy as np
 
 import utils.env_setup
+import utils.configs as Configs
 
 from tensorflow.keras.callbacks import EarlyStopping
 from wandb.keras import WandbCallback
@@ -54,7 +55,7 @@ def train():
 
     model = DRQA(glove)
 
-    model.fit(X, Y, epochs=5, batch_size=16, callbacks=__callbacks())
+    model.fit(X, Y, epochs=Configs.EPOCHS, batch_size=Configs.BATCH_SIZE, callbacks=__callbacks())
 
     model.predict(X)
 
