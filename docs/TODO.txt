@@ -15,6 +15,7 @@ FRA-MATTEO
   [ ] K-Fold evaluation strategy {Fra}
   [x] aggiungere `N+1` bit al one-hot encoding delle Y label (nei dati) {Matte}
   [x] aggiungere `N+1` bit al one-hot encoding delle Y label (nella rete) {Fra}
+  [ ] aggiungere una metrica che calcoli esattamente il valore di loss GIUSTO
 
 
 PRIMIANO-LUCIANO

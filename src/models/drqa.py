@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.optimizers import Adam, Optimizer
 from tensorflow.keras.optimizers.schedules import CosineDecay, ExponentialDecay
-from tensorflow_addons.optimizers import CyclicalLearningRate
+# from tensorflow_addons.optimizers import CyclicalLearningRate
 from wandb import Config
 
 import utils.configs as Configs
@@ -18,8 +18,9 @@ from models.core import start_accuracy, end_accuracy, tot_accuracy
 
 ###
 
-LOSS = [drqa_crossentropy]
-METRICS = [start_accuracy, end_accuracy, tot_accuracy]  # 'categorical_accuracy'
+LOSS = ['binary_crossentropy']  # [drqa_crossentropy]
+# METRICS = [start_accuracy, end_accuracy, tot_accuracy, drqa_crossentropy]  # 'categorical_accuracy'
+METRICS = [tot_accuracy, drqa_crossentropy]
 
 ###
 
@@ -27,40 +28,49 @@ METRICS = [start_accuracy, end_accuracy, tot_accuracy]  # 'categorical_accuracy'
 def _adaptive_learning_rate(name="cosine") -> Any:
 
     def __cosine_decay() -> Any:
-        _alpha = 0.01
-        return CosineDecay(Configs.LEARNING_RATE, Configs.EPOCHS, alpha=_alpha, name="Cosine Decay")
+        initial_lr = Configs.LEARNING_RATE
+        decay_steps = Configs.EPOCHS
+        alpha = 0.1
+
+        return CosineDecay(initial_lr, decay_steps, alpha=alpha)
 
     def __exponential_decay() -> Any:
-        _decay_rate = 0.96
+        initial_lr = Configs.LEARNING_RATE
+        decay_steps = Configs.EPOCHS
+        decay_rate = 0.96
 
-        return ExponentialDecay(
-            Configs.LEARNING_RATE, decay_steps=Configs.EPOCHS, decay_rate=_decay_rate
-        )
+        return ExponentialDecay(initial_lr, decay_steps=decay_steps, decay_rate=decay_rate)
 
-    def __cyclic_decay() -> Any:
-        return CyclicalLearningRate(
-            Configs.MIN_LEARNING_RATE,
-            Configs.LEARNING_RATE,
-            step_size=(2 * Configs.BATCH_SIZE),
-            scale_fn=lambda x: 1 / (2.**(x - 1))
-        )
+    # def __cyclic_decay() -> Any:
+    #     LEARNING_RATE_MIN_VALUE = Configs.LEARNING_RATE / 10
+    #     step_size = 2 * Configs.BATCH_SIZE
+    #     scale_fn = lambda x: 1 / (2.**(x - 1))
+
+    #     return CyclicalLearningRate(
+    #         LEARNING_RATE_MIN_VALUE,
+    #         Configs.LEARNING_RATE,
+    #         step_size=step_size,
+    #         scale_fn=scale_fn
+    #     )
 
     if name == "cosine":
         return __cosine_decay()
-
     if name == "exponential":
         return __exponential_decay()
+    # if name == "cyclic":
+    #     return __cyclic_decay()
 
-    if name == "cyclic":
-        return __cyclic_decay()
+    raise Exception("[_adaptive_learning_rate]: invalid  `name` parameter.")
 
 
 ###
 
 
 def _optimizer() -> Optimizer:
-    # lr_decay_fn = _adaptive_learning_rate(name="cyclic")
-    return Adam(learning_rate=Configs.LEARNING_RATE)
+    # lr = Configs.LEARNING_RATE
+    lr = _adaptive_learning_rate(name="exponential")
+
+    return Adam(learning_rate=lr)
 
 
 def _compile(model) -> Model:

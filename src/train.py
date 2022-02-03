@@ -22,7 +22,7 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
     _, data, glove, _ = get_data(300, debug=True)
 
-    X, Y = XY_data_from_dataset(data, 1000)
+    X, Y = XY_data_from_dataset(data, Configs.BATCH_SIZE * 15)
 
     return X, Y, glove
 
