@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def find_match(passage: List[str], question: List[str]):
-    return [p in question for p in passage]
+    return [1 if p in question else 0 for p in passage]
 
 
 def original_form(passage: List[str], question: List[str]):
@@ -38,47 +38,3 @@ def apply_exact_match(df: pd.DataFrame):
         axis=1
     )
     return df
-
-
-# def exact_match(df: pd.DataFrame):
-#     print("Applying lemmatization")
-#     df = extract_features(df)
-#     print("Applied lemmatization")
-#     print("Applying exact match")
-#     df = apply_exact_match(df)
-#     print("Applied exact match")
-#     return df
-
-# def mayfun2(arg1, arg2):
-#     print(arg1)
-#     print(arg2)
-#
-#
-# def my_fun(**kwargs):
-#     mayfun2(**kwargs)
-
-# def main_test():
-#     pd.set_option('display.max_columns', None)
-#     pd.set_option('display.max_colwidth', None)
-#
-#     df_cleaned, glove_matrix, WTI = data_preprocessing()
-#     df = exact_match(df_cleaned[0:5].copy())
-#     print(df.columns)
-#
-#     print(df[0:1])
-#
-#     # my_fun(arg1 = "pippo", arg2 = "pluto")
-#
-#
-# def main():
-#     pd.set_option('display.max_columns', None)
-#     pd.set_option('display.max_colwidth', None)
-#     df_cleaned, glove_matrix, WTI = data_preprocessing()
-#     df = exact_match(df_cleaned)
-#     print(df.columns)
-#
-#     print(df[0:1])
-#
-#
-# if __name__ == "__main__":
-#     main_test()

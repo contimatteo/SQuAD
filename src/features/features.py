@@ -25,4 +25,4 @@ def add_features(df: pd.DataFrame, WTI: WordToIndex):
     df = apply_padding_to(df, WTI, OHE_pos, OHE_ner)
     df = drop_useless_columns(df)
     print("Applied Padding")
-    return df
+    return df, OHE_pos, OHE_ner
