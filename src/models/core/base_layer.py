@@ -57,27 +57,32 @@ def DrqaRnn() -> Callable[[Any], Any]:
 
 def EnhancedProbabilities() -> Callable[[Any], Any]:
 
+    def __add_complementar_bit(tensor: Any) -> Any:
+        ### tensor shape --> (_, n_tokens)
+
+        tensor_bit = Dense(1, activation="sigmoid")(tensor)
+        ### --> (_, 1)
+        tensor_new = tf.concat([tensor, tensor_bit], axis=1)
+        ### --> (_, n_tokens+1)
+        tensor_new = softmax(tensor_new)
+        ### --> (_, n_tokens+1)
+        tensor_new = tf.expand_dims(tensor_new, axis=2)
+        ### --> (_, n_tokens+1, 1)
+
+        return tensor_new
+
     def __nn1(output: Any):
         out_start = output[:, :, 0]
         ### --> (_, n_tokens)
         out_end = output[:, :, 1]
         ### --> (_, n_tokens)
 
-        out_bit_start = Dense(1, activation="sigmoid")(out_start)
-        ### --> (_, 1)
-        out_bit_end = Dense(1, activation="sigmoid")(out_end)
-        ### --> (_, 1)
+        out_start = __add_complementar_bit(out_start)
+        ### --> (_, n_tokens+1, 1)
+        out_end = __add_complementar_bit(out_end)
+        ### --> (_, n_tokens+1, 1)
 
-        out_bits = tf.concat([out_bit_start, out_bit_end], axis=1)
-        ### --> (_,2)
-
-        out_bits = tf.expand_dims(out_bits, axis=1)
-        ### --> (_, 1, 2)
-
-        output_new = tf.concat([output, out_bits], axis=1)
-        ### --> (_, n_tokens+1, 2)
-
-        output_new = softmax(output_new)
+        output_new = tf.concat([out_start, out_end], axis=2)
         ### --> (_, n_tokens+1, 2)
 
         return output_new
@@ -103,4 +108,4 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
         return out_new
 
-    return __nn2
+    return __nn1
