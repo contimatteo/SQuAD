@@ -24,5 +24,6 @@ googledrivedownloader
 nltk
 pandas
 scikit-learn
+swifter
 tensorflow
 wandb

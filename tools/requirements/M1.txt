@@ -22,6 +22,7 @@ python-dotenv
 googledrivedownloader
 nltk
 scikit-learn
+swifter
 tensorflow-macos
 tensorflow-metal
 wandb
