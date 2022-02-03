@@ -1,4 +1,5 @@
 import os
+import pickle
 
 import numpy as np
 import pandas as pd
@@ -6,6 +7,9 @@ from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
 import nltk
 import pickle as pkl
+from ast import literal_eval
+from data.dataframe_compression import DataframeCompression
+from features.one_hot_encoder import OneHotEncoder
 
 ###
 
@@ -20,7 +24,7 @@ def nltk_download_utilities():
     # spacy.cli.download("en_core_web_sm")
 
 
-FINAL_DATA_FILE_NAME = "data.json"
+FINAL_DATA_FILE_NAME = "data.pkl"
 GLOVE_MATRIX_FILE_NAME = "glove_matrix.pkl"
 WORD_TO_INDEX_FILE_NAME = "word_to_index.pkl"
 
@@ -89,20 +93,24 @@ def download_data(drive_id, zip_file_name, required_file_name):
 
 # def string_to_array(cell):
 #     if isinstance(cell, str):
-#         return cell.replace("\n", "")
+#         cell = cell.replace("\n", "")
+#         cell = literal_eval(cell)
+#         return np.array(cell)
 #     else:
 #         return cell
-
+#
+#
 # def decode_string_csv(df: pd.DataFrame):
 #     df = df.applymap(string_to_array)
-#     COL_TO_EXCLUDE = ["title", "answer", "passage_index", "question_index", "chunk_index"]
 #     # for col in df.columns:
 #     #     if col not in COL_TO_EXCLUDE:
 #     #         df[col] = df[col].apply(lambda a: np.array2string(a))
 #     return df
-
+#
+#
 # def array_to_string(cell):
 #     if isinstance(cell, np.ndarray):
+#         np.set_printoptions(threshold=np.prod(cell.shape))
 #         return np.array2string(cell, separator=",")
 #
 #
@@ -111,21 +119,26 @@ def download_data(drive_id, zip_file_name, required_file_name):
 #     return df
 
 
-def save_processed_data(df: pd.DataFrame, glove_dim: str):
+def save_processed_data(df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder, glove_dim: str):
     # df = dataframe_array_to_string(df)
     name = add_glove_dim_to_name(FINAL_DATA_FILE_NAME, glove_dim)
     folder = get_processed_data_dir()
-    df.to_json(os.path.join(folder, name))
+    file = os.path.join(folder, name)
+    df_c = DataframeCompression(OHE_pos, OHE_ner)
+    df_c.compress(df)
+    with open(file, "wb") as handle:
+        pickle.dump(df_c, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_processed_data(glove_dim: str):
+def load_processed_data(WTI, glove_dim: str):
     name = add_glove_dim_to_name(FINAL_DATA_FILE_NAME, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
     if not os.path.exists(file):
         return None
-    # return decode_string_csv(pd.read_csv(file))
-    return pd.read_json(file)
+    # return decode_string_csv(pd.read_csv(file, sep=";"))
+    with open(file, "rb") as handle:
+        return pickle.load(handle).extract(WTI)
 
 
 def save_pickle(obj, file_name: str, folder: str):

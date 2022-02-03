@@ -7,7 +7,7 @@ from copy import deepcopy
 from nltk.tokenize import RegexpTokenizer
 from utils.preprocessing import get_dict, insert_dict
 
-from .data_utils import nltk_download_utilities
+from utils.data import nltk_download_utilities
 
 ###
 
@@ -153,27 +153,6 @@ def add_labels(df):
     return df
 
 
-# def get_answer_start_end(df_row,passage_name,answer_name,answer_start_name):
-#    passage=df_row[passage_name]
-#    answer_text=df_row[answer_name]
-#    answer_start=df_row[answer_start_name]
-#
-#    answer_end = len(answer_text) + answer_start
-#    interval = [i for i, (s, e) in enumerate(span_tokenize(passage)) if e >= answer_start and s <= answer_end]
-#    if len(interval) <1:
-#       #raise Exception(interval + " is empty.")
-#       err= [answer_text]#[str(passage)[96]]
-#       print("anwer not found: ",err)
-#       return [-1,-1]
-#    return [min(interval),max(interval)]
-#
-#
-# def add_labels(df):
-#    df["label"] = df_apply_function_with_dict_2(df, get_answer_start_end,span_tokenize,"span_tokenize_dict","passage",passage_name="passage",answer_name="answer",answer_start_name="answer_start")
-#    #df.apply(lambda x: get_answer_start_end(x["passage"], x["answer"],x["answer_start"]), axis = 1)
-#    return df
-
-
 def get_passage_index(passage: str):
     if passage not in passage_index_dict.keys():
         passage_index_dict[passage] = len(passage_index_dict.keys())
@@ -196,18 +175,3 @@ def data_cleaning(df: pd.DataFrame):
     print("Data cleaned \n")
     return df
 
-
-def main():
-    insert_dict("sentence_tokenize_dict")
-    print(get_dict())
-    s = "   anna.    va  "
-    nltk_download_utilities()
-    print(tokenize_with_spaces(s))
-    print(span_tokenize(s))
-    print(get_dict())
-
-
-###
-
-if __name__ == "__main__":
-    main()
