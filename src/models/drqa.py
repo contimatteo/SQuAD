@@ -14,7 +14,7 @@ from models.core import start_accuracy, end_accuracy, tot_accuracy
 
 ###
 
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 
 LOSS = [drqa_crossentropy]
 METRICS = [start_accuracy, end_accuracy, tot_accuracy]  # 'categorical_accuracy'

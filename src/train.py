@@ -54,7 +54,7 @@ def train():
 
     model = DRQA(glove)
 
-    model.fit(X, Y, epochs=5, batch_size=16, callbacks=__callbacks())
+    model.fit(X, Y, epochs=5, batch_size=512, callbacks=__callbacks())
 
     model.predict(X)
 

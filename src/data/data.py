@@ -17,6 +17,10 @@ def __df_column_to_numpy(df_column: pd.Series) -> np.ndarray:
     return np.array([np.array(xi) for xi in df_column.to_numpy()])
 
 
+def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
+    return arr.astype(np.float)
+
+
 def __data_to_numpy(df: pd.DataFrame):
     # question_index = np.array(df["question_index"].to_numpy())
     # passage = df["word_index_passage_padded"].to_numpy()
@@ -39,6 +43,15 @@ def __data_to_numpy(df: pd.DataFrame):
     question = __df_column_to_numpy(df["word_index_question_padded"])
     exact_match = __df_column_to_numpy(df["exact_match_padded"])
     question_index = __df_column_to_numpy(df["question_index"])
+
+    tf = __cast_to_numpy_float(tf)
+    pos = __cast_to_numpy_float(pos)
+    ner = __cast_to_numpy_float(ner)
+    label = __cast_to_numpy_float(label)
+    passage = __cast_to_numpy_float(passage)
+    question = __cast_to_numpy_float(question)
+    exact_match = __cast_to_numpy_float(exact_match)
+    question_index = __cast_to_numpy_float(question_index)
 
     return question_index, passage, question, label, pos, ner, tf, exact_match
 
@@ -79,9 +92,8 @@ def get_data(glove_dim, debug=False):
 
     #
 
-    print("[Data] download started.")
+    print("[Data] parsing started.")
     df = load_processed_data(wti, glove_dim)
-    print("[Data] download done.")
 
     if df is None:
         df = data_reader()
@@ -100,6 +112,8 @@ def get_data(glove_dim, debug=False):
         print("[Data] export started.")
         __export_df(df, onehot_pos, onehot_ner, glove_dim)
         print("[Data] export done.")
+
+    print("[Data] parsing done.")
 
     #
 
