@@ -5,17 +5,17 @@ ISSUES
 
 
 FRA-MATTEO
-  [ ] variable batch-size 
-  [ ] network plots
-  [ ] support Keras (generator)
   [x] Early Stopping
-  [ ] save model weights {Matte}
-  [ ] restore weights of the best epoch ('best' in term of accuracy ...) {Matte}
-  [ ] progressive LearningRate {Fra}
-  [ ] K-Fold evaluation strategy {Fra}
+  [x] progressive LearningRate {Fra}
   [x] aggiungere `N+1` bit al one-hot encoding delle Y label (nei dati) {Matte}
   [x] aggiungere `N+1` bit al one-hot encoding delle Y label (nella rete) {Fra}
+  [ ] variable batch-size 
+  [ ] support Keras (generator)
+  [ ] save model weights {Matte}
+  [ ] restore weights of the best epoch ('best' in term of accuracy ...) {Matte}
   [ ] aggiungere una metrica che calcoli esattamente il valore di loss GIUSTO
+  [ ] K-Fold evaluation strategy {Fra}
+  [ ] network plots
 
 
 PRIMIANO-LUCIANO
