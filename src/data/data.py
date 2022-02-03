@@ -39,11 +39,11 @@ def data_to_numpy(df: pd.DataFrame):
 
 
 def get_data(glove_dim, debug=False):
-    print("Trying getting data")
-    df = load_processed_data(glove_dim)
     print("Trying getting glove")
     glove_matrix = load_glove_matrix(glove_dim)
     WTI = load_WTI(glove_dim)
+    print("Trying getting data")
+    df = load_processed_data(WTI, glove_dim)
 
     if glove_matrix is None or WTI is None:
         glove = glove_reader(glove_dim)
@@ -53,12 +53,12 @@ def get_data(glove_dim, debug=False):
 
     if df is None:
         if debug:
-            df = data_reader()[0:100].copy()
+            df = data_reader()[0:10].copy()
         else:
             df = data_reader()
         df = data_preprocessing(df, WTI)
-        df = add_features(df, WTI)
-        print("Exporting json")
+        df, OHE_pos, OHE_ner = add_features(df, WTI)
+        print("Exporting pkl")
         df.drop(
             [
                 "title", "answer", "word_tokens_passage_padded", "word_tokens_question_padded",
@@ -68,7 +68,8 @@ def get_data(glove_dim, debug=False):
             axis=1
         )
         df = df.reset_index(drop=True)
-        save_processed_data(df, glove_dim)
-        print("Exported json")
+        # print(df)
+        save_processed_data(df, OHE_pos, OHE_ner, glove_dim)
+        print("Exported pkl")
     df_np = data_to_numpy(df)
     return df, df_np, glove_matrix, WTI
