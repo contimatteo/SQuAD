@@ -9,7 +9,7 @@ from utils.data import save_WTI, load_WTI
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
 from .glove_reader import glove_embedding
-
+from utils.memory import reduce_mem_usage
 ###
 
 
@@ -56,8 +56,11 @@ def get_data(glove_dim, debug=False):
             df = data_reader()[0:10].copy()
         else:
             df = data_reader()
+        df, _ = reduce_mem_usage(df)
         df = data_preprocessing(df, WTI)
+        df, _ = reduce_mem_usage(df)
         df, OHE_pos, OHE_ner = add_features(df, WTI)
+        df, _ = reduce_mem_usage(df)
         print("Exporting pkl")
         df.drop(
             [

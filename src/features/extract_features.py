@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 from nltk import pos_tag
 from data.data_preprocessing import data_preprocessing
 
@@ -10,7 +10,6 @@ from .name_entity_recognition import apply_ner, apply_ner_one_hot
 from .term_frequency import apply_term_frequency
 from datetime import datetime
 from .pos import apply_pos_tag, apply_pos_one_hot
-
 
 ###
 
@@ -35,5 +34,6 @@ def extract_features(df: pd.DataFrame):
     print("Applying EXACT MATCH")
     df = apply_exact_match(df)
     df = drop_useless_columns(df)
+    # print(ppl)
     return df, OHE_pos, OHE_ner
 

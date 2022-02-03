@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 from features.word_to_index import WordToIndex
 
 from .data_cleaning import data_cleaning
