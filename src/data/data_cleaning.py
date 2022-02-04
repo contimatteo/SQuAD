@@ -124,7 +124,7 @@ def get_word_pstart_pend(interval: Tuple[int, int], dim: int):
     end = np.zeros(dim, dtype=int)
     start[p_start] = 1
     end[p_end] = 1
-    return list(zip(start, end))
+    return list(zip(np.uint8(start), np.uint8(end)))
 
 
 def get_answer_start_end(passage, answer_text, answer_start):
@@ -160,7 +160,7 @@ def get_passage_index(passage: str):
 
 
 def add_passage_index(df: pd.DataFrame):
-    df["passage_index"] = df.apply(lambda x: get_passage_index(x["passage"]), axis=1)
+    df["passage_index"] = df.apply(lambda x: np.uint32(get_passage_index(x["passage"])), axis=1)
     return df
 
 

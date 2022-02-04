@@ -52,7 +52,7 @@ def __callbacks():
 
 def train():
     X, Y, glove = __dataset()
-
+    print("Starting Training")
     model = DRQA(glove)
 
     model.fit(X, Y, epochs=Configs.EPOCHS, batch_size=Configs.BATCH_SIZE, callbacks=__callbacks())
