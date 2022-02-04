@@ -18,9 +18,9 @@ def test():
 def data():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
-    df, df_np, glove_matrix, WTI = get_data(300, debug=False)
-    print(df.columns)
-    print(df.shape)
+    df, df_np, glove_matrix, WTI = get_data(300, debug=True)
+    # print(df.columns)
+    # print(df.shape)
     # print(df[0:4])
     print("\n---------------\n")
     question_index, passage, question, label, pos, ner, tf, exact_match = df_np

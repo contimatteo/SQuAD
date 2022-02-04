@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 from nltk import ne_chunk
 from nltk.chunk import tree2conlltags
 

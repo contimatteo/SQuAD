@@ -103,7 +103,7 @@ def apply_padding_to(
     df_padded['ner_onehot_padded'] = list(ner_onehot)
 
     df_padded['term_frequency_padded'] = list(term_frequency)
+    df_padded = df_padded.reset_index()
 
     # df_padded.set_index(["passage_index", "question_index", "chunk_index"], drop=False, inplace=True)
-
     return df_padded
