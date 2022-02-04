@@ -1,75 +1,27 @@
-from typing import Any, AnyStr
 import numpy as np
 
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.optimizers import Adam, Optimizer
-from tensorflow.keras.optimizers.schedules import CosineDecay, ExponentialDecay
-# from tensorflow_addons.optimizers import CyclicalLearningRate
-from wandb import Config
 
 import utils.configs as Configs
 
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
-from models.core import drqa_crossentropy
-from models.core import start_accuracy, end_accuracy, tot_accuracy
+from models.core import drqa_accuracy, drqa_loss
+from utils import learning_rate
 
 ###
 
-LOSS = ['binary_crossentropy']  # [drqa_crossentropy]
-# METRICS = [start_accuracy, end_accuracy, tot_accuracy, drqa_crossentropy]  # 'categorical_accuracy'
-METRICS = [tot_accuracy, drqa_crossentropy]
-
-###
-
-
-def _adaptive_learning_rate(name="cosine") -> Any:
-
-    def __cosine_decay() -> Any:
-        initial_lr = Configs.LEARNING_RATE
-        decay_steps = Configs.EPOCHS
-        alpha = 0.1
-
-        return CosineDecay(initial_lr, decay_steps, alpha=alpha)
-
-    def __exponential_decay() -> Any:
-        initial_lr = Configs.LEARNING_RATE
-        decay_steps = Configs.EPOCHS
-        decay_rate = 0.96
-
-        return ExponentialDecay(initial_lr, decay_steps=decay_steps, decay_rate=decay_rate)
-
-    # def __cyclic_decay() -> Any:
-    #     LEARNING_RATE_MIN_VALUE = Configs.LEARNING_RATE / 10
-    #     step_size = 2 * Configs.BATCH_SIZE
-    #     scale_fn = lambda x: 1 / (2.**(x - 1))
-
-    #     return CyclicalLearningRate(
-    #         LEARNING_RATE_MIN_VALUE,
-    #         Configs.LEARNING_RATE,
-    #         step_size=step_size,
-    #         scale_fn=scale_fn
-    #     )
-
-    if name == "cosine":
-        return __cosine_decay()
-    if name == "exponential":
-        return __exponential_decay()
-    # if name == "cyclic":
-    #     return __cyclic_decay()
-
-    raise Exception("[_adaptive_learning_rate]: invalid  `name` parameter.")
-
+LOSS = ['binary_crossentropy']
+METRICS = [drqa_accuracy, drqa_loss]
 
 ###
 
 
 def _optimizer() -> Optimizer:
-    # lr = Configs.LEARNING_RATE
-    lr = _adaptive_learning_rate(name="exponential")
-
+    lr = learning_rate("static")
     return Adam(learning_rate=lr)
 
 
@@ -126,14 +78,14 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### OUTPUT ################################################################
 
         ### similarity
-        out_probabilities = BiLinearSimilarityAttention()([p_rnn, q_encoding])
+        out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding])
 
         ### last bit
-        out_probabilities = EnhancedProbabilities()(out_probabilities)
+        out_probs = EnhancedProbabilities()(out_probs)
 
         ###
 
-        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probabilities)
+        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probs, name="DRQA")
 
     #
 

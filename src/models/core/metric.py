@@ -3,7 +3,7 @@ from tensorflow.keras.metrics import CategoricalAccuracy
 ###
 
 
-def start_accuracy(y_true, y_pred):
+def drqa_accuracy_start(y_true, y_pred):
 
     def _metric(y_true, y_pred):
         metric = CategoricalAccuracy()
@@ -16,7 +16,7 @@ def start_accuracy(y_true, y_pred):
     return _metric(y_true_start, y_pred_start)
 
 
-def end_accuracy(y_true, y_pred):
+def drqa_accuracy_end(y_true, y_pred):
 
     def _metric(y_true, y_pred):
         metric = CategoricalAccuracy()
@@ -29,12 +29,12 @@ def end_accuracy(y_true, y_pred):
     return _metric(y_true_end, y_pred_end)
 
 
-def tot_accuracy(y_true, y_pred):
+def drqa_accuracy(y_true, y_pred):
 
     def _aggregate(s_acc, e_acc):
         return (s_acc + e_acc) / 2
 
-    s_acc = start_accuracy(y_true, y_pred)
-    e_acc = end_accuracy(y_true, y_pred)
+    s_acc = drqa_accuracy_start(y_true, y_pred)
+    e_acc = drqa_accuracy_end(y_true, y_pred)
 
     return _aggregate(s_acc, e_acc)
