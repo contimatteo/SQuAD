@@ -1,25 +1,26 @@
-from pyexpat import model
+# pylint: disable=unused-import
 from typing import Tuple
 
 import os
-from black import Any
 import numpy as np
+
+from tensorflow.keras.callbacks import EarlyStopping
+from sklearn.model_selection import KFold
+from wandb.keras import WandbCallback
 
 import utils.env_setup
 import utils.configs as Configs
 
-from tensorflow.keras.callbacks import EarlyStopping
-from wandb.keras import WandbCallback
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
-from models import DRQA
 from data import get_data
-from utils import XY_data_from_dataset
-from models.core import metric
+from models import DRQA
+from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
+from utils import XY_data_from_dataset, LocalStorageManager
 
 ###
 
 os.environ["WANDB_JOB_TYPE"] = "training"
+
+LocalStorage = LocalStorageManager()
 
 ###
 
@@ -27,35 +28,70 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
     _, data, glove, _ = get_data(300, debug=True)
 
-    X, Y = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * 15)
+    X, Y = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * 10)
 
     return X, Y, glove
 
 
 def __callbacks():
-    return [
-        WandbCallback(),
+    callbacks = []
+
+    callbacks.append(
         EarlyStopping(
-            monitor='loss',
+            monitor='drqa_loss',
             patience=3,
             mode='min',
             min_delta=1e-3,
             restore_best_weights=True,
-        ),
-        # ModelCheckpoint(
-        #     filepath=checkpoint_filepath,
-        #     save_weights_only=True,
-        #     monitor='val_accuracy',
-        #     mode='max',
-        #     save_best_only=True
-        # )
-    ]
+        )
+    )
+
+    if not Configs.WANDB_DISABLED:
+        callbacks.append(WandbCallback())
+
+    return callbacks
+
+
+def __fit(model, X, Y):
+    nn_epochs = Configs.NN_EPOCHS
+    nn_batch = Configs.NN_BATCH_SIZE
+    nn_callbacks = __callbacks()
+    nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
+
+    history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
+
+    model.save_weights(str(nn_checkpoint_directory), overwrite=True, save_format=None, options=None)
+
+    return history
+
+
+def __predict(model, X):
+    # nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
+    # assert nn_checkpoint_directory.is_file()
+    # model.load_weights(str(nn_checkpoint_directory))
+
+    Y_pred = model.predict(X)
+
+    return Y_pred
 
 
 ###
 
 
-def extract_sub_dataset(X: Any, indexes: Any):
+def train():
+    X, Y_true, glove = __dataset()
+
+    model = DRQA(glove)
+
+    _ = __fit(model, X, Y_true)
+
+    _ = __predict(model, X)
+
+
+###
+
+
+def extract_sub_dataset(X, indexes):
     X_new = []
 
     for el in X:
@@ -65,10 +101,8 @@ def extract_sub_dataset(X: Any, indexes: Any):
     return X_new
 
 
-def kfold_cross_validation(buckets=3):
+def kfold_cross_validation():
     X, Y, glove = __dataset()
-
-    assert buckets <= Y.shape[0]
 
     model = DRQA(glove)
 
@@ -76,6 +110,7 @@ def kfold_cross_validation(buckets=3):
     end = []
     tot = []
 
+    buckets = 3
     kf = KFold(n_splits=buckets, shuffle=False)
 
     for train_index, test_index in kf.split(Y):
@@ -88,19 +123,18 @@ def kfold_cross_validation(buckets=3):
         model.fit(
             X_train,
             Y_train,
-            # epochs=Configs.NN_EPOCHS,
-            epochs=1,
+            epochs=Configs.NN_EPOCHS,
             batch_size=Configs.NN_BATCH_SIZE,
             callbacks=__callbacks()
         )
 
         Y_test_pred = model.predict(X_test)
 
-        start_accuracy = metric.drqa_start_accuracy(Y_test, Y_test_pred)
+        start_accuracy = drqa_accuracy_start(Y_test, Y_test_pred)
         start.append(start_accuracy)
-        end_accuracy = metric.drqa_end_accuracy(Y_test, Y_test_pred)
+        end_accuracy = drqa_accuracy_end(Y_test, Y_test_pred)
         end.append(end_accuracy)
-        tot_accuracy = metric.drqa_accuracy(Y_test, Y_test_pred)
+        tot_accuracy = drqa_accuracy(Y_test, Y_test_pred)
         tot.append(tot_accuracy)
 
     start = np.array(start)
@@ -113,21 +147,6 @@ def kfold_cross_validation(buckets=3):
     print("end   accuracy: ", end.mean())
     print("total accuracy: ", tot.mean())
     print()
-
-
-###
-
-
-def train():
-    X, Y, glove = __dataset()
-
-    model = DRQA(glove)
-
-    model.fit(
-        X, Y, epochs=Configs.NN_EPOCHS, batch_size=Configs.NN_BATCH_SIZE, callbacks=__callbacks()
-    )
-
-    model.predict(X)
 
 
 ###
