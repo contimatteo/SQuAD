@@ -3,7 +3,7 @@ from tensorflow.keras.losses import categorical_crossentropy
 ###
 
 
-def drqa_crossentropy(y_true, y_pred):
+def drqa_loss(y_true, y_pred):
 
     def _aggregate(loss_start, loss_end):
         ### TODO: reason about the following alternatives:
