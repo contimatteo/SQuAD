@@ -9,16 +9,13 @@ import utils.configs as Configs
 
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
-from models.core import drqa_crossentropy
-from models.core import start_accuracy, end_accuracy, tot_accuracy
+from models.core import drqa_accuracy, drqa_loss
 from utils import learning_rate
 
 ###
 
-LOSS = ['binary_crossentropy']  # [drqa_crossentropy]
-METRICS = [start_accuracy, end_accuracy, tot_accuracy, drqa_crossentropy]
-
-###
+LOSS = ['binary_crossentropy']
+METRICS = [drqa_accuracy, drqa_loss]
 
 ###
 
@@ -81,14 +78,14 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### OUTPUT ################################################################
 
         ### similarity
-        out_probabilities = BiLinearSimilarityAttention()([p_rnn, q_encoding])
+        out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding])
 
         ### last bit
-        out_probabilities = EnhancedProbabilities()(out_probabilities)
+        out_probs = EnhancedProbabilities()(out_probs)
 
         ###
 
-        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probabilities)
+        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probs, name="DRQA")
 
     #
 

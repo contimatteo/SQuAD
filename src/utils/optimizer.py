@@ -9,15 +9,15 @@ import utils.configs as Configs
 
 
 def __lr_cosine_decay() -> Any:
-    initial_lr = Configs.NN_LEARNING_RATE
+    initial_lr = 1e-3
     decay_steps = Configs.NN_EPOCHS
-    alpha = 0.1
+    alpha = 0.05
 
     return CosineDecay(initial_lr, decay_steps, alpha=alpha)
 
 
 def __lr_exponential_decay() -> Any:
-    initial_lr = Configs.NN_LEARNING_RATE
+    initial_lr = 1e-3
     decay_steps = Configs.NN_EPOCHS
     decay_rate = 0.96
 
@@ -37,7 +37,7 @@ def __lr_exponential_decay() -> Any:
 
 def learning_rate(config_name: str) -> Any:
     if config_name == "static":
-        return Configs.NN_LEARNING_RATE
+        return 1e-3
 
     if config_name == "cosine":
         return __lr_cosine_decay()
