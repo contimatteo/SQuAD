@@ -27,7 +27,7 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
     _, data, glove, _ = get_data(300, debug=True)
 
-    X, Y = XY_data_from_dataset(data, Configs.BATCH_SIZE * 15)
+    X, Y = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * 15)
 
     return X, Y, glove
 
@@ -88,19 +88,19 @@ def kfold_cross_validation(buckets=3):
         model.fit(
             X_train,
             Y_train,
-            # epochs=Configs.EPOCHS,
+            # epochs=Configs.NN_EPOCHS,
             epochs=1,
-            batch_size=Configs.BATCH_SIZE,
+            batch_size=Configs.NN_BATCH_SIZE,
             callbacks=__callbacks()
         )
 
         Y_test_pred = model.predict(X_test)
 
-        start_accuracy = metric.start_accuracy(Y_test, Y_test_pred)
+        start_accuracy = metric.drqa_start_accuracy(Y_test, Y_test_pred)
         start.append(start_accuracy)
-        end_accuracy = metric.end_accuracy(Y_test, Y_test_pred)
+        end_accuracy = metric.drqa_end_accuracy(Y_test, Y_test_pred)
         end.append(end_accuracy)
-        tot_accuracy = metric.tot_accuracy(Y_test, Y_test_pred)
+        tot_accuracy = metric.drqa_accuracy(Y_test, Y_test_pred)
         tot.append(tot_accuracy)
 
     start = np.array(start)
@@ -123,7 +123,9 @@ def train():
 
     model = DRQA(glove)
 
-    model.fit(X, Y, epochs=Configs.EPOCHS, batch_size=Configs.BATCH_SIZE, callbacks=__callbacks())
+    model.fit(
+        X, Y, epochs=Configs.NN_EPOCHS, batch_size=Configs.NN_BATCH_SIZE, callbacks=__callbacks()
+    )
 
     model.predict(X)
 
