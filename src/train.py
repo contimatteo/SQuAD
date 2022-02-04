@@ -64,10 +64,9 @@ def __fit(model, X, Y):
 
 
 def __predict(model, X):
-    nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
-    assert nn_checkpoint_directory.is_file()
-
-    model.load_weights(str(nn_checkpoint_directory))
+    # nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
+    # assert nn_checkpoint_directory.is_file()
+    # model.load_weights(str(nn_checkpoint_directory))
 
     Y_pred = model.predict(X)
 
