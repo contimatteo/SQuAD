@@ -27,7 +27,7 @@ LocalStorage = LocalStorageManager()
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    _, data, glove, _ = get_data(300, debug=True)
+    _, data, glove, _ = get_data(300)
 
     X, Y, _ = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
     # X, Y, _ = XY_data_from_dataset(data)
