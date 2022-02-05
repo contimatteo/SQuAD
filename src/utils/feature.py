@@ -100,6 +100,8 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
 
     #
 
+    q_index = data[0]
+
     p_tokens = data[1]
     q_tokens = data[2]
     labels = data[3]
@@ -110,7 +112,16 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
 
     #
 
+    assert p_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert q_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert labels.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_pos.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_ner.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_tf.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_match.shape[1] <= Configs.N_PASSAGE_TOKENS
+
     if n_examples_subset is not None and isinstance(n_examples_subset, int):
+        q_index = __X_feature_examples_subset(q_index, n_examples_subset)
         p_tokens = __X_feature_examples_subset(p_tokens, n_examples_subset)
         q_tokens = __X_feature_examples_subset(q_tokens, n_examples_subset)
         labels = __X_feature_examples_subset(labels, n_examples_subset)
@@ -128,6 +139,9 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
     p_match = __X_feature_tokens_subset(p_match, Configs.N_PASSAGE_TOKENS)
 
     #
+
+    assert isinstance(q_index, np.ndarray)
+    assert len(q_index.shape) == 1
 
     assert isinstance(p_tokens, np.ndarray)
     assert len(p_tokens.shape) == 2
@@ -169,4 +183,4 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
 
     #
 
-    return X, Y
+    return X, Y, q_index
