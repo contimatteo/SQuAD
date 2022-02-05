@@ -85,17 +85,10 @@ def __compute_answers_tokens_indexes(Y, question_indexes: np.ndarray):
 def test():
     X, Y_true, glove, question_indexes = __dataset()
 
-    # model = DRQA(glove)
-    # Y_pred = __predict(model, X)
+    model = DRQA(glove)
+    Y_pred = __predict(model, X)
 
-    # __compute_answers_tokens_indexes(Y_pred, question_indexes)
-    answers_indexes = __compute_answers_tokens_indexes(Y_true, question_indexes)
-
-    print()
-    print()
-    print(answers_indexes)
-    print()
-    print()
+    _ = __compute_answers_tokens_indexes(Y_pred, question_indexes)
 
 
 ###

@@ -72,4 +72,4 @@ class LocalStorageManager():
     #
 
     def nn_checkpoint_url(self, model_name: str) -> Path:
-        return self.dirs.data_checkpoints.joinpath(f"{model_name}")
+        return self.dirs.data_checkpoints.joinpath(f"{model_name}.h5")
