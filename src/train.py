@@ -58,15 +58,16 @@ def __callbacks():
     return callbacks
 
 
-def __fit(model, X, Y):
+def __fit(model, X, Y, save_weights: bool):
     nn_epochs = Configs.NN_EPOCHS
     nn_batch = Configs.NN_BATCH_SIZE
     nn_callbacks = __callbacks()
-    nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
 
     history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
 
-    model.save_weights(str(nn_checkpoint_directory), overwrite=True, save_format=None, options=None)
+    if save_weights is True:
+        nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
+        model.save_weights(str(nn_checkpoint_directory), overwrite=True, save_format='h5')
 
     return history
 
@@ -92,19 +93,14 @@ def __evaluation(Y_true, Y_pred):
 ###
 
 
-def train():
-    X, Y_true, glove = __dataset()
+def train(X, Y, glove):
 
     model = DRQA(glove)
 
-    _ = __fit(model, X, Y_true)
-
-    _ = __predict(model, X)
+    _ = __fit(model, X, Y, True)
 
 
-def kfold_train():
-    X, Y, glove = __dataset()
-
+def kfold_train(X, Y, glove):
     metrics = []
 
     kf = KFold(n_splits=Configs.N_KFOLD_BUCKETS, shuffle=False)
@@ -117,7 +113,7 @@ def kfold_train():
         X_test, Y_test = __dataset_kfold(X, Y, test_indexes)
 
         ### train
-        _ = __fit(model, X_train, Y_train)
+        _ = __fit(model, X_train, Y_train, False)
         ### predict
         Y_test_pred = __predict(model, X_test)
 
@@ -141,5 +137,8 @@ def kfold_train():
 ###
 
 if __name__ == "__main__":
-    # train()
-    kfold_train()
+    X, Y, glove = __dataset()
+
+    # kfold_train(X, Y, glove)
+
+    train(X, Y, glove)

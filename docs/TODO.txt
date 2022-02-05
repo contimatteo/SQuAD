@@ -5,13 +5,8 @@ ISSUES
 
 
 FRA-MATTEO
-  [x] Early Stopping
-  [x] progressive LearningRate {Fra}
-  [x] aggiungere `N+1` bit al one-hot encoding delle Y label (nei dati) {Matte}
-  [x] aggiungere `N+1` bit al one-hot encoding delle Y label (nella rete) {Fra}
-  [x] save model weights {Matte}
-  [x] restore weights of the best epoch ('best' in term of accuracy ...) {Matte}
   [x] K-Fold evaluation strategy {Fra}
+  [ ] create merging strategy for final evaluation
   [ ] variable batch-size 
   [ ] support Keras (generator)
   [ ] network plots
