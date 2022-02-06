@@ -19,7 +19,7 @@ def data():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
     json_path = get_argv()
-    df, df_np, glove_matrix, WTI = get_data(300, debug=True, json_path=json_path)
+    df, df_np, glove_matrix, WTI = get_data(300, debug=False, json_path=json_path)
     print("\n---------------\n")
     # print(df.columns)
     # print(df.shape)
