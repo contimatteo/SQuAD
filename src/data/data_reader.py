@@ -23,13 +23,14 @@ def download_training_set():
     return RAW_FILE
 
 
-def load_training_set():
+def load_training_set(kwargs):
     print("Data downloading")
     raw_file = ""
-    if len(sys.argv) <= 1:
+    print(kwargs)
+    if kwargs is None:
         raw_file = download_training_set()
     else:
-        raw_file = sys.argv[1]
+        raw_file = kwargs[1]
     if not os.path.exists(raw_file):
         raise Exception(raw_file + " does not exists.")
     print("Data downloaded at position: " + raw_file + "\n")
@@ -41,9 +42,9 @@ def load_training_set():
     contents = contents["data"]
     df = pd.json_normalize(
         contents, ['paragraphs', 'qas', 'answers'],
-        ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"]]
+        ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"], ["paragraphs", "qas", "id"]]
     )
-    df = df[["title", "paragraphs.context", "paragraphs.qas.question", "text", "answer_start"]]
+    df = df[["paragraphs.qas.id", "title", "paragraphs.context", "paragraphs.qas.question", "text", "answer_start"]]
 
     df.rename(
         columns={
@@ -51,7 +52,8 @@ def load_training_set():
             'paragraphs.context': 'passage',
             'paragraphs.qas.question': 'question',
             'text': 'answer',
-            'answer_start': 'answer_start'
+            'answer_start': 'answer_start',
+            'paragraphs.qas.id': 'id'
         },
         inplace=True
     )
@@ -59,8 +61,8 @@ def load_training_set():
     return df
 
 
-def data_reader():
-    df = load_training_set()
+def data_reader(kwargs):
+    df = load_training_set(kwargs)
     return df
 
 

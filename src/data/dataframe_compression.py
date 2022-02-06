@@ -15,9 +15,10 @@ class DataframeCompression:
         self.question_dict = pd.DataFrame()
         self.label_dict = pd.DataFrame()
         self.exact_match_dict = pd.DataFrame()
-        self.pos_cat_dict =pd.DataFrame()
+        self.pos_cat_dict = pd.DataFrame()
         self.ner_cat_dict = pd.DataFrame()
         self.tf_dict = pd.DataFrame()
+        self.id_dict = pd.DataFrame()
 
         self.key_all = ["passage_index", "question_index", "chunk_index"]
         self.key_pass = ["passage_index", "chunk_index"]
@@ -38,12 +39,15 @@ class DataframeCompression:
         self.pos_cat_dict = df[self.key_pass + ["pos_categorical_padded"]].drop_duplicates(subset=self.key_pass)
         self.ner_cat_dict = df[self.key_pass + ["ner_categorical_padded"]].drop_duplicates(subset=self.key_pass)
         self.tf_dict = df[self.key_pass + ["term_frequency_padded"]].drop_duplicates(subset=self.key_pass)
+        self.id_dict = df[self.key_ques + ["id"]].drop_duplicates(subset=self.key_ques)
 
         self.OHE_pos.reset_cache()
         self.OHE_ner.reset_cache()
 
     def extract(self, WTI: WordToIndex):
         df = self.index_df
+        print("Rebuilding ID")
+        df = pd.merge(df, self.id_dict, on=self.key_ques, how="inner")
         print("Rebuilding Columns WTI passage")
         df = pd.merge(df, self.passage_dict, on=self.key_pass, how="inner")
         print("Rebuilding Columns WTI question")

@@ -1,5 +1,6 @@
 import os
 import pickle
+import sys
 
 import numpy as np
 import pandas as pd
@@ -179,3 +180,12 @@ def load_WTI(glove_dim: str):
 
 def add_glove_dim_to_name(file_name, glove_dim: str):
     return file_name.replace(".", f"_{glove_dim}.")
+
+
+def get_argv():
+    if len(sys.argv) > 1:
+        return sys.argv
+    else:
+        return None
+
+

@@ -13,7 +13,7 @@ import utils.configs as Configs
 from data import get_data
 from models import DRQA
 from utils import XY_data_from_dataset, LocalStorageManager
-
+from utils.data import get_argv
 ###
 
 os.environ["WANDB_JOB_TYPE"] = "training"
@@ -24,7 +24,8 @@ LocalStorage = LocalStorageManager()
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    _, data, glove, _ = get_data(300, debug=True)
+    kwargs = get_argv()
+    _, data, glove, _ = get_data(300, debug=True, kwargs=kwargs)
 
     X, Y = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * 10)
 

@@ -30,7 +30,7 @@ def __data_to_numpy(df: pd.DataFrame):
     passage = __df_column_to_numpy(df["word_index_passage_padded"])
     question = __df_column_to_numpy(df["word_index_question_padded"])
     exact_match = __df_column_to_numpy(df["exact_match_padded"])
-    question_index = __df_column_to_numpy(df["question_index"])
+    # question_index = __df_column_to_numpy(df["question_index"])
 
     tf = __cast_to_numpy_float(tf)
     pos = __cast_to_numpy_float(pos)
@@ -39,9 +39,11 @@ def __data_to_numpy(df: pd.DataFrame):
     passage = __cast_to_numpy_float(passage)
     question = __cast_to_numpy_float(question)
     exact_match = __cast_to_numpy_float(exact_match)
-    question_index = __cast_to_numpy_float(question_index)
+    # question_index = __cast_to_numpy_float(question_index)
 
-    return question_index, passage, question, label, pos, ner, tf, exact_match
+    id_x = __df_column_to_numpy(df["id"])
+
+    return id_x, passage, question, label, pos, ner, tf, exact_match
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim):
@@ -56,7 +58,7 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim):
     save_processed_data(df, onehot_pos, onehot_ner, glove_dim)
 
 
-def get_data(glove_dim, debug=False):
+def get_data(glove_dim, debug=False, **kwargs):
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
 
@@ -72,7 +74,7 @@ def get_data(glove_dim, debug=False):
         save_WTI(wti, glove_dim)
 
     if df is None:
-        df = data_reader()
+        df = data_reader(kwargs["kwargs"])
         print("[Data] downloaded.")
 
         if debug:
