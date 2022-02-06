@@ -106,6 +106,7 @@ celerybeat.pid
 .venv
 env/
 venv/
+venv_nlp/
 ENV/
 env.bak/
 venv.bak/
@@ -132,6 +133,7 @@ dmypy.json
 #######################################
 
 **/tmp/
-
+wandb/
 data/
 !src/data
+.idea

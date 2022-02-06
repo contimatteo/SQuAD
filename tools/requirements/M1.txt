@@ -1,6 +1,6 @@
 #
 # python  (3.8.5)
-# pip     (21.1.1)
+# pip     (21.3.1)
 #
 # author: @contimatteo
 #
@@ -14,11 +14,15 @@ yapf
 #############################
 ## Standalone
 
-numpy
-h5py
+python-dotenv
 
 #############################
 ## Not-Versioned
 
+googledrivedownloader
+nltk
+scikit-learn
+swifter
 tensorflow-macos
 tensorflow-metal
+wandb
