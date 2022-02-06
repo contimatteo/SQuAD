@@ -16,7 +16,7 @@ from data import get_data
 from models import DRQA
 from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
 from utils import XY_data_from_dataset, LocalStorageManager
-from utils.data import get_argv
+
 ###
 
 os.environ["WANDB_JOB_TYPE"] = "training"
@@ -27,13 +27,11 @@ LocalStorage = LocalStorageManager()
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    json_path = get_argv()
-    _, data, glove, _ = get_data(300, json_path=json_path)
+    _, dataset, glove_matrix, _ = get_data(300)
 
-    X, Y, _ = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
-    # X, Y, _ = XY_data_from_dataset(data)
+    x, y, _ = XY_data_from_dataset(dataset, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
 
-    return X, Y, glove
+    return x, y, glove_matrix
 
 
 def __dataset_kfold(X, Y, indexes):
@@ -122,8 +120,7 @@ def kfold_train(X, Y, glove):
         clear_session()
 
         ### evaluation
-        eval_metrics = __evaluation(Y_test, Y_test_pred)
-        metrics.append(eval_metrics)
+        metrics.append(__evaluation(Y_test, Y_test_pred))
 
     metrics = np.array(metrics)
 
