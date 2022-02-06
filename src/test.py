@@ -1,8 +1,9 @@
 # pylint: disable=unused-import
-from typing import Tuple, List, Dict
+from typing import Any, Tuple, List, Dict
 
 import os
 import numpy as np
+import json
 
 import utils.env_setup
 import utils.configs as Configs
@@ -77,6 +78,30 @@ def __compute_answers_tokens_indexes(Y, question_indexes: np.ndarray):
     #
 
     return answers_tokens_indexes_map
+
+
+###
+def __build_prediction_file(answers_tokens_indexes_map: Any):
+
+    qids = np.array([])  # obtained by loading the pkl with question_iondex, passage as ndarray
+    passages = np.array([])  # obtained by loading the pkl with question_iondex, passage as ndarray
+
+    output_dict = {}
+
+    for i in range(len(qids.shape[0])):
+        qid = qids[i]
+        passage = passages[i]
+
+        answer_range = answers_tokens_indexes_map[qid]
+        answer_start = answer_range[0]
+        answer_end = answer_range[1]
+
+        answer = " ".join(passage[answer_start:answer_end + 1])
+
+        output_dict[qid] = answer
+
+    with open("data/processed/predictions.json", "w", encoding='utf-8') as file:
+        json.dump(output_dict, file)
 
 
 ###
