@@ -1,14 +1,8 @@
 import pandas as pd
-import numpy as np
-from nltk import pos_tag
-from data.data_preprocessing import data_preprocessing
-
-from .one_hot_encoder import OneHotEncoder
 from .exact_match import apply_exact_match
 from .lemmatize import apply_lemmatize
 from .name_entity_recognition import apply_ner, apply_ner_one_hot
 from .term_frequency import apply_term_frequency
-from datetime import datetime
 from .pos import apply_pos_tag, apply_pos_one_hot
 
 ###

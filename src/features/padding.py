@@ -64,12 +64,11 @@ def apply_padding_to(
     NER_ONEHOT = OHE_ner.get_OHE_in_dict(NER_CATEGORICAL)
     TF = 0.0
     df_padded = split_passage(df)
-    df_padded["question_index"] = df_padded.index
+    df_padded["question_index"] = df_padded.index  # df_padded["id"]
     df_padded["chunk_index"] = df_padded.groupby("question_index").cumcount()
     # print("after split:")
     # print(df_padded.index)
 
-    # print("aghtrj")
     # print(df.dtypes)
 
     word_index_passage = pad(df_padded['word_index_passage'], MAX_PASSAGE_LENGTH, PAD_WORD_ENCODING)

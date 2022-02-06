@@ -11,7 +11,7 @@ import utils.configs as Configs
 from data import get_data
 from models import DRQA
 from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
-from utils import XY_data_from_dataset, LocalStorageManager
+from utils import XY_data_from_dataset, LocalStorageManager, passagges_data_from_dataset
 
 ###
 
@@ -23,11 +23,15 @@ LocalStorage = LocalStorageManager()
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    _, data, glove, _ = get_data(300)
+    _, dataset, glove_matrix, _ = get_data(300)
 
-    X, Y, q_index = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
+    x, y, question_indexes = XY_data_from_dataset(
+        dataset, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS
+    )
 
-    return X, Y, glove, q_index
+    passages = passagges_data_from_dataset(dataset)
+
+    return x, y, glove_matrix, question_indexes, passages
 
 
 def __predict(model, X):
@@ -44,8 +48,6 @@ def __predict(model, X):
 
 def __compute_answers_tokens_indexes(Y, question_indexes: np.ndarray):
     answers_tokens_probs_map = {}
-
-    question_indexes = question_indexes.astype(np.int16)
 
     for question_index in np.unique(question_indexes):
         subset_indexes = np.array(question_indexes == question_index)
@@ -108,9 +110,10 @@ def __build_prediction_file(answers_tokens_indexes_map: Any):
 
 
 def test():
-    X, Y_true, glove, question_indexes = __dataset()
+    X, Y, glove, question_indexes, passages = __dataset()
 
     model = DRQA(glove)
+
     Y_pred = __predict(model, X)
 
     _ = __compute_answers_tokens_indexes(Y_pred, question_indexes)
