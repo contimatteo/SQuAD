@@ -3,8 +3,6 @@ import pandas as pd
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 
-from data.data_preprocessing import data_preprocessing
-
 ###
 
 lemmatize_passage_dict = {}

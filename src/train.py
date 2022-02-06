@@ -16,7 +16,7 @@ from data import get_data
 from models import DRQA
 from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
 from utils import XY_data_from_dataset, LocalStorageManager
-
+from utils.data import get_argv
 ###
 
 os.environ["WANDB_JOB_TYPE"] = "training"
@@ -27,7 +27,8 @@ LocalStorage = LocalStorageManager()
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    _, data, glove, _ = get_data(300)
+    json_path = get_argv()
+    _, data, glove, _ = get_data(300, json_path=json_path)
 
     X, Y, _ = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
     # X, Y, _ = XY_data_from_dataset(data)
