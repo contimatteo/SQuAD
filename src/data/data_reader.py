@@ -6,6 +6,7 @@ import pandas as pd
 from utils.data import copy_data
 from utils.data import create_tmp_directories, download_data
 from utils.data import get_data_dir, get_tmp_data_dir
+from utils.data import save_og_data, load_og_data
 from .glove_reader import load_glove, download_glove
 
 ###
@@ -59,6 +60,15 @@ def load_training_set(kwargs):
     )
     print("Converted json to dataframe \n")
     return df
+
+
+def save_og_df(df: pd.DataFrame):
+    save_og_data(df[["id", "passage"]].copy())
+    # print(load_og_data().head())
+
+
+def load_og_df():
+    return load_og_data()
 
 
 def data_reader(kwargs):

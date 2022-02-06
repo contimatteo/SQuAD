@@ -9,6 +9,7 @@ from utils.memory import reduce_mem_usage
 
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
+from .data_reader import save_og_data, load_og_df
 from .glove_reader import glove_embedding
 
 ###
@@ -67,6 +68,8 @@ def get_data(glove_dim, debug=False, **kwargs):
 
     df = load_processed_data(wti, glove_dim)
 
+    og_data = load_og_df()
+
     if glove_matrix is None or wti is None:
         glove = glove_reader(glove_dim)
         glove_matrix, wti = glove_embedding(glove, glove_dim)
@@ -76,6 +79,11 @@ def get_data(glove_dim, debug=False, **kwargs):
     if df is None:
         df = data_reader(kwargs["kwargs"])
         print("[Data] downloaded.")
+
+        if og_data is None:
+            print("[DATA BACKUP] saving")
+            save_og_data(df)
+            print("[DATA BACKUP] saved")
 
         if debug:
             df = df[0:10].copy()
@@ -91,6 +99,11 @@ def get_data(glove_dim, debug=False, **kwargs):
         print("[Data] exported.")
     else:
         print("[Data] loaded.")
+
+    if og_data is None:
+        print("[DATA BACKUP] saving")
+        save_og_data(data_reader(kwargs["kwargs"]))
+        print("[DATA BACKUP] saved")
 
     df_np = __data_to_numpy(df)
 
