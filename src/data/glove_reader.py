@@ -5,9 +5,8 @@ import numpy as np
 from copy import copy
 from features.word_to_index import WordToIndex
 
-from utils.data import copy_data
-from utils.data import create_tmp_directories, download_data
-from utils.data import get_data_dir, get_tmp_data_dir
+from utils.data import copy_data, download_data, get_data_dir, get_tmp_data_dir
+from utils.data_storage import create_tmp_directories
 
 ###
 

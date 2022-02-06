@@ -1,12 +1,10 @@
 import os
-import sys
 import json
 import pandas as pd
 
-from utils.data import copy_data
-from utils.data import create_tmp_directories, download_data
-from utils.data import get_data_dir, get_tmp_data_dir
-from utils.data import save_evaluation_data_data, load_evaluation_data_data
+from utils.data import copy_data, download_data, get_tmp_data_dir
+from utils.data_storage import save_evaluation_data_data, load_evaluation_data_data
+from utils.data import get_default_raw_file_name
 from .glove_reader import load_glove, download_glove
 
 ###
@@ -14,11 +12,10 @@ from .glove_reader import load_glove, download_glove
 
 def download_training_set():
     DRIVE_ID = "19byT_6Hhx4Di1pzbd6bmxQ8sKwCSPhqg"
-    RAW_FILE = os.path.join(get_data_dir(), "training_set.json")
+    RAW_FILE = get_default_raw_file_name()
     REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "training_set.json")
     ZIP_FILE = os.path.join(get_tmp_data_dir(), "training_set.zip")
 
-    create_tmp_directories()
     download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
     copy_data(REQUIRED_FILE, RAW_FILE)
     return RAW_FILE

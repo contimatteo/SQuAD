@@ -3,8 +3,6 @@ from typing import List
 import pandas as pd
 from features.one_hot_encoder import OneHotEncoder
 from features.word_to_index import WordToIndex
-from features.padding import apply_padding_to
-import swifter
 
 
 class DataframeCompression:

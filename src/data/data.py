@@ -2,15 +2,16 @@ import pandas as pd
 import numpy as np
 
 from features.features import add_features
-from utils.data import save_processed_data, load_processed_data
-from utils.data import save_glove_matrix, load_glove_matrix
-from utils.data import save_WTI, load_WTI
+from utils.data_storage import save_processed_data, load_processed_data
+from utils.data_storage import save_glove_matrix, load_glove_matrix
+from utils.data_storage import save_WTI, load_WTI
 from utils.memory import reduce_mem_usage
 
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
 from .data_reader import save_evaluation_data_df, load_evaluation_data_df
 from .glove_reader import glove_embedding
+from utils.data_storage import create_tmp_directories, load_config_data, save_config_data, clean_all_data_cache
 
 ###
 
@@ -63,13 +64,21 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim):
 
 
 def get_data(glove_dim, debug=False, json_path=None):
+    create_tmp_directories()
+
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
 
     wti = load_WTI(glove_dim)
     print("[WTI] prepared.")
 
-    df = load_processed_data(wti, glove_dim)
+    conf = load_config_data()
+
+    df = None
+    if not conf.argv_changed(json_path, debug):
+        df = load_processed_data(wti, glove_dim)
+    else:
+        clean_all_data_cache()
 
     evaluation_data = load_evaluation_data_df()
 
@@ -99,13 +108,15 @@ def get_data(glove_dim, debug=False, json_path=None):
         print("[Data] processed.")
 
         __export_df(df, onehot_pos, onehot_ner, glove_dim)
+        conf.set_argv_json_complete_name(json_path, debug)
+        save_config_data(conf)
         print("[Data] exported.")
     else:
         print("[Data] loaded.")
 
     if evaluation_data is None:
         print("[DATA BACKUP] saving")
-        evaluation_data = save_evaluation_data_df(data_reader(kwargs["kwargs"]))
+        evaluation_data = save_evaluation_data_df(data_reader(json_path))
         print("[DATA BACKUP] saved")
 
     df_np = __data_to_numpy(df, evaluation_data)
