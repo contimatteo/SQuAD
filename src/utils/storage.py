@@ -13,6 +13,7 @@ class LocalStorageDirectoryManager():
         self.data_raw = None
         self.data_processed = None
         self.data_checkpoints = None
+        self.data_predictions = None
 
         self.__initialize()
         self.__mkdirs()
@@ -31,6 +32,7 @@ class LocalStorageDirectoryManager():
         self.data_raw = self.data.joinpath('raw')
         self.data_processed = self.data.joinpath('processed')
         self.data_checkpoints = self.data.joinpath('checkpoints')
+        self.data_predictions = self.data.joinpath('predictions')
 
     def __mkdirs(self) -> None:
         self.tmp.mkdir(exist_ok=True)
@@ -41,6 +43,7 @@ class LocalStorageDirectoryManager():
         self.data_raw.mkdir(exist_ok=True)
         self.data_processed.mkdir(exist_ok=True)
         self.data_checkpoints.mkdir(exist_ok=True)
+        self.data_predictions.mkdir(exist_ok=True)
 
     def __validate(self) -> None:
         assert self.root.is_dir()
@@ -53,6 +56,7 @@ class LocalStorageDirectoryManager():
         assert self.data_raw.is_dir()
         assert self.data_processed.is_dir()
         assert self.data_checkpoints.is_dir()
+        assert self.data_predictions.is_dir()
 
 
 ###
@@ -73,3 +77,7 @@ class LocalStorageManager():
 
     def nn_checkpoint_url(self, model_name: str) -> Path:
         return self.dirs.data_checkpoints.joinpath(f"{model_name}.h5")
+
+    def answers_predictions_url(self, dataset_name: str) -> Path:
+        assert isinstance(dataset_name, str)
+        return self.dirs.data_predictions.joinpath(f"answers-{dataset_name}.json")

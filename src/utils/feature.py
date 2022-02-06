@@ -94,12 +94,13 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
     return Y_onehot_with_additional_case
 
 
-def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
+def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
     assert isinstance(data, tuple)
-    assert len(data) == 8
+    assert len(data) >= 8
 
     #
 
+    q_indexes = data[0]
     p_tokens = data[1]
     q_tokens = data[2]
     labels = data[3]
@@ -110,7 +111,16 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
 
     #
 
+    assert p_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert q_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert labels.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_pos.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_ner.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_tf.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_match.shape[1] <= Configs.N_PASSAGE_TOKENS
+
     if n_examples_subset is not None and isinstance(n_examples_subset, int):
+        q_indexes = __X_feature_examples_subset(q_indexes, n_examples_subset)
         p_tokens = __X_feature_examples_subset(p_tokens, n_examples_subset)
         q_tokens = __X_feature_examples_subset(q_tokens, n_examples_subset)
         labels = __X_feature_examples_subset(labels, n_examples_subset)
@@ -161,6 +171,10 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
     assert p_match.shape[1] == Configs.N_PASSAGE_TOKENS
     assert p_match.shape[2] == Configs.DIM_EXACT_MATCH
 
+    assert isinstance(q_indexes, np.ndarray)
+    assert len(q_indexes.shape) == 1
+    assert q_indexes.shape[0] == q_tokens.shape[0]
+
     #
 
     X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
@@ -169,4 +183,28 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
 
     #
 
-    return X, Y
+    return X, Y, q_indexes
+
+
+def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
+    assert isinstance(data, tuple)
+    assert len(data) >= 10
+
+    #
+
+    question_indexes = data[8]
+    passages = data[9]
+
+    #
+
+    assert isinstance(question_indexes, np.ndarray)
+    assert len(question_indexes.shape) == 1
+
+    assert isinstance(passages, np.ndarray)
+    assert len(passages.shape) == 1
+
+    assert passages.shape[0] == question_indexes.shape[0]
+
+    #
+
+    return question_indexes, passages
