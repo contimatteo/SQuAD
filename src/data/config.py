@@ -18,6 +18,8 @@ class Configuration:
         self.previous_debug_mode = debug_mode
 
     def argv_changed(self, json_name, debug_mode):
+        if json_name is None:
+            json_name = get_default_raw_file_name()
         if debug_mode or self.previous_debug_mode:
             return True
         return self.argv_json_complete_name != json_name
