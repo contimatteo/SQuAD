@@ -6,9 +6,9 @@ from tensorflow.keras.metrics import CategoricalAccuracy
 def drqa_accuracy_start(y_true, y_pred):
 
     def _metric(y_true, y_pred):
-        metric = CategoricalAccuracy()
-        metric.update_state(y_true, y_pred)
-        return metric.result()
+        s_metric = CategoricalAccuracy()
+        s_metric.update_state(y_true, y_pred)
+        return s_metric.result()
 
     y_true_start = y_true[:, :, 0]
     y_pred_start = y_pred[:, :, 0]
@@ -19,9 +19,9 @@ def drqa_accuracy_start(y_true, y_pred):
 def drqa_accuracy_end(y_true, y_pred):
 
     def _metric(y_true, y_pred):
-        metric = CategoricalAccuracy()
-        metric.update_state(y_true, y_pred)
-        return metric.result()
+        e_metric = CategoricalAccuracy()
+        e_metric.update_state(y_true, y_pred)
+        return e_metric.result()
 
     y_true_end = y_true[:, :, 1]
     y_pred_end = y_pred[:, :, 1]

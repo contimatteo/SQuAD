@@ -33,6 +33,8 @@ setup.M1:
 
 train:
 	${PYTHON} src/train.py
+test:
+	${PYTHON} src/test.py
 
 clean:
 	rm -rf __pycache__
@@ -46,4 +48,5 @@ clean:
 .PHONY: setup.GPU
 .PHONY: setup.CPU
 .PHONY: train
+.PHONY: test
 .PHONY: clean
