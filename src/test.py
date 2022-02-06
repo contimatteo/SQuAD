@@ -2,16 +2,15 @@
 from typing import Any, Tuple, List, Dict
 
 import os
-import numpy as np
 import json
+import numpy as np
 
 import utils.env_setup
 import utils.configs as Configs
 
 from data import get_data
 from models import DRQA
-from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
-from utils import XY_data_from_dataset, LocalStorageManager, passagges_data_from_dataset
+from utils import XY_data_from_dataset, LocalStorageManager, QP_data_from_dataset
 
 ###
 
@@ -21,20 +20,20 @@ LocalStorage = LocalStorageManager()
 
 ###
 
+_, dataset, glove_matrix, _ = get_data(300)
+
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    _, dataset, glove_matrix, _ = get_data(300)
-
     x, y, question_indexes = XY_data_from_dataset(
         dataset, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS
     )
 
-    passages = passagges_data_from_dataset(dataset)
-
-    return x, y, glove_matrix, question_indexes, passages
+    return x, y, question_indexes
 
 
-def __predict(model, X):
+def __predict(X):
+    model = DRQA(glove_matrix)
+
     nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
     assert nn_checkpoint_directory.is_file()
 
@@ -46,7 +45,8 @@ def __predict(model, X):
     return Y_pred
 
 
-def __compute_answers_tokens_indexes(Y, question_indexes: np.ndarray):
+def __compute_answers_tokens_indexes(Y: np.ndarray,
+                                     question_indexes: np.ndarray) -> Dict[str, np.ndarray]:
     answers_tokens_probs_map = {}
 
     for question_index in np.unique(question_indexes):
@@ -82,41 +82,53 @@ def __compute_answers_tokens_indexes(Y, question_indexes: np.ndarray):
     return answers_tokens_indexes_map
 
 
-###
-def __build_prediction_file(answers_tokens_indexes_map: Any):
+def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
+    answers_for_question_map = {}
+    qids, passages = QP_data_from_dataset(dataset)
 
-    qids = np.array([])  # obtained by loading the pkl with question_iondex, passage as ndarray
-    passages = np.array([])  # obtained by loading the pkl with question_iondex, passage as ndarray
+    for (idx, qid) in enumerate(list(qids)):
+        passage = passages[idx]
 
-    output_dict = {}
+        if qid in answers_tokens_indexes_map:
+            answers_tokens_indexes = answers_tokens_indexes_map[qid]
+            answer_start = answers_tokens_indexes[0]
+            answer_end = answers_tokens_indexes[1]
+            answer = " ".join(passage[answer_start:answer_end + 1])
+        else:
+            answer = ''
 
-    for i in range(len(qids.shape[0])):
-        qid = qids[i]
-        passage = passages[i]
+        answers_for_question_map[qid] = answer
 
-        answer_range = answers_tokens_indexes_map[qid]
-        answer_start = answer_range[0]
-        answer_end = answer_range[1]
+    return answers_for_question_map
 
-        answer = " ".join(passage[answer_start:answer_end + 1])
 
-        output_dict[qid] = answer
+def __store_answers_predictions(answers_predictions_map: Dict[str, str]) -> None:
+    assert isinstance(answers_predictions_map, dict)
 
-    with open("data/processed/predictions.json", "w", encoding='utf-8') as file:
-        json.dump(output_dict, file)
+    json_file_url = LocalStorage.answers_predictions_url("test")
+
+    if json_file_url.exists():
+        json_file_url.unlink()
+
+    with open(str(json_file_url), "w", encoding='utf-8') as file:
+        json.dump(answers_predictions_map, file)
 
 
 ###
 
 
 def test():
-    X, Y, glove, question_indexes, passages = __dataset()
+    X, _, question_indexes = __dataset()
 
-    model = DRQA(glove)
+    Y_pred = __predict(X)
 
-    Y_pred = __predict(model, X)
+    #
 
-    _ = __compute_answers_tokens_indexes(Y_pred, question_indexes)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, question_indexes)
+
+    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+
+    __store_answers_predictions(answers_for_question)
 
 
 ###

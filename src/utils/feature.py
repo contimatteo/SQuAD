@@ -94,7 +94,7 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
     return Y_onehot_with_additional_case
 
 
-def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
+def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
     assert isinstance(data, tuple)
     assert len(data) >= 8
 
@@ -186,7 +186,7 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[np.ndarray]:
     return X, Y, q_indexes
 
 
-def passagges_data_from_dataset(data) -> Tuple[np.ndarray]:
+def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     assert isinstance(data, tuple)
     assert len(data) >= 10
 
@@ -197,9 +197,14 @@ def passagges_data_from_dataset(data) -> Tuple[np.ndarray]:
 
     #
 
+    assert isinstance(question_indexes, np.ndarray)
+    assert len(question_indexes.shape) == 1
+
     assert isinstance(passages, np.ndarray)
+    assert len(passages.shape) == 1
+
     assert passages.shape[0] == question_indexes.shape[0]
 
     #
 
-    return passages
+    return question_indexes, passages

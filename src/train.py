@@ -1,5 +1,5 @@
 # pylint: disable=unused-import
-from typing import Tuple
+from typing import Any, Tuple
 
 import os
 import numpy as np
@@ -25,20 +25,20 @@ LocalStorage = LocalStorageManager()
 
 ###
 
+_, dataset, glove_matrix, _ = get_data(300)
+
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    _, dataset, glove_matrix, _ = get_data(300)
-
     x, y, _ = XY_data_from_dataset(dataset, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
 
-    return x, y, glove_matrix
+    return x, y
 
 
-def __dataset_kfold(X, Y, indexes):
+def __dataset_kfold(X, Y, indexes) -> list:
     return [el[indexes] for el in X], Y[indexes]
 
 
-def __callbacks():
+def __callbacks() -> list:
     callbacks = []
 
     callbacks.append(
@@ -57,7 +57,7 @@ def __callbacks():
     return callbacks
 
 
-def __fit(model, X, Y, save_weights: bool):
+def __fit(model, X, Y, save_weights: bool) -> Any:
     nn_epochs = Configs.NN_EPOCHS
     nn_batch = Configs.NN_BATCH_SIZE
     nn_callbacks = __callbacks()
@@ -71,14 +71,8 @@ def __fit(model, X, Y, save_weights: bool):
     return history
 
 
-def __predict(model, X):
-    # nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
-    # assert nn_checkpoint_directory.is_file()
-    # model.load_weights(str(nn_checkpoint_directory))
-
-    Y_pred = model.predict(X)
-
-    return Y_pred
+def __predict(model, X) -> np.ndarray:
+    return model.predict(X)
 
 
 def __evaluation(Y_true, Y_pred):
@@ -92,20 +86,19 @@ def __evaluation(Y_true, Y_pred):
 ###
 
 
-def train(X, Y, glove):
-
-    model = DRQA(glove)
+def train(X, Y):
+    model = DRQA(glove_matrix)
 
     _ = __fit(model, X, Y, True)
 
 
-def kfold_train(X, Y, glove):
+def kfold_train(X, Y):
     metrics = []
 
     kf = KFold(n_splits=Configs.N_KFOLD_BUCKETS, shuffle=False)
 
     for train_indexes, test_indexes in kf.split(Y):
-        model = DRQA(glove)
+        model = DRQA(glove_matrix)
 
         ### split dataset in buckets
         X_train, Y_train = __dataset_kfold(X, Y, train_indexes)
@@ -135,8 +128,8 @@ def kfold_train(X, Y, glove):
 ###
 
 if __name__ == "__main__":
-    X, Y, glove = __dataset()
+    X, Y = __dataset()
 
-    # kfold_train(X, Y, glove)
+    # kfold_train(X, Y)
 
-    train(X, Y, glove)
+    train(X, Y)
