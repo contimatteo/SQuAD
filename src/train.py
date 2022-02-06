@@ -24,8 +24,8 @@ LocalStorage = LocalStorageManager()
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    kwargs = get_argv()
-    _, data, glove, _ = get_data(300, debug=True, kwargs=kwargs)
+    json_path = get_argv()
+    _, data, glove, _ = get_data(300, debug=True, json_path=json_path)
 
     X, Y = XY_data_from_dataset(data, Configs.NN_BATCH_SIZE * 10)
 

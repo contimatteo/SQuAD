@@ -9,7 +9,7 @@ from utils.memory import reduce_mem_usage
 
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
-from .data_reader import save_og_data, load_og_df
+from .data_reader import save_evaluation_data_df, load_evaluation_data_df
 from .glove_reader import glove_embedding
 
 ###
@@ -23,7 +23,7 @@ def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
     return arr.astype(np.float)
 
 
-def __data_to_numpy(df: pd.DataFrame):
+def __data_to_numpy(df: pd.DataFrame, evaluation_df: pd.DataFrame):
     tf = __df_column_to_numpy(df["term_frequency_padded"])
     pos = __df_column_to_numpy(df["pos_onehot_padded"])
     ner = __df_column_to_numpy(df["ner_onehot_padded"])
@@ -44,7 +44,10 @@ def __data_to_numpy(df: pd.DataFrame):
 
     id_x = __df_column_to_numpy(df["id"])
 
-    return id_x, passage, question, label, pos, ner, tf, exact_match
+    evaluation_id_x = __df_column_to_numpy(evaluation_df["id"])
+    evaluation_passage = __df_column_to_numpy(evaluation_df["passage"])
+
+    return id_x, passage, question, label, pos, ner, tf, exact_match, evaluation_id_x, evaluation_passage
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim):
@@ -59,7 +62,7 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim):
     save_processed_data(df, onehot_pos, onehot_ner, glove_dim)
 
 
-def get_data(glove_dim, debug=False, **kwargs):
+def get_data(glove_dim, debug=False, json_path=None):
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
 
@@ -68,7 +71,7 @@ def get_data(glove_dim, debug=False, **kwargs):
 
     df = load_processed_data(wti, glove_dim)
 
-    og_data = load_og_df()
+    evaluation_data = load_evaluation_data_df()
 
     if glove_matrix is None or wti is None:
         glove = glove_reader(glove_dim)
@@ -77,12 +80,12 @@ def get_data(glove_dim, debug=False, **kwargs):
         save_WTI(wti, glove_dim)
 
     if df is None:
-        df = data_reader(kwargs["kwargs"])
+        df = data_reader(json_path)
         print("[Data] downloaded.")
 
-        if og_data is None:
+        if evaluation_data is None:
             print("[DATA BACKUP] saving")
-            save_og_data(df)
+            save_evaluation_data_df(df)
             print("[DATA BACKUP] saved")
 
         if debug:
@@ -100,11 +103,11 @@ def get_data(glove_dim, debug=False, **kwargs):
     else:
         print("[Data] loaded.")
 
-    if og_data is None:
+    if evaluation_data is None:
         print("[DATA BACKUP] saving")
-        save_og_data(data_reader(kwargs["kwargs"]))
+        evaluation_data = save_evaluation_data_df(data_reader(kwargs["kwargs"]))
         print("[DATA BACKUP] saved")
 
-    df_np = __data_to_numpy(df)
+    df_np = __data_to_numpy(df, evaluation_data)
 
     return df, df_np, glove_matrix, wti

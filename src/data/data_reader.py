@@ -6,7 +6,7 @@ import pandas as pd
 from utils.data import copy_data
 from utils.data import create_tmp_directories, download_data
 from utils.data import get_data_dir, get_tmp_data_dir
-from utils.data import save_og_data, load_og_data
+from utils.data import save_evaluation_data_data, load_evaluation_data_data
 from .glove_reader import load_glove, download_glove
 
 ###
@@ -24,14 +24,13 @@ def download_training_set():
     return RAW_FILE
 
 
-def load_training_set(kwargs):
+def load_training_set(json_path):
     print("Data downloading")
     raw_file = ""
-    print(kwargs)
-    if kwargs is None:
+    if json_path is None:
         raw_file = download_training_set()
     else:
-        raw_file = kwargs[1]
+        raw_file = json_path
     if not os.path.exists(raw_file):
         raise Exception(raw_file + " does not exists.")
     print("Data downloaded at position: " + raw_file + "\n")
@@ -62,17 +61,18 @@ def load_training_set(kwargs):
     return df
 
 
-def save_og_df(df: pd.DataFrame):
-    save_og_data(df[["id", "passage"]].copy())
-    # print(load_og_data().head())
+def save_evaluation_data_df(df: pd.DataFrame):
+    evaluation_df = df[["id", "passage"]].copy()
+    save_evaluation_data_data(df[["id", "passage"]].copy())
+    return evaluation_df
 
 
-def load_og_df():
-    return load_og_data()
+def load_evaluation_data_df():
+    return load_evaluation_data_data()
 
 
-def data_reader(kwargs):
-    df = load_training_set(kwargs)
+def data_reader(json_path):
+    df = load_training_set(json_path)
     return df
 
 

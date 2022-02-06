@@ -25,7 +25,7 @@ def nltk_download_utilities():
     # spacy.cli.download("en_core_web_sm")
 
 
-OG_DATA_FILE_NAME = "og_data.pkl"
+EVALUATION_DATA_FILE_NAME = "evaluation_data.pkl"
 FINAL_DATA_FILE_NAME = "data.pkl"
 GLOVE_MATRIX_FILE_NAME = "glove_matrix.pkl"
 WORD_TO_INDEX_FILE_NAME = "word_to_index.pkl"
@@ -159,12 +159,12 @@ def load_pickle(file_name: str, folder: str):
         return pkl.load(f)
 
 
-def save_og_data(og_data):
-    save_pickle(og_data, OG_DATA_FILE_NAME, get_processed_data_dir())
+def save_evaluation_data_data(og_data):
+    save_pickle(og_data, EVALUATION_DATA_FILE_NAME, get_processed_data_dir())
 
 
-def load_og_data():
-    return load_pickle(OG_DATA_FILE_NAME, get_processed_data_dir())
+def load_evaluation_data_data():
+    return load_pickle(EVALUATION_DATA_FILE_NAME, get_processed_data_dir())
 
 
 def save_glove_matrix(glove_matrix, glove_dim: str):
@@ -193,7 +193,7 @@ def add_glove_dim_to_name(file_name, glove_dim: str):
 
 def get_argv():
     if len(sys.argv) > 1:
-        return sys.argv
+        return sys.argv[1]
     else:
         return None
 
