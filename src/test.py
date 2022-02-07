@@ -93,9 +93,9 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
             answers_tokens_indexes = answers_tokens_indexes_map[qid]
             answer_start = answers_tokens_indexes[0]
             answer_end = answers_tokens_indexes[1]
-            answer = " ".join(passage[answer_start:answer_end + 1])
+            answer = "".join(passage[answer_start:answer_end + 1])
         else:
-            answer = ''
+            answer = ""
 
         answers_for_question_map[qid] = answer
 

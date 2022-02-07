@@ -14,7 +14,8 @@ import utils.configs as Configs
 
 from data import get_data
 from models import DRQA
-from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
+from models.core import drqa_start_accuracy, drqa_end_accuracy, drqa_tot_accuracy
+from models.core import drqa_start_mae, drqa_end_mae, drqa_tot_mae
 from utils import XY_data_from_dataset, LocalStorageManager
 
 ###
@@ -43,7 +44,7 @@ def __callbacks() -> list:
 
     callbacks.append(
         EarlyStopping(
-            monitor='drqa_loss',
+            monitor='drqa_tot_crossentropy',
             patience=3,
             mode='min',
             min_delta=1e-3,
@@ -76,11 +77,15 @@ def __predict(model, X) -> np.ndarray:
 
 
 def __evaluation(Y_true, Y_pred):
-    start_accuracy = drqa_accuracy_start(Y_true, Y_pred).numpy()
-    end_accuracy = drqa_accuracy_end(Y_true, Y_pred).numpy()
-    tot_accuracy = drqa_accuracy(Y_true, Y_pred).numpy()
+    start_accuracy = drqa_start_accuracy(Y_true, Y_pred).numpy()
+    end_accuracy = drqa_end_accuracy(Y_true, Y_pred).numpy()
+    tot_accuracy = drqa_tot_accuracy(Y_true, Y_pred).numpy()
 
-    return [start_accuracy, end_accuracy, tot_accuracy]
+    start_mae = drqa_start_mae(Y_true, Y_pred).numpy()
+    end_mae = drqa_end_mae(Y_true, Y_pred).numpy()
+    tot_mae = drqa_tot_mae(Y_true, Y_pred).numpy()
+
+    return [start_accuracy, end_accuracy, tot_accuracy, start_mae, end_mae, tot_mae]
 
 
 ###
@@ -120,8 +125,11 @@ def kfold_train(X, Y):
     print()
     print("METRICS")
     print("[accuracy] start: ", metrics[:, 0].mean())
-    print("[accuracy] end  : ", metrics[:, 1].mean())
+    print("[accuracy]   end: ", metrics[:, 1].mean())
     print("[accuracy] total: ", metrics[:, 2].mean())
+    print("     [mae] start: ", metrics[:, 3].mean())
+    print("     [mae]   end: ", metrics[:, 4].mean())
+    print("     [mae] total: ", metrics[:, 5].mean())
     print()
 
 

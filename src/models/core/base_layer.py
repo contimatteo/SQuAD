@@ -57,7 +57,7 @@ def DrqaRnn() -> Callable[[Any], Any]:
 
 def EnhancedProbabilities() -> Callable[[Any], Any]:
 
-    def __add_complementar_bit(tensor: Any) -> Any:
+    def __nn1_add_complementar_bit(tensor: Any) -> Any:
         ### tensor shape --> (_, n_tokens)
 
         tensor_bit = Dense(1, activation="sigmoid")(tensor)
@@ -77,9 +77,9 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         out_end = output[:, :, 1]
         ### --> (_, n_tokens)
 
-        out_start = __add_complementar_bit(out_start)
+        out_start = __nn1_add_complementar_bit(out_start)
         ### --> (_, n_tokens+1, 1)
-        out_end = __add_complementar_bit(out_end)
+        out_end = __nn1_add_complementar_bit(out_end)
         ### --> (_, n_tokens+1, 1)
 
         output_new = tf.concat([out_start, out_end], axis=2)
@@ -108,4 +108,4 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
         return out_new
 
-    return __nn2
+    return __nn1

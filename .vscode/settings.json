@@ -15,6 +15,9 @@
     "**/build/": true,
     "**/dist/": true,
     "**/venv/": true,
+    "data/": true,
+    "tmp/": true,
+    "wandb/": true,
   },
 
   
@@ -26,6 +29,6 @@
 
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": false
   }
 }
