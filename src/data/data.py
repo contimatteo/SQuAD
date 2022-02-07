@@ -24,7 +24,7 @@ def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
     return arr.astype(np.float)
 
 
-def __data_to_numpy(df: pd.DataFrame, evaluation_df: pd.DataFrame):
+def __data_to_numpy(df: pd.DataFrame):
     tf = __df_column_to_numpy(df["term_frequency_padded"])
     pos = __df_column_to_numpy(df["pos_onehot_padded"])
     ner = __df_column_to_numpy(df["ner_onehot_padded"])
@@ -36,8 +36,9 @@ def __data_to_numpy(df: pd.DataFrame, evaluation_df: pd.DataFrame):
     if "label_padded" in df:
         label = __df_column_to_numpy(df["label_padded"])
 
-    evaluation_id_x = __df_column_to_numpy(evaluation_df["id"])
-    evaluation_passage = __df_column_to_numpy(evaluation_df["passage"])
+    evaluation_id_x = id_x
+    evaluation_passage = __df_column_to_numpy(df["word_tokens_passage"])
+    evaluation_question = __df_column_to_numpy(df["word_tokens_question"])
 
     tf = __cast_to_numpy_float(tf)
     pos = __cast_to_numpy_float(pos)
@@ -48,7 +49,7 @@ def __data_to_numpy(df: pd.DataFrame, evaluation_df: pd.DataFrame):
     if "label_padded" in df:
         label = __cast_to_numpy_float(label)
 
-    return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage
+    return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage, evaluation_question
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim):
@@ -83,7 +84,7 @@ def get_data(glove_dim, ret="all", debug=False, json_path=None):
     else:
         clean_all_data_cache()
 
-    evaluation_data = load_evaluation_data_df()
+    # evaluation_data = load_evaluation_data_df()
 
     if glove_matrix is None or wti is None:
         glove = glove_reader(glove_dim)
@@ -95,10 +96,10 @@ def get_data(glove_dim, ret="all", debug=False, json_path=None):
         df = data_reader(json_path)
         print("[Data] downloaded.")
 
-        if evaluation_data is None:
-            print("[DATA BACKUP] saving")
-            save_evaluation_data_df(df)
-            print("[DATA BACKUP] saved")
+        # if evaluation_data is None:
+        #     print("[DATA BACKUP] saving")
+        #     save_evaluation_data_df(df)
+        #     print("[DATA BACKUP] saved")
 
         if debug:
             df = df[0:5].copy()
@@ -119,16 +120,16 @@ def get_data(glove_dim, ret="all", debug=False, json_path=None):
 
     conf.set_argv_json_complete_name(json_path, debug)
     save_config_data(conf)
-    evaluation_data = load_evaluation_data_df()
-    if evaluation_data is None:
-        print("[DATA BACKUP] saving")
-        evaluation_data = save_evaluation_data_df(data_reader(json_path))
-        print("[DATA BACKUP] saved")
+    # evaluation_data = load_evaluation_data_df()
+    # if evaluation_data is None:
+    #     print("[DATA BACKUP] saving")
+    #     evaluation_data = save_evaluation_data_df(data_reader(json_path))
+    #     print("[DATA BACKUP] saved")
 
-    df_np = __data_to_numpy(df, evaluation_data)
+    df_np = __data_to_numpy(df)
 
     if ret == "original":
-        df_np = df_np[8], df_np[9]
+        df_np = df_np[8], df_np[9], df_np[10]
     elif ret == "label":
         df_np = df_np[7]
     elif ret == "data":
