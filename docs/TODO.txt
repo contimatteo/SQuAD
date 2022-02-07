@@ -1,33 +1,22 @@
 
 
-ISSUES
-  [ ] dataset size
-
-
 FRA-MATTEO
   [x] K-Fold evaluation strategy {Fra}
-  [ ] create merging strategy for final evaluation
+  [x] create merging strategy for final evaluation
   [ ] variable batch-size 
   [ ] support Keras (generator)
-  [ ] network plots
 
 
 PRIMIANO-LUCIANO
   [ ] adaptive batch-size 
   [ ] split in multiple files
-  [ ] dataset plots
   [ ] create Keras (generator)
-  [ ] K-Fold evaluation strategy
-
-
-TO-DISCUSS
-  [ ] tuning
 
 
 --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 
-IMPROVEMENTS
+PROJECT-WORK
   [ ] BERT 
   [ ] Character-Level Word Embeddings (slide 10, page 43-44)
 
