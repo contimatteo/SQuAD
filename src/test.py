@@ -5,6 +5,8 @@ import os
 import json
 import numpy as np
 
+from alive_progress import alive_bar
+
 import utils.env_setup
 import utils.configs as Configs
 
@@ -39,7 +41,7 @@ def __predict(X):
     ### load weights
     model.load_weights(str(nn_checkpoint_directory))
 
-    Y_pred = model.predict(X)
+    Y_pred = model.predict(X, verbose=1)
 
     return Y_pred
 
@@ -86,33 +88,36 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     qids, passages = QP_data_from_dataset(dataset)
 
-    for (idx, qid) in enumerate(list(qids)):
-        answer = ""
-        passage = passages[idx]
-        passage_tokens = passage.split(" ")  # TODO: we need a list of tokens, not a `str`!
+    with alive_bar(qids.shape[0]) as bar:
+        for (idx, qid) in enumerate(list(qids)):
+            answer = ""
+            passage = passages[idx]
+            passage_tokens = passage.split(" ")  # TODO: we need a list of tokens, not a `str`!
 
-        if qid in answers_tokens_indexes_map:
-            answ_tokens_bounds = answers_tokens_indexes_map[qid]
-            answ_token_start_index = answ_tokens_bounds[0]
-            answer_token_end_index = answ_tokens_bounds[1]
+            if qid in answers_tokens_indexes_map:
+                answ_tokens_bounds = answers_tokens_indexes_map[qid]
+                answ_token_start_index = answ_tokens_bounds[0]
+                answer_token_end_index = answ_tokens_bounds[1]
 
-            ### INFO: the original predictions are based on PADDED passages.
-            if answer_token_end_index >= len(passage_tokens):
-                answer_token_end_index = len(passage_tokens) - 1
+                ### INFO: the original predictions are based on PADDED passages.
+                if answer_token_end_index >= len(passage_tokens):
+                    answer_token_end_index = len(passage_tokens) - 1
 
-            ### INFO: we have no guarantees to have a 'valid' indexes range.
-            if answer_token_end_index < answ_token_start_index:
-                answer_token_end_index = answ_token_start_index
+                ### INFO: we have no guarantees to have a 'valid' indexes range.
+                if answer_token_end_index < answ_token_start_index:
+                    answer_token_end_index = answ_token_start_index
 
-            answ_span_pre_start = passage_tokens[0:answ_token_start_index]
-            answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
+                answ_span_pre_start = passage_tokens[0:answ_token_start_index]
+                answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
 
-            answ_char_start_index = len(" ".join(answ_span_pre_start))
-            answ_char_end_index = len(" ".join(answ_span_to_end))
+                answ_char_start_index = len(" ".join(answ_span_pre_start))
+                answ_char_end_index = len(" ".join(answ_span_to_end))
 
-            answer = str(passage[answ_char_start_index:answ_char_end_index]).strip()
+                answer = str(passage[answ_char_start_index:answ_char_end_index]).strip()
 
-        answers_for_question_map[qid] = answer
+            answers_for_question_map[qid] = answer
+
+            bar()
 
     return answers_for_question_map
 
