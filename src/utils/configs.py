@@ -20,6 +20,11 @@ DIM_EMBEDDING: int = 300
 DIM_EXACT_MATCH: int = 3
 DIM_TOKEN_TF: int = 1
 
-NN_EPOCHS = 1
-NN_BATCH_SIZE = 256
+##################
+##  NN + TRAIN  ##
+
+NN_EPOCHS = 2
+NN_BATCH_SIZE = 10
 NN_LEARNING_RATE_TYPE = "static"
+
+N_KFOLD_BUCKETS = 5
