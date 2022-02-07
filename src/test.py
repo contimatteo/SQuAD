@@ -4,8 +4,10 @@ from typing import Any, Tuple, List, Dict
 import os
 import json
 import numpy as np
+import tensorflow as tf
 
 from alive_progress import alive_bar
+from tensorflow.keras.backend import set_learning_phase
 
 import utils.env_setup
 import utils.configs as Configs
@@ -18,6 +20,8 @@ from utils import XY_data_from_dataset, LocalStorageManager, QP_data_from_datase
 
 os.environ["WANDB_JOB_TYPE"] = "training"
 
+set_learning_phase(0)
+
 LocalStorage = LocalStorageManager()
 
 ###
@@ -26,7 +30,6 @@ _, dataset, glove_matrix, _ = get_data(300)
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    # x, y, question_indexes = XY_data_from_dataset(dataset, Configs.NN_BATCH_SIZE)
     x, y, question_indexes = XY_data_from_dataset(dataset)
 
     return x, y, question_indexes
@@ -41,7 +44,7 @@ def __predict(X):
     ### load weights
     model.load_weights(str(nn_checkpoint_directory))
 
-    Y_pred = model.predict(X, verbose=1)
+    Y_pred = model.predict(X, batch_size=512, verbose=1)
 
     return Y_pred
 
@@ -50,13 +53,18 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
                                      question_indexes: np.ndarray) -> Dict[str, np.ndarray]:
     answers_tokens_probs_map = {}
 
-    for question_index in np.unique(question_indexes):
-        subset_indexes = np.array(question_indexes == question_index)
+    question_indexes_unique = list(np.unique(question_indexes))
 
-        current_answers = Y[subset_indexes]
-        answers_tokens_probs_map[question_index] = current_answers
+    with alive_bar(len(question_indexes_unique)) as progress_bar:
+        for question_index in np.unique(question_indexes):
+            subset_indexes = np.array(question_indexes == question_index)
 
-    assert len(answers_tokens_probs_map.keys()) == np.unique(question_indexes).shape[0]
+            current_answers = Y[subset_indexes]
+            answers_tokens_probs_map[question_index] = current_answers
+
+            progress_bar()
+
+    assert len(answers_tokens_probs_map.keys()) == len(question_indexes_unique)
 
     #
 
@@ -67,16 +75,19 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
 
-    for (q_index, answers) in answers_tokens_probs_map.items():
-        answer_tokens_probs = np.array(
-            [__weigth_answer_probs(answers[idx]) for idx in range(answers.shape[0])],
-            dtype=answers.dtype
-        )
+    with alive_bar(len(list(answers_tokens_probs_map.items()))) as progress_bar:
+        for (q_index, answers) in answers_tokens_probs_map.items():
+            answer_tokens_probs = np.array(
+                [__weigth_answer_probs(answers[idx]) for idx in range(answers.shape[0])],
+                dtype=answers.dtype
+            )
 
-        start_index = np.argmax(answer_tokens_probs[:, :, 0].flatten())
-        end_index = np.argmax(answer_tokens_probs[:, :, 1].flatten())
+            start_index = np.argmax(answer_tokens_probs[:, :, 0].flatten())
+            end_index = np.argmax(answer_tokens_probs[:, :, 1].flatten())
 
-        answers_tokens_indexes_map[q_index] = np.array([start_index, end_index], dtype=np.int16)
+            answers_tokens_indexes_map[q_index] = np.array([start_index, end_index], dtype=np.int16)
+
+            progress_bar()
 
     #
 
@@ -88,7 +99,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     qids, passages = QP_data_from_dataset(dataset)
 
-    with alive_bar(qids.shape[0]) as bar:
+    with alive_bar(qids.shape[0]) as progress_bar:
         for (idx, qid) in enumerate(list(qids)):
             answer = ""
             passage = passages[idx]
@@ -117,7 +128,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
             answers_for_question_map[qid] = answer
 
-            bar()
+            progress_bar()
 
     return answers_for_question_map
 

@@ -5,6 +5,7 @@ FRA-MATTEO
   [x] create merging strategy for final evaluation
   [ ] variable batch-size 
   [ ] support Keras (generator)
+  [ ] don't compile the model during the evaluation phase
 
 
 PRIMIANO-LUCIANO
