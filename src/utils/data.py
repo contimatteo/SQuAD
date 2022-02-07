@@ -22,8 +22,8 @@ def get_project_directory():
     return cd_parent(cd_parent(cd_parent(os.path.realpath(__file__))))
 
 
-def download_url(drive_id, save_path):
-    gdd.download_file_from_google_drive(file_id=drive_id, dest_path=save_path, unzip=True)
+def download_url(drive_id, save_path, unzip=True):
+    gdd.download_file_from_google_drive(file_id=drive_id, dest_path=save_path, unzip=unzip)
 
 
 def get_data_dir():
