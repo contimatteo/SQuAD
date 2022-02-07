@@ -95,7 +95,6 @@ def get_data(glove_dim, debug=False, json_path=None):
             save_evaluation_data_df(df)
             print("[DATA BACKUP] saved")
 
-        df = df[0:20].copy()
         if debug:
             df = df[0:10].copy()
 
