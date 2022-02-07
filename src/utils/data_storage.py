@@ -27,7 +27,8 @@ def create_tmp_directories():
 
 def clean_all_data_cache():
     folder = get_processed_data_dir()
-    os.remove(os.path.join(folder, EVALUATION_DATA_FILE_NAME))
+    if os.path.exists(os.path.join(folder, EVALUATION_DATA_FILE_NAME)):
+        os.remove(os.path.join(folder, EVALUATION_DATA_FILE_NAME))
     for name in os.listdir(folder):
         if name.startswith("data"):
             os.remove(os.path.join(folder, name))

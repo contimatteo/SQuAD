@@ -32,7 +32,10 @@ class DataframeCompression:
 
         self.passage_dict = df[self.key_pass + ["word_index_passage_padded"]].drop_duplicates(subset=self.key_pass)
         self.question_dict = df[self.key_ques + ["word_index_question_padded"]].drop_duplicates(subset=self.key_ques)
-        self.label_dict = df[self.key_all + ["label_padded"]].drop_duplicates(subset=self.key_all)
+        if "label_padded" in df:
+            self.label_dict = df[self.key_all + ["label_padded"]].drop_duplicates(subset=self.key_all)
+        else:
+            self.label_dict = None
         self.exact_match_dict = df[self.key_all + ["exact_match_padded"]].drop_duplicates(subset=self.key_all)
         self.pos_cat_dict = df[self.key_pass + ["pos_categorical_padded"]].drop_duplicates(subset=self.key_pass)
         self.ner_cat_dict = df[self.key_pass + ["ner_categorical_padded"]].drop_duplicates(subset=self.key_pass)
@@ -50,8 +53,9 @@ class DataframeCompression:
         df = pd.merge(df, self.passage_dict, on=self.key_pass, how="inner")
         print("Rebuilding Columns WTI question")
         df = pd.merge(df, self.question_dict, on=self.key_ques, how="inner")
-        print("Rebuilding Labels")
-        df = pd.merge(df, self.label_dict, on=self.key_all, how="inner")
+        if self.label_dict is not None:
+            print("Rebuilding Labels")
+            df = pd.merge(df, self.label_dict, on=self.key_all, how="inner")
         print("Rebuilding Exact Match")
         df = pd.merge(df, self.exact_match_dict, on=self.key_all, how="inner")
         print("Rebuilding POS")

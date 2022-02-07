@@ -28,38 +28,43 @@ def __data_to_numpy(df: pd.DataFrame, evaluation_df: pd.DataFrame):
     tf = __df_column_to_numpy(df["term_frequency_padded"])
     pos = __df_column_to_numpy(df["pos_onehot_padded"])
     ner = __df_column_to_numpy(df["ner_onehot_padded"])
-    label = __df_column_to_numpy(df["label_padded"])
     passage = __df_column_to_numpy(df["word_index_passage_padded"])
     question = __df_column_to_numpy(df["word_index_question_padded"])
     exact_match = __df_column_to_numpy(df["exact_match_padded"])
     id_x = __df_column_to_numpy(df["id"])
+    label = None
+    if "label_padded" in df:
+        label = __df_column_to_numpy(df["label_padded"])
+
     evaluation_id_x = __df_column_to_numpy(evaluation_df["id"])
     evaluation_passage = __df_column_to_numpy(evaluation_df["passage"])
 
     tf = __cast_to_numpy_float(tf)
     pos = __cast_to_numpy_float(pos)
     ner = __cast_to_numpy_float(ner)
-    label = __cast_to_numpy_float(label)
     passage = __cast_to_numpy_float(passage)
     question = __cast_to_numpy_float(question)
     exact_match = __cast_to_numpy_float(exact_match)
+    if "label_padded" in df:
+        label = __cast_to_numpy_float(label)
 
-    return id_x, passage, question, label, pos, ner, tf, exact_match, evaluation_id_x, evaluation_passage
+    return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim):
     cols = [
-        "title", "answer", "word_tokens_passage_padded", "word_tokens_question_padded",
+        "title", "word_tokens_passage_padded", "word_tokens_question_padded",
         "pos_padded", "ner_padded"
     ]
-
+    if "answer" in df:
+        cols.append("answer")
     df.drop(cols, inplace=True, axis=1)
     df = df.reset_index(drop=True)
 
     save_processed_data(df, onehot_pos, onehot_ner, glove_dim)
 
 
-def get_data(glove_dim, debug=False, json_path=None):
+def get_data(glove_dim, ret="all", debug=False, json_path=None):
     create_tmp_directories()
 
     glove_matrix = load_glove_matrix(glove_dim)
@@ -96,7 +101,7 @@ def get_data(glove_dim, debug=False, json_path=None):
             print("[DATA BACKUP] saved")
 
         if debug:
-            df = df[0:10].copy()
+            df = df[0:5].copy()
 
         df, _ = reduce_mem_usage(df)
         df = data_preprocessing(df, wti)
@@ -121,5 +126,14 @@ def get_data(glove_dim, debug=False, json_path=None):
         print("[DATA BACKUP] saved")
 
     df_np = __data_to_numpy(df, evaluation_data)
+
+    if ret == "original":
+        df_np = df_np[8], df_np[9]
+    elif ret == "label":
+        df_np = df_np[7]
+    elif ret == "data":
+        df_np = df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]
+    else:
+        pass
 
     return df, df_np, glove_matrix, wti

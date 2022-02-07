@@ -169,7 +169,8 @@ def data_cleaning(df: pd.DataFrame):
     print()
     print("Data cleaning")
     df = add_passage_index(df)
-    df = add_labels(df).drop(axis=1, columns='answer_start')
+    if "answer" in df:
+        df = add_labels(df).drop(axis=1, columns='answer_start')
     df = add_split_into_words(df)
     print("Data cleaned \n")
     return df

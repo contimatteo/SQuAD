@@ -27,9 +27,11 @@ def split_passage(df):
     df_clone = df.copy()
     # print(df.columns)
     passage_features = [
-        "word_tokens_passage", "word_index_passage", "label", "pos", "pos_onehot", "ner",
+        "word_tokens_passage", "word_index_passage", "pos", "pos_onehot", "ner",
         "ner_onehot", "term_frequency", "exact_match"
     ]
+    if "label" in df:
+        passage_features.append("label")
     df_clone = df_clone.apply(
         lambda x: split_in_chunks(x, passage_features, MAX_PASSAGE_LENGTH), axis=1
     )
@@ -75,7 +77,8 @@ def apply_padding_to(
     word_index_question = pad(df_padded['word_index_question'], MAX_QUESTION_LENGTH, PAD_WORD_ENCODING)
     word_tokens_passage = pad(df_padded['word_tokens_passage'], MAX_PASSAGE_LENGTH, PAD_WORD)
     word_tokens_question = pad(df_padded['word_tokens_question'], MAX_QUESTION_LENGTH, PAD_WORD)
-    label = pad(df_padded['label'], MAX_PASSAGE_LENGTH, LABEL)
+    if "label" in df_padded:
+        label = pad(df_padded['label'], MAX_PASSAGE_LENGTH, LABEL)
     exact_match = pad(df_padded['exact_match'], MAX_PASSAGE_LENGTH, EXACT_MATCH)
     pos = pad(df_padded['pos'], MAX_PASSAGE_LENGTH, POS)
     pos_categorical = pad(df_padded['pos_categorical'], MAX_PASSAGE_LENGTH, POS_CATEGORICAL)
@@ -90,7 +93,8 @@ def apply_padding_to(
     df_padded['word_tokens_question_padded'] = list(word_tokens_question)
     df_padded['word_index_question_padded'] = list(word_index_question)
 
-    df_padded['label_padded'] = list(label)
+    if "label" in df_padded:
+        df_padded['label_padded'] = list(label)
     df_padded['exact_match_padded'] = list(exact_match)
 
     df_padded['pos_padded'] = list(pos)
