@@ -24,9 +24,8 @@ _, dataset, glove_matrix, _ = get_data(300)
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    x, y, question_indexes = XY_data_from_dataset(
-        dataset, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS
-    )
+    # x, y, question_indexes = XY_data_from_dataset(dataset, Configs.NN_BATCH_SIZE)
+    x, y, question_indexes = XY_data_from_dataset(dataset)
 
     return x, y, question_indexes
 
@@ -84,28 +83,44 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
 def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
     answers_for_question_map = {}
+
     qids, passages = QP_data_from_dataset(dataset)
 
     for (idx, qid) in enumerate(list(qids)):
+        answer = ""
         passage = passages[idx]
+        passage_tokens = passage.split(" ")  # TODO: we need a list of tokens, not a `str`!
 
         if qid in answers_tokens_indexes_map:
-            answers_tokens_indexes = answers_tokens_indexes_map[qid]
-            answer_start = answers_tokens_indexes[0]
-            answer_end = answers_tokens_indexes[1]
-            answer = "".join(passage[answer_start:answer_end + 1])
-        else:
-            answer = ""
+            answ_tokens_bounds = answers_tokens_indexes_map[qid]
+            answ_token_start_index = answ_tokens_bounds[0]
+            answer_token_end_index = answ_tokens_bounds[1]
+
+            ### INFO: the original predictions are based on PADDED passages.
+            if answer_token_end_index >= len(passage_tokens):
+                answer_token_end_index = len(passage_tokens) - 1
+
+            ### INFO: we have no guarantees to have a 'valid' indexes range.
+            if answer_token_end_index < answ_token_start_index:
+                answer_token_end_index = answ_token_start_index
+
+            answ_span_pre_start = passage_tokens[0:answ_token_start_index]
+            answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
+
+            answ_char_start_index = len(" ".join(answ_span_pre_start))
+            answ_char_end_index = len(" ".join(answ_span_to_end))
+
+            answer = str(passage[answ_char_start_index:answ_char_end_index]).strip()
 
         answers_for_question_map[qid] = answer
 
     return answers_for_question_map
 
 
-def __store_answers_predictions(answers_predictions_map: Dict[str, str]) -> None:
+def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_name: str) -> None:
     assert isinstance(answers_predictions_map, dict)
 
-    json_file_url = LocalStorage.answers_predictions_url("test")
+    json_file_url = LocalStorage.answers_predictions_url(file_name)
 
     if json_file_url.exists():
         json_file_url.unlink()
@@ -118,17 +133,27 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str]) -> None
 
 
 def test():
-    X, _, question_indexes = __dataset()
-
-    Y_pred = __predict(X)
+    X, Y_true, question_indexes = __dataset()
 
     #
 
+    # ### TODO: remove the following code ...
+    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, question_indexes)
+    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    # __store_answers_predictions(answers_for_question, "training.true")
+
+    #
+
+    Y_pred = __predict(X)
+
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, question_indexes)
-
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    __store_answers_predictions(answers_for_question, "training.pred")
 
-    __store_answers_predictions(answers_for_question)
+    print()
+    print("The generated answers (json with predictions) file is available at:")
+    print(str(LocalStorage.answers_predictions_url("training.pred")))
+    print()
 
 
 ###

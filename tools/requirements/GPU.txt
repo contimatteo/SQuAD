@@ -21,6 +21,7 @@ python-dotenv
 ## Not-Versioned
 
 googledrivedownloader
+matplotlib
 nltk
 pandas
 scikit-learn

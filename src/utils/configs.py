@@ -23,8 +23,8 @@ DIM_TOKEN_TF: int = 1
 ##################
 ##  NN + TRAIN  ##
 
-NN_EPOCHS = 2
-NN_BATCH_SIZE = 10
+NN_EPOCHS = 8
+NN_BATCH_SIZE = 128
 NN_LEARNING_RATE_TYPE = "static"
 
 N_KFOLD_BUCKETS = 5

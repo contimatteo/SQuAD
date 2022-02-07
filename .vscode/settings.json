@@ -29,6 +29,6 @@
 
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
-    "editor.formatOnSave": false
+    "editor.formatOnSave": true
   }
 }

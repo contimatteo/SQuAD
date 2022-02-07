@@ -20,6 +20,7 @@ python-dotenv
 ## Not-Versioned
 
 googledrivedownloader
+matplotlib
 nltk
 scikit-learn
 swifter
