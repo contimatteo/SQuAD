@@ -71,7 +71,9 @@ def get_data(glove_dim, debug=False, json_path=None):
     conf = load_config_data()
 
     df = None
-    if not conf.argv_changed(json_path, debug):
+    if debug is False and conf.get_argv_json_complete_name() is None:
+        df = load_processed_data(wti, glove_dim)
+    elif not conf.argv_changed(json_path, debug):
         df = load_processed_data(wti, glove_dim)
     else:
         clean_all_data_cache()
@@ -92,6 +94,8 @@ def get_data(glove_dim, debug=False, json_path=None):
             print("[DATA BACKUP] saving")
             save_evaluation_data_df(df)
             print("[DATA BACKUP] saved")
+
+        df = df[0:20].copy()
         if debug:
             df = df[0:10].copy()
 
@@ -103,12 +107,14 @@ def get_data(glove_dim, debug=False, json_path=None):
         print("[Data] processed.")
 
         __export_df(df, onehot_pos, onehot_ner, glove_dim)
-        conf.set_argv_json_complete_name(json_path, debug)
-        save_config_data(conf)
+        # conf.set_argv_json_complete_name(json_path, debug)
+        # save_config_data(conf)
         print("[Data] exported.")
     else:
         print("[Data] loaded.")
 
+    conf.set_argv_json_complete_name(json_path, debug)
+    save_config_data(conf)
     evaluation_data = load_evaluation_data_df()
     if evaluation_data is None:
         print("[DATA BACKUP] saving")
