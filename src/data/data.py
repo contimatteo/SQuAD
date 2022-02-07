@@ -92,7 +92,6 @@ def get_data(glove_dim, debug=False, json_path=None):
             print("[DATA BACKUP] saving")
             save_evaluation_data_df(df)
             print("[DATA BACKUP] saved")
-
         if debug:
             df = df[0:10].copy()
 
@@ -110,6 +109,7 @@ def get_data(glove_dim, debug=False, json_path=None):
     else:
         print("[Data] loaded.")
 
+    evaluation_data = load_evaluation_data_df()
     if evaluation_data is None:
         print("[DATA BACKUP] saving")
         evaluation_data = save_evaluation_data_df(data_reader(json_path))
