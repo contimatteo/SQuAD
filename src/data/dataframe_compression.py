@@ -26,24 +26,67 @@ class DataframeCompression:
         self.OHE_pos = OHE_pos
         self.OHE_ner = OHE_ner
 
+    @staticmethod
+    def from_pickle(d, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder):
+        a = DataframeCompression(OHE_pos, OHE_ner)
+        a.index_df = d["index_df"]
+        a.index_df = d["index_df"]
+        a.index_df = d["index_df"]
+        a.index_df = d["index_df"]
+        a.index_df = d["index_df"]
+        a.index_df = d["index_df"]
+        return a
+
+    def to_pickle(self):
+        return {
+            "index_df": self.index_df,
+            "passage_index_dict": self.passage_index_dict,
+            "question_index_dict": self.question_index_dict,
+            "passage_dict": self.passage_dict,
+            "question_dict": self.question_dict,
+            "label_dict": self.label_dict,
+            "exact_match_dict": self.exact_match_dict,
+            "pos_cat_dict": self.pos_cat_dict,
+            "ner_cat_dict": self.ner_cat_dict,
+            "tf_dict": self.tf_dict,
+            "id_dict": self.id_dict,
+            "key_all": self.key_all,
+            "key_pass": self.key_pass,
+            "key_ques": self.key_ques,
+            "OHE_pos": self.OHE_pos,
+            "OHE_ner": self.OHE_ner,
+        }
+
     def compress(self, df):
         self.index_df = df[self.key_all]
         # df_all = df.set_index(self.key_all, drop=False)
         # df_pass = df.set_index(self.key_pass, drop=False)
         # df_ques = df.set_index(self.key_ques, drop=False)
 
-        self.passage_index_dict = df[self.key_pass + ["word_index_passage_padded"]].drop_duplicates(subset=self.key_pass)
-        self.question_index_dict = df[self.key_ques + ["word_index_question_padded"]].drop_duplicates(subset=self.key_ques)
-        self.passage_dict = df[self.key_pass + ["word_tokens_passage"]].drop_duplicates(subset=self.key_pass)
-        self.question_dict = df[self.key_ques + ["word_tokens_question"]].drop_duplicates(subset=self.key_ques)
+        self.passage_index_dict = df[self.key_pass + ["word_index_passage_padded"]].drop_duplicates(
+            subset=self.key_pass
+        )
+        self.question_index_dict = df[self.key_ques +
+                                      ["word_index_question_padded"]].drop_duplicates(
+                                          subset=self.key_ques
+                                      )
+        self.passage_dict = df[self.key_pass +
+                               ["word_tokens_passage"]].drop_duplicates(subset=self.key_pass)
+        self.question_dict = df[self.key_ques +
+                                ["word_tokens_question"]].drop_duplicates(subset=self.key_ques)
         if "label_padded" in df:
-            self.label_dict = df[self.key_all + ["label_padded"]].drop_duplicates(subset=self.key_all)
+            self.label_dict = df[self.key_all +
+                                 ["label_padded"]].drop_duplicates(subset=self.key_all)
         else:
             self.label_dict = None
-        self.exact_match_dict = df[self.key_all + ["exact_match_padded"]].drop_duplicates(subset=self.key_all)
-        self.pos_cat_dict = df[self.key_pass + ["pos_categorical_padded"]].drop_duplicates(subset=self.key_pass)
-        self.ner_cat_dict = df[self.key_pass + ["ner_categorical_padded"]].drop_duplicates(subset=self.key_pass)
-        self.tf_dict = df[self.key_pass + ["term_frequency_padded"]].drop_duplicates(subset=self.key_pass)
+        self.exact_match_dict = df[self.key_all +
+                                   ["exact_match_padded"]].drop_duplicates(subset=self.key_all)
+        self.pos_cat_dict = df[self.key_pass +
+                               ["pos_categorical_padded"]].drop_duplicates(subset=self.key_pass)
+        self.ner_cat_dict = df[self.key_pass +
+                               ["ner_categorical_padded"]].drop_duplicates(subset=self.key_pass)
+        self.tf_dict = df[self.key_pass +
+                          ["term_frequency_padded"]].drop_duplicates(subset=self.key_pass)
         self.id_dict = df[self.key_ques + ["id"]].drop_duplicates(subset=self.key_ques)
 
         self.OHE_pos.reset_cache()
@@ -112,7 +155,14 @@ class DataframeCompression:
         return df
 
     def add_pos_ner_onehot(self, df):
-        df["pos_onehot_padded"] = df.apply(lambda x: self.OHE_pos.transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]), axis=1)
-        df["ner_onehot_padded"] = df.apply(lambda x: self.OHE_ner.transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]), axis=1)
+        df["pos_onehot_padded"] = df.apply(
+            lambda x: self.OHE_pos.
+            transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]),
+            axis=1
+        )
+        df["ner_onehot_padded"] = df.apply(
+            lambda x: self.OHE_ner.
+            transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]),
+            axis=1
+        )
         return df
-
