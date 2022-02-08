@@ -14,7 +14,7 @@ from utils.data_storage import create_tmp_directories
 def download_glove(glove_dim: int):
     DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
     RAW_FILE = os.path.join(get_data_dir(), "GloVe_" + str(glove_dim) + ".txt")
-    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B." + str(glove_dim) + "d.txt")
+    REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "glove.6B." + str(glove_dim) + "d.txt")
     ZIP_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.zip")
 
     create_tmp_directories()

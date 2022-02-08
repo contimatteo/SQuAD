@@ -1,7 +1,8 @@
 import os
+# import pickle5 as pickle
 import pickle
 import pandas as pd
-import pickle as pkl
+
 from data.dataframe_compression import DataframeCompression
 from features.one_hot_encoder import OneHotEncoder
 from data.config import Configuration
@@ -34,14 +35,17 @@ def clean_all_data_cache():
             os.remove(os.path.join(folder, name))
 
 
-def save_processed_data(df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder, glove_dim: str, file_name: str):
+def save_processed_data(
+    df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder, glove_dim: str, file_name: str
+):
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
     df_c = DataframeCompression(OHE_pos, OHE_ner)
     df_c.compress(df)
     with open(file, "wb") as handle:
-        pickle.dump(df_c, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # pickle.dump(df_c, handle, protocol=pickle.DEFAULT_PROTOCOL)
+        pickle.dump(df_c, handle)
 
 
 def load_processed_data(WTI, glove_dim: str, file_name: str):
@@ -58,7 +62,7 @@ def save_pickle(obj, file_name: str, folder: str):
     file = os.path.join(folder, file_name)
 
     with open(file, "wb") as f:
-        pkl.dump(obj, f)
+        pickle.dump(obj, f)
 
 
 def load_pickle(file_name: str, folder: str):
@@ -67,7 +71,7 @@ def load_pickle(file_name: str, folder: str):
         return None
 
     with open(file, "rb") as f:
-        return pkl.load(f)
+        return pickle.load(f)
 
 
 def save_evaluation_data_data(evaluation_data):
