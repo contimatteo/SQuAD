@@ -15,6 +15,7 @@ yapf
 ## Standalone
 
 alive-progress
+pickle5
 pydot
 python-dotenv
 
