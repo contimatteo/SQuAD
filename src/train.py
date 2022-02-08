@@ -25,7 +25,7 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = 1000  # `None` for all rows :)
+N_ROWS_SUBSET = None  # `None` for all rows :)
 
 ###
 
