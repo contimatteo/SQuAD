@@ -16,7 +16,6 @@ yapf
 
 alive-progress
 numpy
-pickle5
 pydot
 python-dotenv
 

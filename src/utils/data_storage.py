@@ -1,5 +1,6 @@
 import os
-import pickle5 as pickle
+# import pickle5 as pickle
+import pickle
 import pandas as pd
 
 from data.dataframe_compression import DataframeCompression
@@ -43,7 +44,7 @@ def save_processed_data(
     df_c = DataframeCompression(OHE_pos, OHE_ner)
     df_c.compress(df)
     with open(file, "wb") as handle:
-        pickle.dump(df_c, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(df_c, handle, protocol=pickle.DEFAULT_PROTOCOL)
 
 
 def load_processed_data(WTI, glove_dim: str, file_name: str):
