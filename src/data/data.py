@@ -79,7 +79,7 @@ def load_data(debug=False, json_path=None):
     global df_np
     global glove_matrix
     create_tmp_directories()
-    glove_dim = configs.DIM_EMBEDDING
+    glove_dim = str(configs.DIM_EMBEDDING)
 
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
