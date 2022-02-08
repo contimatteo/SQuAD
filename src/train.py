@@ -39,8 +39,8 @@ def __callbacks() -> list:
 
     callbacks.append(
         EarlyStopping(
-            monitor='drqa_tot_crossentropy',
-            patience=3,
+            monitor='loss',
+            patience=5,
             mode='min',
             min_delta=1e-3,
             restore_best_weights=True,
