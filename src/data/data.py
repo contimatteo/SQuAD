@@ -16,6 +16,10 @@ from utils.data_storage import create_tmp_directories, load_config_data, save_co
 ###
 
 
+df_np = None
+glove_matrix = None
+
+
 def __df_column_to_numpy(df_column: pd.Series) -> np.ndarray:
     return np.array([np.array(xi) for xi in df_column.to_numpy()])
 
@@ -65,7 +69,9 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim):
     save_processed_data(df, onehot_pos, onehot_ner, glove_dim)
 
 
-def get_data(glove_dim, ret="all", debug=False, json_path=None):
+def load_data(glove_dim, debug=False, json_path=None):
+    global df_np
+    global glove_matrix
     create_tmp_directories()
 
     glove_matrix = load_glove_matrix(glove_dim)
@@ -74,15 +80,15 @@ def get_data(glove_dim, ret="all", debug=False, json_path=None):
     wti = load_WTI(glove_dim)
     print("[WTI] prepared.")
 
-    conf = load_config_data()
+    # conf = load_config_data()
 
-    df = None
-    if debug is False and conf.get_argv_json_complete_name() is None:
-        df = load_processed_data(wti, glove_dim)
-    elif not conf.argv_changed(json_path, debug):
-        df = load_processed_data(wti, glove_dim)
-    else:
-        clean_all_data_cache()
+    df = load_processed_data(wti, glove_dim)
+    # if debug is False and conf.get_argv_json_complete_name() is None:
+    #     df = load_processed_data(wti, glove_dim)
+    # elif not conf.argv_changed(json_path, debug):
+    #     df = load_processed_data(wti, glove_dim)
+    # else:
+    # clean_all_data_cache()
 
     # evaluation_data = load_evaluation_data_df()
 
@@ -118,8 +124,8 @@ def get_data(glove_dim, ret="all", debug=False, json_path=None):
     else:
         print("[Data] loaded.")
 
-    conf.set_argv_json_complete_name(json_path, debug)
-    save_config_data(conf)
+    # conf.set_argv_json_complete_name(json_path, debug)
+    # save_config_data(conf)
     # evaluation_data = load_evaluation_data_df()
     # if evaluation_data is None:
     #     print("[DATA BACKUP] saving")
@@ -128,13 +134,19 @@ def get_data(glove_dim, ret="all", debug=False, json_path=None):
 
     df_np = __data_to_numpy(df)
 
-    if ret == "original":
-        df_np = df_np[8], df_np[9], df_np[10]
-    elif ret == "label":
-        df_np = df_np[7]
-    elif ret == "data":
-        df_np = df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]
-    else:
-        pass
 
-    return df, df_np, glove_matrix, wti
+def get_data(ret: str):
+    global df_np, glove_matrix
+    assert df_np is not None
+    assert glove_matrix is not None
+    assert isinstance(ret, str)
+    if ret == "original":
+        return df_np[8], df_np[9], df_np[10]
+    elif ret == "label":
+        return df_np[7]
+    elif ret == "data":
+        return df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]
+    elif ret == "glove":
+        return glove_matrix
+    raise Exception("parameter not correct")
+

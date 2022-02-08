@@ -47,13 +47,11 @@ def load_training_set(json_path):
         ["title", ["paragraphs", "context"]]
     )
     if "answers" in df:
-
         df = df[["id", "title", "paragraphs.context", "question", "answers"]]
-        df["answers"] = [i[0] for i in df["answers"]]
-        A = df['answers'].apply(pd.Series).add_prefix('answers.')
+        # df["answers"] = [i[0] for i in df["answers"]]
+        A = df['answers'].apply(lambda x: pd.Series(x[0])).add_prefix('answers.')
         df = df.join([A])
         df.drop(columns='answers', inplace=True)
-
         df.rename(
             columns={
                 'id': 'id',
