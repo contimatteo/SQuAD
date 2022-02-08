@@ -10,7 +10,7 @@ def load():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
     json_path = get_argv()
-    load_data(300, debug=True, json_path=json_path)
+    load_data(debug=True, json_path=json_path)
 
 
 def data():

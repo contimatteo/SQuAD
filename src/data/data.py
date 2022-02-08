@@ -14,6 +14,7 @@ from .data_reader import data_reader, glove_reader
 from .data_reader import save_evaluation_data_df, load_evaluation_data_df
 from .glove_reader import glove_embedding
 from utils.data_storage import create_tmp_directories, load_config_data, save_config_data, clean_all_data_cache
+from utils import configs
 
 ###
 
@@ -74,10 +75,11 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
     save_processed_data(df, onehot_pos, onehot_ner, glove_dim, file_name=file_name)
 
 
-def load_data(glove_dim, debug=False, json_path=None):
+def load_data(debug=False, json_path=None):
     global df_np
     global glove_matrix
     create_tmp_directories()
+    glove_dim = configs.DIM_EMBEDDING
 
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
