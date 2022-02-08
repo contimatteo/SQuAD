@@ -16,6 +16,7 @@ yapf
 
 alive-progress
 numpy
+pydot
 python-dotenv
 
 #############################
