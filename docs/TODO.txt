@@ -2,10 +2,10 @@
 
 FRA-MATTEO
   [x] K-Fold evaluation strategy {Fra}
-  [x] create merging strategy for final evaluation
+  [ ] reason about the merging strategy for final evaluation
   [ ] variable batch-size 
   [ ] support Keras (generator)
-  [ ] don't compile the model during the evaluation phase
+  [ ] we have to be sure that the model weights are the BEST ones
 
 
 PRIMIANO-LUCIANO

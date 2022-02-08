@@ -12,9 +12,10 @@ from tensorflow.keras.backend import set_learning_phase
 import utils.env_setup
 import utils.configs as Configs
 
-from data import get_data
+from data import get_data, load_data
 from models import DRQA
-from utils import XY_data_from_dataset, LocalStorageManager, QP_data_from_dataset
+from utils import LocalStorageManager
+from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
 
 ###
 
@@ -24,18 +25,15 @@ set_learning_phase(0)
 
 LocalStorage = LocalStorageManager()
 
+N_ROWS_SUBSET = 1000  # `None` for all rows :)
+
 ###
 
-_, dataset, glove_matrix, _ = get_data(300)
 
+def __predict():
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    glove_matrix = get_data("glove")
 
-def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    x, y, question_indexes = XY_data_from_dataset(dataset)
-
-    return x, y, question_indexes
-
-
-def __predict(X):
     model = DRQA(glove_matrix)
 
     nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
@@ -44,16 +42,16 @@ def __predict(X):
     ### load weights
     model.load_weights(str(nn_checkpoint_directory))
 
-    Y_pred = model.predict(X, batch_size=512, verbose=1)
+    Y_pred = model.predict(X, batch_size=Configs.NN_BATCH_SIZE, verbose=1)
 
     return Y_pred
 
 
-def __compute_answers_tokens_indexes(Y: np.ndarray,
-                                     question_indexes: np.ndarray) -> Dict[str, np.ndarray]:
-    answers_tokens_probs_map = {}
-
+def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
+    _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     question_indexes_unique = list(np.unique(question_indexes))
+
+    answers_tokens_probs_map = {}
 
     with alive_bar(len(question_indexes_unique)) as progress_bar:
         for question_index in np.unique(question_indexes):
@@ -68,10 +66,7 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
     #
 
-    def __weigth_answer_probs(answer: np.ndarray):
-        answer_tokens_probs = answer[0:-1]  ### --> (n_tokens, 2)
-        answer_no_token_prob = answer[-1]  ### --> (2,)
-        return answer_tokens_probs - answer_no_token_prob
+    __weigth_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
 
@@ -97,13 +92,13 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
     answers_for_question_map = {}
 
-    qids, passages = QP_data_from_dataset(dataset)
+    qids, _, passages = QP_data_from_dataset(get_data("original"))
 
     with alive_bar(qids.shape[0]) as progress_bar:
         for (idx, qid) in enumerate(list(qids)):
             answer = ""
-            passage = passages[idx]
-            passage_tokens = passage.split(" ")  # TODO: we need a list of tokens, not a `str`!
+            passage_tokens = passages[idx]
+            passage = " ".join(passage_tokens)
 
             if qid in answers_tokens_indexes_map:
                 answ_tokens_bounds = answers_tokens_indexes_map[qid]
@@ -126,7 +121,9 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
                 answer = str(passage[answ_char_start_index:answ_char_end_index]).strip()
 
-            answers_for_question_map[qid] = answer
+            if qid in answers_tokens_indexes_map:
+                answers_for_question_map[qid] = answer
+            # answers_for_question_map[qid] = answer
 
             progress_bar()
 
@@ -149,20 +146,9 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 
 def test():
-    X, Y_true, question_indexes = __dataset()
+    Y_pred = __predict()
 
-    #
-
-    # ### TODO: remove the following code ...
-    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, question_indexes)
-    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    # __store_answers_predictions(answers_for_question, "training.true")
-
-    #
-
-    Y_pred = __predict(X)
-
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, question_indexes)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
@@ -171,8 +157,20 @@ def test():
     print(str(LocalStorage.answers_predictions_url("training.pred")))
     print()
 
+    #
+
+    ### TODO: remove the following code ...
+    Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+
+    ### TODO: remove the following code ...
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
+    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    __store_answers_predictions(answers_for_question, "training.true")
+
 
 ###
 
 if __name__ == "__main__":
+    load_data()
+
     test()

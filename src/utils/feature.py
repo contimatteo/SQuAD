@@ -203,12 +203,13 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
 def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     assert isinstance(data, tuple)
-    assert len(data) >= 10
+    assert len(data) == 3
 
     #
 
-    question_indexes = data[8]
-    passages = data[9]
+    question_indexes = data[0]
+    passages = data[1]
+    questions = data[2]
 
     #
 
@@ -218,8 +219,12 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     assert isinstance(passages, np.ndarray)
     assert len(passages.shape) == 1
 
-    assert passages.shape[0] == question_indexes.shape[0]
+    assert isinstance(questions, np.ndarray)
+    assert len(questions.shape) == 1
+
+    assert question_indexes.shape[0] == passages.shape[0]
+    assert question_indexes.shape[0] == questions.shape[0]
 
     #
 
-    return question_indexes, passages
+    return question_indexes, questions, passages
