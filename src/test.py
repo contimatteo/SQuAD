@@ -54,7 +54,7 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
     answers_tokens_probs_map = {}
 
     with alive_bar(len(question_indexes_unique)) as progress_bar:
-        for question_index in np.unique(question_indexes):
+        for question_index in question_indexes_unique:
             subset_indexes = np.array(question_indexes == question_index)
 
             current_answers = Y[subset_indexes]
@@ -146,16 +146,16 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 
 def test():
-    Y_pred = __predict()
+    # Y_pred = __predict()
 
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
-    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    __store_answers_predictions(answers_for_question, "training.pred")
+    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
+    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    # __store_answers_predictions(answers_for_question, "training.pred")
 
-    print()
-    print("The generated answers (json with predictions) file is available at:")
-    print(str(LocalStorage.answers_predictions_url("training.pred")))
-    print()
+    # print()
+    # print("The generated answers (json with predictions) file is available at:")
+    # print(str(LocalStorage.answers_predictions_url("training.pred")))
+    # print()
 
     #
 
