@@ -25,7 +25,7 @@ set_learning_phase(0)
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = 1000  # `None` for all rows :)
+N_ROWS_SUBSET = 10  # `None` for all rows :)
 
 ###
 
