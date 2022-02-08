@@ -1,7 +1,7 @@
 import os
 import json
 import pandas as pd
-
+import ast
 from utils.data import copy_data, download_data, get_tmp_data_dir
 from utils.data_storage import save_evaluation_data_data, load_evaluation_data_data
 from utils.data import get_default_raw_file_name
@@ -21,6 +21,11 @@ def download_training_set():
     return RAW_FILE
 
 
+def only_dict(d):
+    import ast
+    return ast.literal_eval(str(d))
+
+
 def load_training_set(json_path):
     print("Data downloading")
     raw_file = ""
@@ -38,22 +43,39 @@ def load_training_set(json_path):
 
     contents = contents["data"]
     df = pd.json_normalize(
-        contents, ['paragraphs', 'qas', 'answers'],
-        ["title", ["paragraphs", "context"], ["paragraphs", "qas", "question"], ["paragraphs", "qas", "id"]]
+        contents, ['paragraphs', 'qas'],
+        ["title", ["paragraphs", "context"]]
     )
-    df = df[["paragraphs.qas.id", "title", "paragraphs.context", "paragraphs.qas.question", "text", "answer_start"]]
+    if "answers" in df:
+        df = df[["id", "title", "paragraphs.context", "question", "answers"]]
+        # df["answers"] = [i[0] for i in df["answers"]]
+        A = df['answers'].apply(lambda x: pd.Series(x[0])).add_prefix('answers.')
+        df = df.join([A])
+        df.drop(columns='answers', inplace=True)
+        df.rename(
+            columns={
+                'id': 'id',
+                'title': 'title',
+                'paragraphs.context': 'passage',
+                'question': 'question',
+                'answers.text': 'answer',
+                'answers.answer_start': 'answer_start'
+            },
+            inplace=True
+        )
+    else:
+        df = df[["id", "title", "paragraphs.context", "question"]]
 
-    df.rename(
-        columns={
-            'title': 'title',
-            'paragraphs.context': 'passage',
-            'paragraphs.qas.question': 'question',
-            'text': 'answer',
-            'answer_start': 'answer_start',
-            'paragraphs.qas.id': 'id'
-        },
-        inplace=True
-    )
+        df.rename(
+            columns={
+                'id': 'id',
+                'title': 'title',
+                'paragraphs.context': 'passage',
+                'question': 'question'
+            },
+            inplace=True
+        )
+
     print("Converted json to dataframe \n")
     return df
 

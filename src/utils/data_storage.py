@@ -8,7 +8,7 @@ from data.config import Configuration
 from utils.data import add_glove_dim_to_name, get_processed_data_dir, get_data_dir, get_tmp_data_dir
 
 EVALUATION_DATA_FILE_NAME = "evaluation_data.pkl"
-FINAL_DATA_FILE_NAME = "data.pkl"
+# FINAL_DATA_FILE_NAME = "data.pkl"
 GLOVE_MATRIX_FILE_NAME = "glove_matrix.pkl"
 WORD_TO_INDEX_FILE_NAME = "word_to_index.pkl"
 CONFIG_FILE_NAME = "configuration.pkl"
@@ -27,14 +27,15 @@ def create_tmp_directories():
 
 def clean_all_data_cache():
     folder = get_processed_data_dir()
-    os.remove(os.path.join(folder, EVALUATION_DATA_FILE_NAME))
+    if os.path.exists(os.path.join(folder, EVALUATION_DATA_FILE_NAME)):
+        os.remove(os.path.join(folder, EVALUATION_DATA_FILE_NAME))
     for name in os.listdir(folder):
         if name.startswith("data"):
             os.remove(os.path.join(folder, name))
 
 
-def save_processed_data(df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder, glove_dim: str):
-    name = add_glove_dim_to_name(FINAL_DATA_FILE_NAME, glove_dim)
+def save_processed_data(df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder, glove_dim: str, file_name: str):
+    name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
     df_c = DataframeCompression(OHE_pos, OHE_ner)
@@ -43,8 +44,8 @@ def save_processed_data(df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHo
         pickle.dump(df_c, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def load_processed_data(WTI, glove_dim: str):
-    name = add_glove_dim_to_name(FINAL_DATA_FILE_NAME, glove_dim)
+def load_processed_data(WTI, glove_dim: str, file_name: str):
+    name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
     if not os.path.exists(file):
