@@ -92,13 +92,13 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
 def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
     answers_for_question_map = {}
 
-    qids, _, passages = QP_data_from_dataset(get_data("original"))
+    qids, questions, passages = QP_data_from_dataset(get_data("original"))
 
     with alive_bar(qids.shape[0]) as progress_bar:
         for (idx, qid) in enumerate(list(qids)):
             answer = ""
             passage_tokens = passages[idx]
-            passage = " ".join(passage_tokens)
+            # passage = " ".join(passage_tokens)
 
             if qid in answers_tokens_indexes_map:
                 answ_tokens_bounds = answers_tokens_indexes_map[qid]
@@ -108,18 +108,24 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 ### INFO: the original predictions are based on PADDED passages.
                 if answer_token_end_index >= len(passage_tokens):
                     answer_token_end_index = len(passage_tokens) - 1
+                if answ_token_start_index >= len(passage_tokens):
+                    answ_token_start_index = len(passage_tokens) - 1
 
                 ### INFO: we have no guarantees to have a 'valid' indexes range.
                 if answer_token_end_index < answ_token_start_index:
                     answer_token_end_index = answ_token_start_index
 
-                answ_span_pre_start = passage_tokens[0:answ_token_start_index]
-                answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
-
-                answ_char_start_index = len(" ".join(answ_span_pre_start))
-                answ_char_end_index = len(" ".join(answ_span_to_end))
-
-                answer = str(passage[answ_char_start_index:answ_char_end_index]).strip()
+                # answ_span_pre_start = passage_tokens[0:answ_token_start_index]
+                # answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
+                # ### INFO: we have always to consider the ENTIRE end token.
+                # answ_span_to_end += [str(passage_tokens[answer_token_end_index])]
+                # ### compute the chars range indexes
+                # answ_char_start_index = len(" ".join(answ_span_pre_start))
+                # answ_char_end_index = len(" ".join(answ_span_to_end))
+                # ### extract answer from chars indexes
+                # answer = passage[answ_char_start_index:answ_char_end_index]
+                answer = " ".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1])
+                answer = str(answer).strip()
 
             if qid in answers_tokens_indexes_map:
                 answers_for_question_map[qid] = answer
@@ -146,26 +152,26 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 
 def test():
-    # Y_pred = __predict()
+    Y_pred = __predict()
 
-    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
-    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    # __store_answers_predictions(answers_for_question, "training.pred")
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
+    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    __store_answers_predictions(answers_for_question, "training.pred")
 
-    # print()
-    # print("The generated answers (json with predictions) file is available at:")
-    # print(str(LocalStorage.answers_predictions_url("training.pred")))
-    # print()
+    print()
+    print("The generated answers (json with predictions) file is available at:")
+    print(str(LocalStorage.answers_predictions_url("training.pred")))
+    print()
 
     #
 
-    ### TODO: remove the following code ...
-    Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    # ### TODO: remove the following code ...
+    # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
 
-    ### TODO: remove the following code ...
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
-    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    __store_answers_predictions(answers_for_question, "training.true")
+    # ### TODO: remove the following code ...
+    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
+    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    # __store_answers_predictions(answers_for_question, "training.true")
 
 
 ###
