@@ -44,7 +44,8 @@ def save_processed_data(
     df_c = DataframeCompression(OHE_pos, OHE_ner)
     df_c.compress(df)
     with open(file, "wb") as handle:
-        pickle.dump(df_c, handle, protocol=pickle.DEFAULT_PROTOCOL)
+        # pickle.dump(df_c, handle, protocol=pickle.DEFAULT_PROTOCOL)
+        pickle.dump(df_c, handle)
 
 
 def load_processed_data(WTI, glove_dim: str, file_name: str):
