@@ -12,11 +12,12 @@ from wandb.keras import WandbCallback
 import utils.env_setup
 import utils.configs as Configs
 
-from data import get_data
+from data import get_data, load_data
 from models import DRQA
 from models.core import drqa_start_accuracy, drqa_end_accuracy, drqa_tot_accuracy
 from models.core import drqa_start_mae, drqa_end_mae, drqa_tot_mae
-from utils import XY_data_from_dataset, LocalStorageManager
+from utils import LocalStorageManager
+from utils import X_data_from_dataset, Y_data_from_dataset
 
 ###
 
@@ -24,15 +25,9 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 LocalStorage = LocalStorageManager()
 
+N_ROWS_SUBSET = 1000  # `None` for all rows :)
+
 ###
-
-_, dataset, glove_matrix, _ = get_data(300)
-
-
-def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    x, y, _ = XY_data_from_dataset(dataset, 10000)
-
-    return x, y
 
 
 def __dataset_kfold(X, Y, indexes) -> list:
@@ -91,13 +86,21 @@ def __evaluation(Y_true, Y_pred):
 ###
 
 
-def train(X, Y):
+def train():
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    glove_matrix = get_data("glove")
+
     model = DRQA(glove_matrix)
 
     _ = __fit(model, X, Y, True)
 
 
-def kfold_train(X, Y):
+def kfold_train():
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    glove_matrix = get_data("glove")
+
     metrics = []
 
     kf = KFold(n_splits=Configs.N_KFOLD_BUCKETS, shuffle=False)
@@ -136,8 +139,8 @@ def kfold_train(X, Y):
 ###
 
 if __name__ == "__main__":
-    X, Y = __dataset()
+    load_data()
 
-    # kfold_train(X, Y)
+    # kfold_train()
 
-    train(X, Y)
+    train()

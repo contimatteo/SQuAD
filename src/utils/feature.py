@@ -94,26 +94,24 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
     return Y_onehot_with_additional_case
 
 
-def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
-    assert isinstance(data, tuple)
-    assert len(data) >= 8
+def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
+    assert isinstance(X_data, tuple)
+    assert len(X_data) == 7
 
     #
 
-    q_indexes = data[0]
-    p_tokens = data[1]
-    q_tokens = data[2]
-    labels = data[3]
-    p_pos = data[4]
-    p_ner = data[5]
-    p_tf = data[6]
-    p_match = data[7]
+    q_indexes = X_data[0]
+    p_tokens = X_data[1]
+    q_tokens = X_data[2]
+    p_pos = X_data[3]
+    p_ner = X_data[4]
+    p_tf = X_data[5]
+    p_match = X_data[6]
 
     #
 
     assert p_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert q_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
-    assert labels.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_pos.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_ner.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_tf.shape[1] <= Configs.N_PASSAGE_TOKENS
@@ -123,7 +121,6 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray
         q_indexes = __X_feature_examples_subset(q_indexes, n_examples_subset)
         p_tokens = __X_feature_examples_subset(p_tokens, n_examples_subset)
         q_tokens = __X_feature_examples_subset(q_tokens, n_examples_subset)
-        labels = __X_feature_examples_subset(labels, n_examples_subset)
         p_pos = __X_feature_examples_subset(p_pos, n_examples_subset)
         p_ner = __X_feature_examples_subset(p_ner, n_examples_subset)
         p_tf = __X_feature_examples_subset(p_tf, n_examples_subset)
@@ -131,7 +128,6 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray
 
     p_tokens = __X_feature_tokens_subset(p_tokens, Configs.N_PASSAGE_TOKENS)
     q_tokens = __X_feature_tokens_subset(q_tokens, Configs.N_PASSAGE_TOKENS)
-    labels = __X_feature_tokens_subset(labels, Configs.N_PASSAGE_TOKENS)
     p_pos = __X_feature_tokens_subset(p_pos, Configs.N_PASSAGE_TOKENS)
     p_ner = __X_feature_tokens_subset(p_ner, Configs.N_PASSAGE_TOKENS)
     p_tf = __X_feature_tokens_subset(p_tf, Configs.N_PASSAGE_TOKENS)
@@ -146,11 +142,6 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray
     assert isinstance(q_tokens, np.ndarray)
     assert len(q_tokens.shape) == 2
     assert q_tokens.shape[1] == Configs.N_QUESTION_TOKENS
-
-    assert isinstance(labels, np.ndarray)
-    assert len(labels.shape) == 3
-    assert labels.shape[1] == Configs.N_PASSAGE_TOKENS
-    assert labels.shape[2] == 2
 
     assert isinstance(p_pos, np.ndarray)
     assert len(p_pos.shape) == 3
@@ -179,11 +170,35 @@ def XY_data_from_dataset(data, n_examples_subset=None) -> Tuple[list, np.ndarray
 
     X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
 
-    Y = __prepare_Y_true_onehot_encoding(labels)
+    return X, q_indexes
+
+
+def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
+    assert Y_data is not None
+
+    labels = Y_data
 
     #
 
-    return X, Y, q_indexes
+    assert labels.shape[1] <= Configs.N_PASSAGE_TOKENS
+
+    if n_examples_subset is not None and isinstance(n_examples_subset, int):
+        labels = __X_feature_examples_subset(labels, n_examples_subset)
+
+    labels = __X_feature_tokens_subset(labels, Configs.N_PASSAGE_TOKENS)
+
+    #
+
+    assert isinstance(labels, np.ndarray)
+    assert len(labels.shape) == 3
+    assert labels.shape[1] == Configs.N_PASSAGE_TOKENS
+    assert labels.shape[2] == 2
+
+    #
+
+    Y = __prepare_Y_true_onehot_encoding(labels)
+
+    return Y
 
 
 def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
