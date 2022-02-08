@@ -30,7 +30,7 @@ _, dataset, glove_matrix, _ = get_data(300)
 
 
 def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    x, y, _ = XY_data_from_dataset(dataset, 2000)
+    x, y, _ = XY_data_from_dataset(dataset, 10000)
 
     return x, y
 
