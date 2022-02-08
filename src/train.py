@@ -12,10 +12,12 @@ from wandb.keras import WandbCallback
 import utils.env_setup
 import utils.configs as Configs
 
-from data import get_data
+from data import get_data, load_data
 from models import DRQA
-from models.core import drqa_accuracy_start, drqa_accuracy_end, drqa_accuracy
-from utils import XY_data_from_dataset, LocalStorageManager
+from models.core import drqa_start_accuracy, drqa_end_accuracy, drqa_tot_accuracy
+from models.core import drqa_start_mae, drqa_end_mae, drqa_tot_mae
+from utils import LocalStorageManager
+from utils import X_data_from_dataset, Y_data_from_dataset
 
 ###
 
@@ -23,15 +25,9 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 LocalStorage = LocalStorageManager()
 
+N_ROWS_SUBSET = 1000  # `None` for all rows :)
+
 ###
-
-_, dataset, glove_matrix, _ = get_data(300)
-
-
-def __dataset() -> Tuple[Tuple[np.ndarray], np.ndarray, np.ndarray]:
-    x, y, _ = XY_data_from_dataset(dataset, Configs.NN_BATCH_SIZE * Configs.N_KFOLD_BUCKETS)
-
-    return x, y
 
 
 def __dataset_kfold(X, Y, indexes) -> list:
@@ -43,7 +39,7 @@ def __callbacks() -> list:
 
     callbacks.append(
         EarlyStopping(
-            monitor='drqa_loss',
+            monitor='drqa_tot_crossentropy',
             patience=3,
             mode='min',
             min_delta=1e-3,
@@ -76,23 +72,35 @@ def __predict(model, X) -> np.ndarray:
 
 
 def __evaluation(Y_true, Y_pred):
-    start_accuracy = drqa_accuracy_start(Y_true, Y_pred).numpy()
-    end_accuracy = drqa_accuracy_end(Y_true, Y_pred).numpy()
-    tot_accuracy = drqa_accuracy(Y_true, Y_pred).numpy()
+    start_accuracy = drqa_start_accuracy(Y_true, Y_pred).numpy()
+    end_accuracy = drqa_end_accuracy(Y_true, Y_pred).numpy()
+    tot_accuracy = drqa_tot_accuracy(Y_true, Y_pred).numpy()
 
-    return [start_accuracy, end_accuracy, tot_accuracy]
+    start_mae = drqa_start_mae(Y_true, Y_pred).numpy()
+    end_mae = drqa_end_mae(Y_true, Y_pred).numpy()
+    tot_mae = drqa_tot_mae(Y_true, Y_pred).numpy()
+
+    return [start_accuracy, end_accuracy, tot_accuracy, start_mae, end_mae, tot_mae]
 
 
 ###
 
 
-def train(X, Y):
+def train():
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    glove_matrix = get_data("glove")
+
     model = DRQA(glove_matrix)
 
     _ = __fit(model, X, Y, True)
 
 
-def kfold_train(X, Y):
+def kfold_train():
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    glove_matrix = get_data("glove")
+
     metrics = []
 
     kf = KFold(n_splits=Configs.N_KFOLD_BUCKETS, shuffle=False)
@@ -120,16 +128,19 @@ def kfold_train(X, Y):
     print()
     print("METRICS")
     print("[accuracy] start: ", metrics[:, 0].mean())
-    print("[accuracy] end  : ", metrics[:, 1].mean())
+    print("[accuracy]   end: ", metrics[:, 1].mean())
     print("[accuracy] total: ", metrics[:, 2].mean())
+    print("     [mae] start: ", metrics[:, 3].mean())
+    print("     [mae]   end: ", metrics[:, 4].mean())
+    print("     [mae] total: ", metrics[:, 5].mean())
     print()
 
 
 ###
 
 if __name__ == "__main__":
-    X, Y = __dataset()
+    load_data()
 
-    # kfold_train(X, Y)
+    # kfold_train()
 
-    train(X, Y)
+    train()

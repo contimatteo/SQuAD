@@ -15,6 +15,9 @@
     "**/build/": true,
     "**/dist/": true,
     "**/venv/": true,
+    "data/": true,
+    "tmp/": true,
+    "wandb/": true,
   },
 
   
