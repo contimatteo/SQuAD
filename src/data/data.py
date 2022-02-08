@@ -20,8 +20,11 @@ df_np = None
 glove_matrix = None
 
 
-def __df_column_to_numpy(df_column: pd.Series) -> np.ndarray:
-    return np.array([np.array(xi) for xi in df_column.to_numpy()])
+def __df_column_to_numpy(df_column: pd.Series, dtype=None) -> np.ndarray:
+    if dtype is None:
+        return np.array([np.array(xi) for xi in df_column.to_numpy()])
+    else:
+        return np.array([np.array(xi) for xi in df_column.to_numpy()], dtype=dtype)
 
 
 def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
@@ -41,8 +44,8 @@ def __data_to_numpy(df: pd.DataFrame):
         label = __df_column_to_numpy(df["label_padded"])
 
     evaluation_id_x = id_x
-    evaluation_passage = __df_column_to_numpy(df["word_tokens_passage"])
-    evaluation_question = __df_column_to_numpy(df["word_tokens_question"])
+    evaluation_passage = __df_column_to_numpy(df["word_tokens_passage"], dtype=object)
+    evaluation_question = __df_column_to_numpy(df["word_tokens_question"], dtype=object)
 
     tf = __cast_to_numpy_float(tf)
     pos = __cast_to_numpy_float(pos)
