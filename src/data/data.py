@@ -18,7 +18,6 @@ from utils import configs
 
 ###
 
-
 df_np = None
 glove_matrix = None
 
@@ -64,8 +63,8 @@ def __data_to_numpy(df: pd.DataFrame):
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
     cols = [
-        "title", "word_tokens_passage_padded", "word_tokens_question_padded",
-        "pos_padded", "ner_padded"
+        "title", "word_tokens_passage_padded", "word_tokens_question_padded", "pos_padded",
+        "ner_padded"
     ]
     if "answer" in df:
         cols.append("answer")
@@ -146,16 +145,18 @@ def load_data(debug=False, json_path=None):
 
 def get_data(ret: str):
     global df_np, glove_matrix
+
     assert df_np is not None
     assert glove_matrix is not None
     assert isinstance(ret, str)
+
     if ret == "original":
         return df_np[8], df_np[9], df_np[10]
-    elif ret == "label":
+    elif ret == "labels":
         return df_np[7]
-    elif ret == "data":
+    elif ret == "features":
         return df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]
     elif ret == "glove":
         return glove_matrix
-    raise Exception("parameter not correct")
 
+    raise Exception("`get_data` invalid enum value.")

@@ -14,12 +14,15 @@ yapf
 #############################
 ## Standalone
 
+alive-progress
+pydot
 python-dotenv
 
 #############################
 ## Not-Versioned
 
 googledrivedownloader
+matplotlib
 nltk
 scikit-learn
 swifter
