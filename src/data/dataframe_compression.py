@@ -9,6 +9,8 @@ class DataframeCompression:
 
     def __init__(self, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder):
         self.index_df = pd.DataFrame()
+        self.passage_index_dict = pd.DataFrame()
+        self.question_index_dict = pd.DataFrame()
         self.passage_dict = pd.DataFrame()
         self.question_dict = pd.DataFrame()
         self.label_dict = pd.DataFrame()
@@ -30,9 +32,14 @@ class DataframeCompression:
         # df_pass = df.set_index(self.key_pass, drop=False)
         # df_ques = df.set_index(self.key_ques, drop=False)
 
-        self.passage_dict = df[self.key_pass + ["word_index_passage_padded"]].drop_duplicates(subset=self.key_pass)
-        self.question_dict = df[self.key_ques + ["word_index_question_padded"]].drop_duplicates(subset=self.key_ques)
-        self.label_dict = df[self.key_all + ["label_padded"]].drop_duplicates(subset=self.key_all)
+        self.passage_index_dict = df[self.key_pass + ["word_index_passage_padded"]].drop_duplicates(subset=self.key_pass)
+        self.question_index_dict = df[self.key_ques + ["word_index_question_padded"]].drop_duplicates(subset=self.key_ques)
+        self.passage_dict = df[self.key_pass + ["word_tokens_passage"]].drop_duplicates(subset=self.key_pass)
+        self.question_dict = df[self.key_ques + ["word_tokens_question"]].drop_duplicates(subset=self.key_ques)
+        if "label_padded" in df:
+            self.label_dict = df[self.key_all + ["label_padded"]].drop_duplicates(subset=self.key_all)
+        else:
+            self.label_dict = None
         self.exact_match_dict = df[self.key_all + ["exact_match_padded"]].drop_duplicates(subset=self.key_all)
         self.pos_cat_dict = df[self.key_pass + ["pos_categorical_padded"]].drop_duplicates(subset=self.key_pass)
         self.ner_cat_dict = df[self.key_pass + ["ner_categorical_padded"]].drop_duplicates(subset=self.key_pass)
@@ -47,11 +54,16 @@ class DataframeCompression:
         print("Rebuilding ID")
         df = pd.merge(df, self.id_dict, on=self.key_ques, how="inner")
         print("Rebuilding Columns WTI passage")
-        df = pd.merge(df, self.passage_dict, on=self.key_pass, how="inner")
+        df = pd.merge(df, self.passage_index_dict, on=self.key_pass, how="inner")
         print("Rebuilding Columns WTI question")
+        df = pd.merge(df, self.question_index_dict, on=self.key_ques, how="inner")
+        print("Rebuilding Columns passage list")
+        df = pd.merge(df, self.passage_dict, on=self.key_pass, how="inner")
+        print("Rebuilding Columns question list")
         df = pd.merge(df, self.question_dict, on=self.key_ques, how="inner")
-        print("Rebuilding Labels")
-        df = pd.merge(df, self.label_dict, on=self.key_all, how="inner")
+        if self.label_dict is not None:
+            print("Rebuilding Labels")
+            df = pd.merge(df, self.label_dict, on=self.key_all, how="inner")
         print("Rebuilding Exact Match")
         df = pd.merge(df, self.exact_match_dict, on=self.key_all, how="inner")
         print("Rebuilding POS")
