@@ -1,3 +1,5 @@
+import os.path
+
 import pandas as pd
 import numpy as np
 
@@ -59,7 +61,7 @@ def __data_to_numpy(df: pd.DataFrame):
     return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage, evaluation_question
 
 
-def __export_df(df, onehot_pos, onehot_ner, glove_dim):
+def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
     cols = [
         "title", "word_tokens_passage_padded", "word_tokens_question_padded",
         "pos_padded", "ner_padded"
@@ -69,7 +71,7 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim):
     df.drop(cols, inplace=True, axis=1)
     df = df.reset_index(drop=True)
 
-    save_processed_data(df, onehot_pos, onehot_ner, glove_dim)
+    save_processed_data(df, onehot_pos, onehot_ner, glove_dim, file_name=file_name)
 
 
 def load_data(glove_dim, debug=False, json_path=None):
@@ -84,8 +86,10 @@ def load_data(glove_dim, debug=False, json_path=None):
     print("[WTI] prepared.")
 
     # conf = load_config_data()
-
-    df = load_processed_data(wti, glove_dim)
+    file_name = "drive_dataset.pkl"
+    if json_path is not None:
+        file_name = os.path.basename(json_path).replace(".json", ".pkl")
+    df = load_processed_data(wti, glove_dim, file_name=file_name)
     # if debug is False and conf.get_argv_json_complete_name() is None:
     #     df = load_processed_data(wti, glove_dim)
     # elif not conf.argv_changed(json_path, debug):
@@ -120,7 +124,7 @@ def load_data(glove_dim, debug=False, json_path=None):
         df, _ = reduce_mem_usage(df)
         print("[Data] processed.")
 
-        __export_df(df, onehot_pos, onehot_ner, glove_dim)
+        __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name)
         # conf.set_argv_json_complete_name(json_path, debug)
         # save_config_data(conf)
         print("[Data] exported.")
