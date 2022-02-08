@@ -14,13 +14,16 @@ yapf
 #############################
 ## Standalone
 
+alive-progress
 numpy
+pydot
 python-dotenv
 
 #############################
 ## Not-Versioned
 
 googledrivedownloader
+matplotlib
 nltk
 pandas
 scikit-learn

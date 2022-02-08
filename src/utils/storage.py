@@ -80,4 +80,4 @@ class LocalStorageManager():
 
     def answers_predictions_url(self, dataset_name: str) -> Path:
         assert isinstance(dataset_name, str)
-        return self.dirs.data_predictions.joinpath(f"answers-{dataset_name}.json")
+        return self.dirs.data_predictions.joinpath(f"answers.{dataset_name}.json")
