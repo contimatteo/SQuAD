@@ -41,7 +41,7 @@ def save_processed_data(
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
-    df_c = DataframeCompression(OHE_pos, OHE_ner)
+    df_c = DataframeCompression(OHE_pos.get_OHE_dicts(), OHE_ner.get_OHE_dicts())
     df_c.compress(df)
     df_c = df_c.to_pickle()
     with open(file, "wb") as handle:
@@ -57,7 +57,9 @@ def load_processed_data(WTI, glove_dim: str, file_name: str):
         return None
     with open(file, "rb") as handle:
         df_c = DataframeCompression()
-        df_c.from_pickle(pickle.load(handle))
+        tmp=pickle.load(handle)
+        print("aaaaaaaaaaaaaaaaaaaaaa\n",tmp,"\naaaaaaaaaaaaaaaaaaaaaaaaaa")
+        df_c.from_pickle(tmp)
         return df_c.extract(WTI)
 
 

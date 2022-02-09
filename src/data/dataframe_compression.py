@@ -7,7 +7,7 @@ from features.word_to_index import WordToIndex
 
 class DataframeCompression:
 
-    def __init__(self, OHE_pos: OneHotEncoder=None, OHE_ner: OneHotEncoder=None):
+    def __init__(self, OHE_pos: dict = None, OHE_ner: dict = None):
         self.index_df = pd.DataFrame()
         self.passage_index_dict = pd.DataFrame()
         self.question_index_dict = pd.DataFrame()
@@ -23,8 +23,9 @@ class DataframeCompression:
         self.key_all = ["passage_index", "question_index", "chunk_index"]
         self.key_pass = ["passage_index", "chunk_index"]
         self.key_ques = ["question_index", "chunk_index"]
-        self.OHE_pos = OHE_pos
-        self.OHE_ner = OHE_ner
+        self.OHE = {"OHE_pos": OHE_pos, "OHE_ner": OHE_ner}
+        # self.OHE_pos = [OHE_pos]
+        # self.OHE_ner = [OHE_ner]
 
     def from_pickle(self, d: dict):
         self.index_df = d["index_df"]
@@ -41,8 +42,9 @@ class DataframeCompression:
         self.key_all = d["key_all"]
         self.key_pass = d["key_pass"]
         self.key_ques = d["key_ques"]
-        self.OHE_pos = d["OHE_pos"]
-        self.OHE_ner = d["OHE_ner"]
+        self.OHE = d["OHE"]
+        # self.OHE_pos = d["OHE_pos"]
+        # self.OHE_ner = d["OHE_ner"]
 
     def to_pickle(self):
         return {
@@ -60,8 +62,9 @@ class DataframeCompression:
             "key_all": self.key_all,
             "key_pass": self.key_pass,
             "key_ques": self.key_ques,
-            "OHE_pos": self.OHE_pos,
-            "OHE_ner": self.OHE_ner,
+            "OHE": self.OHE
+            # "OHE_pos": self.OHE_pos,
+            # "OHE_ner": self.OHE_ner,
         }
 
     def compress(self, df):
@@ -75,8 +78,8 @@ class DataframeCompression:
         )
         self.question_index_dict = df[self.key_ques +
                                       ["word_index_question_padded"]].drop_duplicates(
-                                          subset=self.key_ques
-                                      )
+            subset=self.key_ques
+        )
         self.passage_dict = df[self.key_pass +
                                ["word_tokens_passage"]].drop_duplicates(subset=self.key_pass)
         self.question_dict = df[self.key_ques +
@@ -96,8 +99,14 @@ class DataframeCompression:
                           ["term_frequency_padded"]].drop_duplicates(subset=self.key_pass)
         self.id_dict = df[self.key_ques + ["id"]].drop_duplicates(subset=self.key_ques)
 
-        self.OHE_pos.reset_cache()
-        self.OHE_ner.reset_cache()
+        # OHE_pos = OneHotEncoder(self.OHE["OHE_pos"])
+        # OHE_pos.reset_cache()
+        # OHE_ner = OneHotEncoder(self.OHE["OHE_ner"])
+        # OHE_ner.reset_cache()
+        self.OHE["OHE_pos"]["cache_categorical_dict"] = {}
+        self.OHE["OHE_pos"]["cache_one_hot_dict"] = {}
+        self.OHE["OHE_ner"]["cache_categorical_dict"] = {}
+        self.OHE["OHE_ner"]["cache_one_hot_dict"] = {}
 
     def extract(self, WTI: WordToIndex):
         df = self.index_df
@@ -163,13 +172,11 @@ class DataframeCompression:
 
     def add_pos_ner_onehot(self, df):
         df["pos_onehot_padded"] = df.apply(
-            lambda x: self.OHE_pos.
-            transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]),
+            lambda x: OneHotEncoder(self.OHE["OHE_pos"]).transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]),
             axis=1
         )
         df["ner_onehot_padded"] = df.apply(
-            lambda x: self.OHE_ner.
-            transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]),
+            lambda x: OneHotEncoder(self.OHE["OHE_ner"]).transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]),
             axis=1
         )
         return df
