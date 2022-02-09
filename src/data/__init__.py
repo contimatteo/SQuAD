@@ -1,1 +1,1 @@
-from .data import get_data, load_data
+from .data import get_data, load_data, delete_data

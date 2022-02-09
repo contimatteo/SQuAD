@@ -112,9 +112,9 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
     q_indexes = pd_series_to_numpy(X_data[0])
 
-    p_tokens = pd_series_to_numpy(X_data[1], np.float16)
+    p_tokens = pd_series_to_numpy(X_data[1], np.float32)
     X_data[1] = None
-    q_tokens = pd_series_to_numpy(X_data[2], np.float16)
+    q_tokens = pd_series_to_numpy(X_data[2], np.float32)
     X_data[2] = None
     p_pos = pd_series_to_numpy(X_data[3], np.float16)
     X_data[3] = None
