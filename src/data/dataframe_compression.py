@@ -7,7 +7,7 @@ from features.word_to_index import WordToIndex
 
 class DataframeCompression:
 
-    def __init__(self, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder):
+    def __init__(self, OHE_pos: OneHotEncoder=None, OHE_ner: OneHotEncoder=None):
         self.index_df = pd.DataFrame()
         self.passage_index_dict = pd.DataFrame()
         self.question_index_dict = pd.DataFrame()
@@ -26,16 +26,23 @@ class DataframeCompression:
         self.OHE_pos = OHE_pos
         self.OHE_ner = OHE_ner
 
-    @staticmethod
-    def from_pickle(d, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder):
-        a = DataframeCompression(OHE_pos, OHE_ner)
-        a.index_df = d["index_df"]
-        a.index_df = d["index_df"]
-        a.index_df = d["index_df"]
-        a.index_df = d["index_df"]
-        a.index_df = d["index_df"]
-        a.index_df = d["index_df"]
-        return a
+    def from_pickle(self, d: dict):
+        self.index_df = d["index_df"]
+        self.passage_index_dict = d["passage_index_dict"]
+        self.question_index_dict = d["question_index_dict"]
+        self.passage_dict = d["passage_dict"]
+        self.question_dict = d["question_dict"]
+        self.label_dict = d["label_dict"]
+        self.exact_match_dict = d["exact_match_dict"]
+        self.pos_cat_dict = d["pos_cat_dict"]
+        self.ner_cat_dict = d["ner_cat_dict"]
+        self.tf_dict = d["tf_dict"]
+        self.id_dict = d["id_dict"]
+        self.key_all = d["key_all"]
+        self.key_pass = d["key_pass"]
+        self.key_ques = d["key_ques"]
+        self.OHE_pos = d["OHE_pos"]
+        self.OHE_ner = d["OHE_ner"]
 
     def to_pickle(self):
         return {
