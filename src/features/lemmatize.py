@@ -5,7 +5,9 @@ from nltk.corpus import wordnet
 
 ###
 
+### TODO: remove this global variable
 lemmatize_passage_dict = {}
+### TODO: remove this global variable
 lemmatize_question_dict = {}
 
 ###
@@ -54,4 +56,3 @@ def apply_lemmatize(df: pd.DataFrame):
     # df["lemmatized_passage"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_passage_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_passage")
     # df["lemmatized_question"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_question_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_question")
     return df
-

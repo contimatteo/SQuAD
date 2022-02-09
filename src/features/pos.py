@@ -4,9 +4,9 @@ from nltk import pos_tag
 
 from .one_hot_encoder import OneHotEncoder
 
-
 ###
 
+### TODO: remove this global variable
 pos_tag_dict = {}
 
 ###
@@ -34,6 +34,10 @@ def apply_pos_one_hot(df: pd.DataFrame):
     ]
     OHE = OneHotEncoder()
     OHE.fit(pos_list)
-    df["pos_categorical"] = df.apply(lambda x: np.uint8(OHE.transform_categorical(x["pos"], x["passage_index"])), axis=1)
-    df["pos_onehot"] = df.apply(lambda x: OHE.transform_one_hot(x["pos_categorical"], x["passage_index"]), axis=1)
+    df["pos_categorical"] = df.apply(
+        lambda x: np.uint8(OHE.transform_categorical(x["pos"], x["passage_index"])), axis=1
+    )
+    df["pos_onehot"] = df.apply(
+        lambda x: OHE.transform_one_hot(x["pos_categorical"], x["passage_index"]), axis=1
+    )
     return df, OHE
