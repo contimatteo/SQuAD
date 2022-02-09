@@ -2,6 +2,7 @@ from typing import List
 
 import numpy as np
 
+
 ###
 
 
@@ -72,8 +73,25 @@ class OneHotEncoder:
         self.cache_categorical_dict = {}
         self.cache_one_hot_dict = {}
 
-    def __init__(self):
-        self.one_hot_dict = {}
-        self.categorical_dict = {}
-        self.cache_categorical_dict = {}
-        self.cache_one_hot_dict = {}
+    def __init__(self, d: dict = None):
+        if d is None:
+            self.one_hot_dict = {}
+            self.categorical_dict = {}
+            self.cache_categorical_dict = {}
+            self.cache_one_hot_dict = {}
+        else:
+            self.set_OHE_dicts(d)
+
+    def get_OHE_dicts(self):
+        return {
+            "one_hot_dict": self.one_hot_dict,
+            "categorical_dict": self.categorical_dict,
+            "cache_categorical_dict": self.cache_categorical_dict,
+            "cache_one_hot_dict": self.cache_one_hot_dict
+        }
+
+    def set_OHE_dicts(self, d: dict):
+        self.one_hot_dict = d["one_hot_dict"]
+        self.categorical_dict = d["categorical_dict"]
+        self.cache_categorical_dict = d["cache_categorical_dict"]
+        self.cache_one_hot_dict = d["cache_one_hot_dict"]

@@ -41,8 +41,9 @@ def save_processed_data(
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
-    df_c = DataframeCompression(OHE_pos, OHE_ner)
+    df_c = DataframeCompression(OHE_pos.get_OHE_dicts(), OHE_ner.get_OHE_dicts())
     df_c.compress(df)
+    df_c = df_c.to_pickle()
     with open(file, "wb") as handle:
         # pickle.dump(df_c, handle, protocol=pickle.DEFAULT_PROTOCOL)
         pickle.dump(df_c, handle)
@@ -55,7 +56,9 @@ def load_processed_data(WTI, glove_dim: str, file_name: str):
     if not os.path.exists(file):
         return None
     with open(file, "rb") as handle:
-        return pickle.load(handle).extract(WTI)
+        df_c = DataframeCompression()
+        df_c.from_pickle(pickle.load(handle))
+        return df_c.extract(WTI)
 
 
 def save_pickle(obj, file_name: str, folder: str):
