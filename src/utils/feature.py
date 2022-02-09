@@ -102,13 +102,13 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
     #
 
-    q_indexes = pd_series_to_numpy(X_data[0], str)
-    p_tokens = pd_series_to_numpy(X_data[1], np.float32)
-    q_tokens = pd_series_to_numpy(X_data[2], np.float32)
-    p_pos = pd_series_to_numpy(X_data[3], np.float32)
-    p_ner = pd_series_to_numpy(X_data[4], np.float32)
-    p_tf = pd_series_to_numpy(X_data[5], np.float32)
-    p_match = pd_series_to_numpy(X_data[6], np.float32)
+    q_indexes = pd_series_to_numpy(X_data[0])
+    p_tokens = pd_series_to_numpy(X_data[1], np.float16)
+    q_tokens = pd_series_to_numpy(X_data[2], np.float16)
+    p_pos = pd_series_to_numpy(X_data[3], np.float16)
+    p_ner = pd_series_to_numpy(X_data[4], np.float16)
+    p_tf = pd_series_to_numpy(X_data[5], np.float16)
+    p_match = pd_series_to_numpy(X_data[6], np.float16)
 
     #
 
@@ -178,7 +178,7 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
     assert Y_data is not None
 
-    labels = pd_series_to_numpy(Y_data, int)
+    labels = pd_series_to_numpy(Y_data, np.int8)
 
     #
 
