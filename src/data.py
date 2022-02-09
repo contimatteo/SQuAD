@@ -4,6 +4,8 @@ from utils.memory_usage import memory_usage
 from utils.data import get_argv
 ###
 from data.data import delete_data
+import gc
+
 
 def load():
     pd.set_option('display.max_columns', None)
@@ -53,6 +55,11 @@ def data():
 
 if __name__ == "__main__":
     data()
+    print("After preprocessing")
     memory_usage()
     delete_data()
+    print("After deleting glove and dataset")
+    memory_usage()
+    print("After using garbage collector")
+    gc.collect()
     memory_usage()
