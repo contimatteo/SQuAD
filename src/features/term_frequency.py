@@ -4,7 +4,7 @@ import pandas as pd
 
 ###
 
-
+### TODO: remove this global variable
 ter_freq_dict = {}
 
 

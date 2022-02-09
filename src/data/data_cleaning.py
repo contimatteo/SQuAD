@@ -10,8 +10,11 @@ from utils.data import nltk_download_utilities
 
 ###
 
+### TODO: remove this global variable
 span_tokenize_dict = {}
+### TODO: remove this global variable
 sentence_tokenize_dict = {}
+### TODO: remove this global variable
 passage_index_dict = {}
 
 ###
@@ -21,7 +24,6 @@ passage_index_dict = {}
 #    for sep in separator:
 #       text= text.replace(sep," ")
 #    return text
-#
 #
 # def separate_words(df,separator=["-"]):
 #    columns=["passage","answer","question"]
@@ -174,4 +176,3 @@ def data_cleaning(df: pd.DataFrame):
     df = add_split_into_words(df)
     print("Data cleaned \n")
     return df
-

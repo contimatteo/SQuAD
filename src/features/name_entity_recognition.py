@@ -6,6 +6,7 @@ from .one_hot_encoder import OneHotEncoder
 
 ###
 
+### TODO: remove this global variable
 ner_dict = {}
 
 ###
@@ -36,6 +37,10 @@ def apply_ner_one_hot(df: pd.DataFrame):
             ner_list.append(pref + ent)
     OHE = OneHotEncoder()
     OHE.fit(ner_list)
-    df["ner_categorical"] = df.apply(lambda x: OHE.transform_categorical(x["ner"], x["passage_index"]), axis=1)
-    df["ner_onehot"] = df.apply(lambda x: OHE.transform_one_hot(x["ner_categorical"], x["passage_index"]), axis=1)
+    df["ner_categorical"] = df.apply(
+        lambda x: OHE.transform_categorical(x["ner"], x["passage_index"]), axis=1
+    )
+    df["ner_onehot"] = df.apply(
+        lambda x: OHE.transform_one_hot(x["ner_categorical"], x["passage_index"]), axis=1
+    )
     return df, OHE

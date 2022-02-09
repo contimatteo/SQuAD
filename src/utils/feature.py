@@ -5,6 +5,8 @@ from random import randint
 import numpy as np
 import utils.configs as Configs
 
+from utils.preprocessing import pd_series_to_numpy
+
 ###
 
 N_ROWS = 500
@@ -100,13 +102,13 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
     #
 
-    q_indexes = X_data[0]
-    p_tokens = X_data[1]
-    q_tokens = X_data[2]
-    p_pos = X_data[3]
-    p_ner = X_data[4]
-    p_tf = X_data[5]
-    p_match = X_data[6]
+    q_indexes = pd_series_to_numpy(X_data[0], str)
+    p_tokens = pd_series_to_numpy(X_data[1], np.float32)
+    q_tokens = pd_series_to_numpy(X_data[2], np.float32)
+    p_pos = pd_series_to_numpy(X_data[3], np.float32)
+    p_ner = pd_series_to_numpy(X_data[4], np.float32)
+    p_tf = pd_series_to_numpy(X_data[5], np.float32)
+    p_match = pd_series_to_numpy(X_data[6], np.float32)
 
     #
 
@@ -176,7 +178,7 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
     assert Y_data is not None
 
-    labels = Y_data
+    labels = pd_series_to_numpy(Y_data, int)
 
     #
 
@@ -207,9 +209,9 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
 
     #
 
-    question_indexes = data[0]
-    passages = data[1]
-    questions = data[2]
+    question_indexes = pd_series_to_numpy(data[0], str)
+    passages = pd_series_to_numpy(data[1], str)
+    questions = pd_series_to_numpy(data[2], str)
 
     #
 
