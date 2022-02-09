@@ -3,7 +3,7 @@ from data.data import get_data, load_data
 from utils.memory_usage import memory_usage
 from utils.data import get_argv
 ###
-
+from data.data import delete_data
 
 def load():
     pd.set_option('display.max_columns', None)
@@ -53,4 +53,6 @@ def data():
 
 if __name__ == "__main__":
     data()
+    memory_usage()
+    delete_data()
     memory_usage()

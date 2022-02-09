@@ -34,6 +34,13 @@ def delete_cache():
     delete_cache_pos()
     delete_cache_tf()
 
+
+def delete_data():
+    global df_np, glove_matrix
+    df_np = None
+    glove_matrix = None
+
+
 # def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
 #     return arr.astype(np.float)
 #
