@@ -167,9 +167,9 @@ def load_data(debug=False, json_path=None):
     #     print("[DATA BACKUP] saving")
     #     evaluation_data = save_evaluation_data_df(data_reader(json_path))
     #     print("[DATA BACKUP] saved")
-    print("[Data] converting to numpy")
+    print("[Data] converting to list")
     df_np = __data_to_list(df)
-    print("[Data] converted to numpy")
+    print("[Data] converted to list")
 
 
 def get_data(ret: str):
