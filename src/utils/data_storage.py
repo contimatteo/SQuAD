@@ -57,9 +57,7 @@ def load_processed_data(WTI, glove_dim: str, file_name: str):
         return None
     with open(file, "rb") as handle:
         df_c = DataframeCompression()
-        tmp=pickle.load(handle)
-        print("aaaaaaaaaaaaaaaaaaaaaa\n",tmp,"\naaaaaaaaaaaaaaaaaaaaaaaaaa")
-        df_c.from_pickle(tmp)
+        df_c.from_pickle(pickle.load(handle))
         return df_c.extract(WTI)
 
 
