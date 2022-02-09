@@ -1,64 +1,52 @@
 import os.path
 
 import pandas as pd
-import numpy as np
 
 from features.features import add_features
 from utils.data_storage import save_processed_data, load_processed_data
 from utils.data_storage import save_glove_matrix, load_glove_matrix
-from utils.data_storage import save_WTI, load_WTI
+from utils.data_storage import save_WTI, load_WTI, create_tmp_directories
 from utils.memory import reduce_mem_usage
+
+import utils.configs as Configs
 
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
-from .data_reader import save_evaluation_data_df, load_evaluation_data_df
 from .glove_reader import glove_embedding
-from utils.data_storage import create_tmp_directories, load_config_data, save_config_data, clean_all_data_cache
-from utils import configs
 
 ###
 
 df_np = None
 glove_matrix = None
 
+###
 
-def __df_column_to_numpy(df_column: pd.Series, dtype=None) -> np.ndarray:
-    if dtype is None:
-        return np.array([np.array(xi) for xi in df_column.to_numpy()])
-    else:
-        return np.array([np.array(xi) for xi in df_column.to_numpy()], dtype=dtype)
-
-
-def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
-    return arr.astype(np.float)
-
-
-def __data_to_numpy(df: pd.DataFrame):
-    tf = __df_column_to_numpy(df["term_frequency_padded"])
-    pos = __df_column_to_numpy(df["pos_onehot_padded"])
-    ner = __df_column_to_numpy(df["ner_onehot_padded"])
-    passage = __df_column_to_numpy(df["word_index_passage_padded"])
-    question = __df_column_to_numpy(df["word_index_question_padded"])
-    exact_match = __df_column_to_numpy(df["exact_match_padded"])
-    id_x = __df_column_to_numpy(df["id"])
-    label = None
-    if "label_padded" in df:
-        label = __df_column_to_numpy(df["label_padded"])
-
-    evaluation_id_x = id_x
-    evaluation_passage = __df_column_to_numpy(df["word_tokens_passage"], dtype=object)
-    evaluation_question = __df_column_to_numpy(df["word_tokens_question"], dtype=object)
-
-    tf = __cast_to_numpy_float(tf)
-    pos = __cast_to_numpy_float(pos)
-    ner = __cast_to_numpy_float(ner)
-    passage = __cast_to_numpy_float(passage)
-    question = __cast_to_numpy_float(question)
-    exact_match = __cast_to_numpy_float(exact_match)
-    if "label_padded" in df:
-        label = __cast_to_numpy_float(label)
-
-    return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage, evaluation_question
+# def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
+#     return arr.astype(np.float)
+#
+# def __data_to_numpy(df: pd.DataFrame):
+#     tf = pd_series_to_numpy(df["term_frequency_padded"])
+#     pos = pd_series_to_numpy(df["pos_onehot_padded"])
+#     ner = pd_series_to_numpy(df["ner_onehot_padded"])
+#     passage = pd_series_to_numpy(df["word_index_passage_padded"])
+#     question = pd_series_to_numpy(df["word_index_question_padded"])
+#     exact_match = pd_series_to_numpy(df["exact_match_padded"])
+#     id_x = pd_series_to_numpy(df["id"])
+#     label = None
+#     if "label_padded" in df:
+#         label = pd_series_to_numpy(df["label_padded"])
+#     evaluation_id_x = id_x
+#     evaluation_passage = pd_series_to_numpy(df["word_tokens_passage"], dtype=object)
+#     evaluation_question = pd_series_to_numpy(df["word_tokens_question"], dtype=object)
+#     tf = __cast_to_numpy_float(tf)
+#     pos = __cast_to_numpy_float(pos)
+#     ner = __cast_to_numpy_float(ner)
+#     passage = __cast_to_numpy_float(passage)
+#     question = __cast_to_numpy_float(question)
+#     exact_match = __cast_to_numpy_float(exact_match)
+#     if "label_padded" in df:
+#         label = __cast_to_numpy_float(label)
+#     return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage, evaluation_question
 
 
 def __data_to_list(df: pd.DataFrame):
@@ -69,22 +57,11 @@ def __data_to_list(df: pd.DataFrame):
     question = df["word_index_question_padded"]
     exact_match = df["exact_match_padded"]
     id_x = df["id"]
-    label = None
-    if "label_padded" in df:
-        label = df["label_padded"]
+    label = df["label_padded"] if "label_padded" in df else None
 
     # evaluation_id_x = id_x
     evaluation_passage = df["word_tokens_passage"]
     evaluation_question = df["word_tokens_question"]
-
-    # tf = __cast_to_numpy_float(tf)
-    # pos = __cast_to_numpy_float(pos)
-    # ner = __cast_to_numpy_float(ner)
-    # passage = __cast_to_numpy_float(passage)
-    # question = __cast_to_numpy_float(question)
-    # exact_match = __cast_to_numpy_float(exact_match)
-    # if "label_padded" in df:
-    #     label = __cast_to_numpy_float(label)
 
     return id_x, passage, question, pos, ner, tf, exact_match, label, id_x, evaluation_passage, evaluation_question
 
@@ -103,10 +80,10 @@ def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
 
 
 def load_data(debug=False, json_path=None):
-    global df_np
-    global glove_matrix
+    global df_np, glove_matrix
+
     create_tmp_directories()
-    glove_dim = configs.DIM_EMBEDDING
+    glove_dim = Configs.DIM_EMBEDDING
 
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
