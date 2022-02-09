@@ -210,8 +210,8 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     #
 
     question_indexes = pd_series_to_numpy(data[0], str)
-    passages = pd_series_to_numpy(data[1], str)
-    questions = pd_series_to_numpy(data[2], str)
+    passages = pd_series_to_numpy(data[1])
+    questions = pd_series_to_numpy(data[2])
 
     #
 
