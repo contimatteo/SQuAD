@@ -54,11 +54,10 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
     answers_tokens_probs_map = {}
 
     with alive_bar(len(question_indexes_unique)) as progress_bar:
-        for question_index in question_indexes_unique:
-            subset_indexes = np.array(question_indexes == question_index)
-
+        for qid in question_indexes_unique:
+            subset_indexes = np.array(question_indexes == qid)
             current_answers = Y[subset_indexes]
-            answers_tokens_probs_map[question_index] = current_answers
+            answers_tokens_probs_map[qid] = current_answers
 
             progress_bar()
 
@@ -92,13 +91,19 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
 def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
     answers_for_question_map = {}
 
-    qids, questions, passages = QP_data_from_dataset(get_data("original"))
+    qids, _, passages = QP_data_from_dataset(get_data("original"))
+    qids_unique = list(np.unique(qids))
 
-    with alive_bar(qids.shape[0]) as progress_bar:
-        for (idx, qid) in enumerate(list(qids)):
+    passage_by_question_map = {}
+    with alive_bar(len(qids_unique)) as progress_bar:
+        for qid in qids_unique:
+            passage_by_question_map[qid] = np.concatenate((passages[qids == qid])).tolist()
+            progress_bar()
+
+    with alive_bar(len(qids_unique)) as progress_bar:
+        for qid in qids_unique:
             answer = ""
-            passage_tokens = passages[idx]
-            # passage = " ".join(passage_tokens)
+            passage_tokens = passage_by_question_map[qid]
 
             if qid in answers_tokens_indexes_map:
                 answ_tokens_bounds = answers_tokens_indexes_map[qid]
@@ -127,9 +132,9 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 answer = " ".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1])
                 answer = str(answer).strip()
 
-            if qid in answers_tokens_indexes_map:
-                answers_for_question_map[qid] = answer
-            # answers_for_question_map[qid] = answer
+            # if qid in answers_tokens_indexes_map:
+            #     answers_for_question_map[qid] = answer
+            answers_for_question_map[qid] = answer
 
             progress_bar()
 
@@ -177,6 +182,7 @@ def test():
 ###
 
 if __name__ == "__main__":
+    # load_data(json_path="./data/raw/train.v1.json")
     load_data()
 
     test()

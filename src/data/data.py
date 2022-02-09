@@ -157,11 +157,11 @@ def get_data(ret: str):
     assert isinstance(ret, str)
 
     if ret == "original":
-        return df_np[8], df_np[9], df_np[10]
+        return [df_np[8], df_np[9], df_np[10]]
     elif ret == "labels":
-        return df_np[7]
+        return [df_np[7]]
     elif ret == "features":
-        return df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]
+        return [df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]]
     elif ret == "glove":
         return glove_matrix
 
