@@ -12,12 +12,13 @@ from wandb.keras import WandbCallback
 import utils.env_setup
 import utils.configs as Configs
 
-from data import get_data, load_data
+from data import get_data, load_data, delete_data
 from models import DRQA
 from models.core import drqa_start_accuracy, drqa_end_accuracy, drqa_tot_accuracy
 from models.core import drqa_start_mae, drqa_end_mae, drqa_tot_mae
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset
+from utils.memory_usage import memory_usage
 
 ###
 
@@ -90,6 +91,11 @@ def train():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
+    print("After numpy")
+    memory_usage()
+    delete_data()
+    print("After deletaed data")
+    memory_usage()
 
     model = DRQA(glove_matrix)
 
@@ -141,6 +147,9 @@ def kfold_train():
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v1.json")
     load_data()
+
+    print("After preprocessing")
+    memory_usage()
 
     # kfold_train()
 
