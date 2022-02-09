@@ -61,6 +61,34 @@ def __data_to_numpy(df: pd.DataFrame):
     return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage, evaluation_question
 
 
+def __data_to_list(df: pd.DataFrame):
+    tf = df["term_frequency_padded"]
+    pos = df["pos_onehot_padded"]
+    ner = df["ner_onehot_padded"]
+    passage = df["word_index_passage_padded"]
+    question = df["word_index_question_padded"]
+    exact_match = df["exact_match_padded"]
+    id_x = df["id"]
+    label = None
+    if "label_padded" in df:
+        label = df["label_padded"]
+
+    # evaluation_id_x = id_x
+    evaluation_passage = df["word_tokens_passage"]
+    evaluation_question = df["word_tokens_question"]
+
+    # tf = __cast_to_numpy_float(tf)
+    # pos = __cast_to_numpy_float(pos)
+    # ner = __cast_to_numpy_float(ner)
+    # passage = __cast_to_numpy_float(passage)
+    # question = __cast_to_numpy_float(question)
+    # exact_match = __cast_to_numpy_float(exact_match)
+    # if "label_padded" in df:
+    #     label = __cast_to_numpy_float(label)
+
+    return id_x, passage, question, pos, ner, tf, exact_match, label, id_x, evaluation_passage, evaluation_question
+
+
 def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
     cols = [
         "title", "word_tokens_passage_padded", "word_tokens_question_padded", "pos_padded",
@@ -140,7 +168,7 @@ def load_data(debug=False, json_path=None):
     #     evaluation_data = save_evaluation_data_df(data_reader(json_path))
     #     print("[DATA BACKUP] saved")
     print("[Data] converting to numpy")
-    df_np = __data_to_numpy(df)
+    df_np = __data_to_list(df)
     print("[Data] converted to numpy")
 
 
