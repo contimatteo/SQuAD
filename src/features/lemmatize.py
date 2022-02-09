@@ -5,12 +5,16 @@ from nltk.corpus import wordnet
 
 ###
 
-### TODO: remove this global variable
 lemmatize_passage_dict = {}
-### TODO: remove this global variable
 lemmatize_question_dict = {}
 
 ###
+
+
+def delete_cache_lemmatize():
+    global lemmatize_passage_dict, lemmatize_question_dict
+    lemmatize_passage_dict = None
+    lemmatize_question_dict = None
 
 
 def get_wordnet_pos(tag):

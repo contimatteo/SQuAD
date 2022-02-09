@@ -10,14 +10,19 @@ from utils.data import nltk_download_utilities
 
 ###
 
-### TODO: remove this global variable
 span_tokenize_dict = {}
-### TODO: remove this global variable
 sentence_tokenize_dict = {}
-### TODO: remove this global variable
 passage_index_dict = {}
 
 ###
+
+
+def delete_cache_data_cleaning():
+    global span_tokenize_dict, sentence_tokenize_dict, passage_index_dict
+    span_tokenize_dict = None
+    sentence_tokenize_dict = None
+    passage_index_dict = None
+
 
 # def __regex_separator(text,separator):
 #   # separator =["�"]#["�"]
