@@ -32,9 +32,8 @@ import tensorflow as tf
 
 ### use 'eager' execution
 tf.config.run_functions_eagerly(True)
-### avoid enabling GPU execution
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 # gpus = tf.config.list_physical_devices('GPU')
 # if gpus:
 #     try:

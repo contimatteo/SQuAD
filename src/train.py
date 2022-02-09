@@ -25,7 +25,7 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = 1000  # `None` for all rows :)
+N_ROWS_SUBSET = None  # `None` for all rows :)
 
 ###
 
@@ -39,10 +39,10 @@ def __callbacks() -> list:
 
     callbacks.append(
         EarlyStopping(
-            monitor='drqa_tot_crossentropy',
-            patience=3,
+            monitor='loss',
+            patience=5,
             mode='min',
-            min_delta=1e-3,
+            min_delta=1e-4,
             restore_best_weights=True,
         )
     )
