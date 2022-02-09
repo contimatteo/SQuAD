@@ -97,18 +97,33 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
 
 
 def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
-    assert isinstance(X_data, tuple)
+    assert X_data is not None
+    assert isinstance(X_data, list)
     assert len(X_data) == 7
+    assert X_data[0] is not None
+    assert X_data[1] is not None
+    assert X_data[2] is not None
+    assert X_data[3] is not None
+    assert X_data[4] is not None
+    assert X_data[5] is not None
+    assert X_data[6] is not None
 
     #
 
-    q_indexes = pd_series_to_numpy(X_data[0], str)
-    p_tokens = pd_series_to_numpy(X_data[1], np.float32)
-    q_tokens = pd_series_to_numpy(X_data[2], np.float32)
-    p_pos = pd_series_to_numpy(X_data[3], np.float32)
-    p_ner = pd_series_to_numpy(X_data[4], np.float32)
-    p_tf = pd_series_to_numpy(X_data[5], np.float32)
-    p_match = pd_series_to_numpy(X_data[6], np.float32)
+    q_indexes = pd_series_to_numpy(X_data[0])
+
+    p_tokens = pd_series_to_numpy(X_data[1], np.float16)
+    X_data[1] = None
+    q_tokens = pd_series_to_numpy(X_data[2], np.float16)
+    X_data[2] = None
+    p_pos = pd_series_to_numpy(X_data[3], np.float16)
+    X_data[3] = None
+    p_ner = pd_series_to_numpy(X_data[4], np.float16)
+    X_data[4] = None
+    p_tf = pd_series_to_numpy(X_data[5], np.float16)
+    X_data[5] = None
+    p_match = pd_series_to_numpy(X_data[6], np.float16)
+    X_data[6] = None
 
     #
 
@@ -177,8 +192,14 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
 def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
     assert Y_data is not None
+    assert isinstance(Y_data, list)
+    assert len(Y_data) == 1
+    assert Y_data[0] is not None
 
-    labels = pd_series_to_numpy(Y_data, int)
+    #
+
+    labels = pd_series_to_numpy(Y_data[0], np.int8)
+    Y_data[0] = None
 
     #
 
@@ -204,14 +225,21 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
 
 def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
-    assert isinstance(data, tuple)
+    assert data is not None
+    assert isinstance(data, list)
     assert len(data) == 3
+    assert data[0] is not None
+    assert data[1] is not None
+    assert data[2] is not None
 
     #
 
     question_indexes = pd_series_to_numpy(data[0], str)
+    data[0] = None
     passages = pd_series_to_numpy(data[1])
+    data[1] = None
     questions = pd_series_to_numpy(data[2])
+    data[2] = None
 
     #
 
