@@ -6,10 +6,14 @@ from .one_hot_encoder import OneHotEncoder
 
 ###
 
-### TODO: remove this global variable
 ner_dict = {}
 
 ###
+
+
+def delete_cache_ner():
+    global ner_dict
+    ner_dict = None
 
 
 def ner(pos, passage_index: int):

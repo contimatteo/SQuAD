@@ -6,10 +6,14 @@ from .one_hot_encoder import OneHotEncoder
 
 ###
 
-### TODO: remove this global variable
 pos_tag_dict = {}
 
 ###
+
+
+def delete_cache_pos():
+    global pos_tag_dict
+    pos_tag_dict = None
 
 
 def pos_tag_cache(words: str, passage_index: int):

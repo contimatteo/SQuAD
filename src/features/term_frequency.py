@@ -4,8 +4,14 @@ import pandas as pd
 
 ###
 
-### TODO: remove this global variable
 ter_freq_dict = {}
+
+###
+
+
+def delete_cache_tf():
+    global ter_freq_dict
+    ter_freq_dict = None
 
 
 def get_term_freq_normalized(token_list: List[str], passage_index: int):

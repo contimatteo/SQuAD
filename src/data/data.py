@@ -21,6 +21,19 @@ glove_matrix = None
 
 ###
 
+
+def delete_cache():
+    from .data_cleaning import delete_cache_data_cleaning
+    from features.lemmatize import delete_cache_lemmatize
+    from features.name_entity_recognition import delete_cache_ner
+    from features.pos import delete_cache_pos
+    from features.term_frequency import delete_cache_tf
+    delete_cache_data_cleaning()
+    delete_cache_lemmatize()
+    delete_cache_ner()
+    delete_cache_pos()
+    delete_cache_tf()
+
 # def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
 #     return arr.astype(np.float)
 #
@@ -144,6 +157,9 @@ def load_data(debug=False, json_path=None):
     #     print("[DATA BACKUP] saving")
     #     evaluation_data = save_evaluation_data_df(data_reader(json_path))
     #     print("[DATA BACKUP] saved")
+    print("Deleting cache")
+    delete_cache()
+    print("Deleted cache")
     print("[Data] converting to list")
     df_np = __data_to_list(df)
     print("[Data] converted to list")
