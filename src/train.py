@@ -17,8 +17,10 @@ from models import DRQA
 from models.core import drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_accuracy_metric
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset
+from utils.generator import Generator
 from utils.memory_usage import memory_usage
 
+import tensorflow as tf
 ###
 
 os.environ["WANDB_JOB_TYPE"] = "training"
@@ -39,14 +41,13 @@ def __callbacks() -> list:
 
     # callbacks.append(
     #     EarlyStopping(
-    #         monitor='loss',
+    #         monitor='acc',
     #         patience=5,
-    #         mode='min',
+    #         mode='max',
     #         min_delta=1e-4,
     #         restore_best_weights=True,
     #     )
     # )
-
     # if not Configs.WANDB_DISABLED:
     #     callbacks.append(WandbCallback())
 
@@ -58,12 +59,26 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
     nn_batch = Configs.NN_BATCH_SIZE
     nn_callbacks = __callbacks()
 
+    ### generator
+    gen = Generator(X, Y)
+    dataset = gen.generate_dynamic_batches()
+    steps_per_epoch = gen.get_steps_per_epoch()
+
     ### load weights
     nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
     if preload_weights is True and nn_checkpoint_directory.is_file():
         model.load_weights(str(nn_checkpoint_directory))
 
+    ### train
     history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
+    # history = model.fit(
+    #     dataset,
+    #     epochs=nn_epochs,
+    #     batch_size=nn_batch,
+    #     callbacks=nn_callbacks,
+    #     steps_per_epoch=steps_per_epoch,
+    #     max_queue_size=1
+    # )
 
     if save_weights is True:
         nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
@@ -100,7 +115,7 @@ def train():
     print("After numpy")
     memory_usage()
     delete_data()
-    print("After deletaed data")
+    print("After deleted data")
     memory_usage()
 
     model = DRQA(glove_matrix)
@@ -125,7 +140,7 @@ def kfold_train():
         X_test, Y_test = __dataset_kfold(X, Y, test_indexes)
 
         ### train
-        _ = __fit(model, X_train, Y_train, False)
+        _ = __fit(model, X_train, Y_train, False, False)
         ### predict
         Y_test_pred = __predict(model, X_test)
 
