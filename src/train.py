@@ -59,25 +59,28 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
     nn_batch = Configs.NN_BATCH_SIZE
     nn_callbacks = __callbacks()
 
-    ### generator
-    gen = Generator(X, Y)
-    dataset = gen.generate_dynamic_batches()
-    steps_per_epoch = gen.get_steps_per_epoch()
-
     ### load weights
     nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
     if preload_weights is True and nn_checkpoint_directory.is_file():
         model.load_weights(str(nn_checkpoint_directory))
 
     ### train
-    history = model.fit(
-        dataset,
-        epochs=nn_epochs,
-        batch_size=nn_batch,
-        callbacks=nn_callbacks,
-        steps_per_epoch=steps_per_epoch,
-        max_queue_size=1
-    )
+    if Configs.CUDA_ENABLED is True:
+        ### generator
+        gen = Generator(X, Y)
+        dataset = gen.generate_dynamic_batches()
+        steps_per_epoch = gen.get_steps_per_epoch()
+
+        history = model.fit(
+            dataset,
+            epochs=nn_epochs,
+            batch_size=nn_batch,
+            callbacks=nn_callbacks,
+            steps_per_epoch=steps_per_epoch,
+            max_queue_size=1
+        )
+    else:
+        history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
 
     if save_weights is True:
         nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
