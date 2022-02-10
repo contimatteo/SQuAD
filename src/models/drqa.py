@@ -13,8 +13,8 @@ from utils import learning_rate
 
 ###
 
-# LOSS = ['binary_crossentropy']
-LOSS = [drqa_crossentropy_loss]
+LOSS = ['binary_crossentropy']
+# LOSS = [drqa_crossentropy_loss]
 
 # METRICS = [drqa_accuracy_metric]
 METRICS = ['acc', drqa_accuracy_metric]
