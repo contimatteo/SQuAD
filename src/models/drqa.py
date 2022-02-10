@@ -1,8 +1,7 @@
 import numpy as np
 
 from tensorflow.keras import Model
-from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import Concatenate
+from tensorflow.keras.layers import Input, Concatenate, Dropout
 from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
@@ -17,7 +16,7 @@ from utils import learning_rate
 LOSS = ['binary_crossentropy']
 # LOSS = [drqa_prob_sum_loss]
 
-METRICS = [drqa_accuracy_metric, drqa_crossentropy_loss]
+METRICS = [drqa_accuracy_metric, drqa_crossentropy_loss, drqa_prob_sum_loss]
 
 ###
 
@@ -57,6 +56,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### embeddings
         q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
+        q_embeddings = Dropout(.3)(q_embeddings)
 
         ### lstm
         q_rnn = DrqaRnn()(q_embeddings)
@@ -68,6 +68,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### embeddings
         p_embeddings = GloveEmbeddings(N_P_TOKENS, embeddings_initializer)(p_tokens)
+        p_embeddings = Dropout(.3)(p_embeddings)
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])

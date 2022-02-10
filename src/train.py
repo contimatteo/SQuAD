@@ -53,10 +53,16 @@ def __callbacks() -> list:
     return callbacks
 
 
-def __fit(model, X, Y, save_weights: bool) -> Any:
+def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
     nn_epochs = Configs.NN_EPOCHS
     nn_batch = Configs.NN_BATCH_SIZE
     nn_callbacks = __callbacks()
+
+    ### load weights
+    if preload_weights is True:
+        nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
+        assert nn_checkpoint_directory.is_file()
+        model.load_weights(str(nn_checkpoint_directory))
 
     history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
 
@@ -91,6 +97,7 @@ def train():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
+
     print("After numpy")
     memory_usage()
     delete_data()
@@ -99,7 +106,7 @@ def train():
 
     model = DRQA(glove_matrix)
 
-    _ = __fit(model, X, Y, True)
+    _ = __fit(model, X, Y, True, True)
 
 
 def kfold_train():
@@ -145,7 +152,7 @@ def kfold_train():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v1.json")
+    # load_data(json_path="./data/raw/train.v2.json")
     load_data()
 
     print("After preprocessing")

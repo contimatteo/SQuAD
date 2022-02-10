@@ -6,6 +6,8 @@ from tensorflow.keras.losses import categorical_crossentropy  # , mae
 
 
 def drqa_crossentropy_loss(y_true, y_pred):
+    tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
+    tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
 
     def _aggregate(loss_start, loss_end):
         ### TODO: reason about the following alternatives:
@@ -29,6 +31,8 @@ def drqa_crossentropy_loss(y_true, y_pred):
 
 
 def drqa_prob_sum_loss(y_true, y_pred):
+    tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
+    tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
 
     def _aggregate(loss_start, loss_end):
         return loss_start + loss_end

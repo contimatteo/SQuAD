@@ -1,4 +1,4 @@
-from typing import Callable, Any, List
+from typing import Callable, Any
 
 import tensorflow as tf
 import numpy as np
@@ -19,18 +19,13 @@ def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any
     i_dim = initializer.shape[0]  # size of the vocabulary
     o_dim = Configs.DIM_EMBEDDING  # dimension of the 'dense' embedding
 
-    def _nn(inp: Any) -> Any:
-        x = Embedding(
-            i_dim,
-            o_dim,
-            input_length=input_length,
-            embeddings_initializer=Constant(initializer),
-            trainable=False
-        )(inp)
-        x = Dropout(.3)(x)
-        return x
-
-    return _nn
+    return Embedding(
+        i_dim,
+        o_dim,
+        input_length=input_length,
+        embeddings_initializer=Constant(initializer),
+        trainable=False
+    )
 
 
 ###
@@ -63,21 +58,27 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         activation="sigmoid",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2'
+        bias_regularizer='l2',
+        kernel_initializer='he_normal',
+        bias_initializer='zeros'
     )
     nn2_start = Dense(
         nn1_units,
         activation="softmax",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2'
+        bias_regularizer='l2',
+        kernel_initializer='he_normal',
+        bias_initializer='zeros'
     )
     nn2_end = Dense(
         nn1_units,
         activation="softmax",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2'
+        bias_regularizer='l2',
+        kernel_initializer='he_normal',
+        bias_initializer='zeros'
     )
 
     def __nn1_add_complementar_bit(tensor: Any) -> Any:
