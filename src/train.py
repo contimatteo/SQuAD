@@ -37,18 +37,18 @@ def __dataset_kfold(X, Y, indexes) -> list:
 def __callbacks() -> list:
     callbacks = []
 
-    callbacks.append(
-        EarlyStopping(
-            monitor='loss',
-            patience=5,
-            mode='min',
-            min_delta=1e-4,
-            restore_best_weights=True,
-        )
-    )
+    # callbacks.append(
+    #     EarlyStopping(
+    #         monitor='loss',
+    #         patience=5,
+    #         mode='min',
+    #         min_delta=1e-4,
+    #         restore_best_weights=True,
+    #     )
+    # )
 
-    if not Configs.WANDB_DISABLED:
-        callbacks.append(WandbCallback())
+    # if not Configs.WANDB_DISABLED:
+    #     callbacks.append(WandbCallback())
 
     return callbacks
 

@@ -9,13 +9,13 @@ import utils.configs as Configs
 
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
-from models.core import drqa_accuracy_metric, drqa_crossentropy_loss, drqa_mae_loss
+from models.core import drqa_accuracy_metric, drqa_crossentropy_loss, drqa_prob_sum_loss
 from utils import learning_rate
 
 ###
 
 LOSS = ['binary_crossentropy']
-# LOSS = [drqa_mae_loss]
+# LOSS = [drqa_prob_sum_loss]
 
 METRICS = [drqa_accuracy_metric, drqa_crossentropy_loss]
 
@@ -24,7 +24,7 @@ METRICS = [drqa_accuracy_metric, drqa_crossentropy_loss]
 
 def _optimizer() -> Optimizer:
     lr = learning_rate("static")
-    return Adam(learning_rate=lr)
+    return Adam(learning_rate=lr, clipnorm=1)
 
 
 def _compile(model) -> Model:

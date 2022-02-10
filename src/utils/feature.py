@@ -198,7 +198,7 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarra
 
     #
 
-    labels = pd_series_to_numpy(Y_data[0], np.int8)
+    labels = pd_series_to_numpy(Y_data[0], np.float16)
     Y_data[0] = None
 
     #

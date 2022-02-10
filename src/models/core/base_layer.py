@@ -5,7 +5,7 @@ import numpy as np
 
 import utils.configs as Configs
 
-from tensorflow.keras.layers import Dense, Dropout, Dot
+from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.layers import Embedding, Bidirectional, LSTM
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.initializers import Constant
@@ -58,9 +58,27 @@ def DrqaRnn() -> Callable[[Any], Any]:
 def EnhancedProbabilities() -> Callable[[Any], Any]:
     nn1_units = Configs.N_PASSAGE_TOKENS + 1
 
-    nn1_dense = Dense(1, activation="sigmoid")
-    nn2_start = Dense(nn1_units, activation="softmax")
-    nn2_end = Dense(nn1_units, activation="softmax")
+    nn1_dense = Dense(
+        1,
+        activation="sigmoid",
+        kernel_regularizer='l2',
+        activity_regularizer='l2',
+        bias_regularizer='l2'
+    )
+    nn2_start = Dense(
+        nn1_units,
+        activation="softmax",
+        kernel_regularizer='l2',
+        activity_regularizer='l2',
+        bias_regularizer='l2'
+    )
+    nn2_end = Dense(
+        nn1_units,
+        activation="softmax",
+        kernel_regularizer='l2',
+        activity_regularizer='l2',
+        bias_regularizer='l2'
+    )
 
     def __nn1_add_complementar_bit(tensor: Any) -> Any:
         ### tensor shape --> (_, n_tokens)
@@ -88,8 +106,6 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         return output_new
 
     def __nn2(output: Any) -> Any:
-        units = Configs.N_PASSAGE_TOKENS + 1
-
         out_start = output[:, :, 0]
         ### --> (_, n_tokens)
         out_end = output[:, :, 1]
@@ -108,4 +124,5 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
         return out_new
 
-    return __nn2
+    return __nn1
+    # return __nn2
