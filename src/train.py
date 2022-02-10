@@ -14,8 +14,7 @@ import utils.configs as Configs
 
 from data import get_data, load_data, delete_data
 from models import DRQA
-from models.core import drqa_start_accuracy, drqa_end_accuracy, drqa_tot_accuracy
-from models.core import drqa_start_mae, drqa_end_mae, drqa_tot_mae
+from models.core import drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_accuracy_metric
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset
 from utils.memory_usage import memory_usage
@@ -73,15 +72,16 @@ def __predict(model, X) -> np.ndarray:
 
 
 def __evaluation(Y_true, Y_pred):
-    start_accuracy = drqa_start_accuracy(Y_true, Y_pred).numpy()
-    end_accuracy = drqa_end_accuracy(Y_true, Y_pred).numpy()
-    tot_accuracy = drqa_tot_accuracy(Y_true, Y_pred).numpy()
+    start_accuracy = drqa_start_accuracy_metric(Y_true, Y_pred).numpy()
+    end_accuracy = drqa_end_accuracy_metric(Y_true, Y_pred).numpy()
+    tot_accuracy = drqa_accuracy_metric(Y_true, Y_pred).numpy()
 
-    start_mae = drqa_start_mae(Y_true, Y_pred).numpy()
-    end_mae = drqa_end_mae(Y_true, Y_pred).numpy()
-    tot_mae = drqa_tot_mae(Y_true, Y_pred).numpy()
+    # start_mae = drqa_start_mae(Y_true, Y_pred).numpy()
+    # end_mae = drqa_end_mae(Y_true, Y_pred).numpy()
+    # tot_mae = drqa_tot_mae(Y_true, Y_pred).numpy()
+    # return [start_accuracy, end_accuracy, tot_accuracy, start_mae, end_mae, tot_mae]
 
-    return [start_accuracy, end_accuracy, tot_accuracy, start_mae, end_mae, tot_mae]
+    return [start_accuracy, end_accuracy, tot_accuracy]
 
 
 ###
