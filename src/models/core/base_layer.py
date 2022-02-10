@@ -26,7 +26,7 @@ def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any
             input_length=input_length,
             embeddings_initializer=Constant(initializer),
             trainable=False,
-            mask_zero=True,
+            mask_zero=True
         )
 
 
@@ -38,8 +38,8 @@ def DrqaRnn() -> Callable[[Any], Any]:
     initializer = 'glorot_uniform'
 
     def _lstm() -> LSTM:
-        # return LSTM(units, dropout=.3, recurrent_initializer=initializer, return_sequences=True)
-        return RNN(LSTMCell(units, dropout=.3), return_sequences=True)
+        cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
+        return RNN(cell, return_sequences=True)
 
     def _nn(inp: Any) -> Any:
         x = Bidirectional(_lstm(), merge_mode="concat")(inp)
@@ -56,27 +56,9 @@ def DrqaRnn() -> Callable[[Any], Any]:
 def EnhancedProbabilities() -> Callable[[Any], Any]:
     nn1_units = Configs.N_PASSAGE_TOKENS + 1
 
-    nn1_dense = Dense(
-        1,
-        activation="sigmoid",
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
-    )
-    nn2_start = Dense(
-        nn1_units,
-        activation="softmax",
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
-    )
-    nn2_end = Dense(
-        nn1_units,
-        activation="softmax",
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
-    )
+    nn1_dense = Dense(1, activation="sigmoid")
+    nn2_start = Dense(nn1_units, activation="softmax")
+    nn2_end = Dense(nn1_units, activation="softmax")
 
     def __nn1_add_complementar_bit(tensor: Any) -> Any:
         ### tensor shape --> (_, n_tokens)

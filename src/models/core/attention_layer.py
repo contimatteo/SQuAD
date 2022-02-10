@@ -45,13 +45,7 @@ def AttentionModel(compatibility: Callable[[Any, Any], Any],
 
 # pylint: disable=invalid-name
 def WeightedSumSelfAttention():
-    W = Dense(
-        1,
-        use_bias=False,
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
-    )
+    W = Dense(1, use_bias=False)
 
     def compatibility(keys: Any, *_) -> Any:
         return W(keys)
@@ -76,9 +70,9 @@ def AlignedAttention() -> Callable[[Any, Any], Any]:
     _alpha = Dense(
         1,
         activation="relu",
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
+        # kernel_regularizer='l2',
+        # activity_regularizer='l2',
+        # bias_regularizer='l2'
     )
 
     def compatibility(a: Any, b: Any) -> Any:
@@ -128,22 +122,8 @@ def AlignedAttention() -> Callable[[Any, Any], Any]:
 
 # pylint: disable=invalid-name
 def BiLinearSimilarityAttention():
-    Ws = Dense(
-        256,
-        activation="exponential",
-        use_bias=False,
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
-    )
-    We = Dense(
-        256,
-        activation="exponential",
-        use_bias=False,
-        kernel_regularizer='l2',
-        activity_regularizer='l2',
-        bias_regularizer='l2'
-    )
+    Ws = Dense(256, activation="exponential", use_bias=False)
+    We = Dense(256, activation="exponential", use_bias=False)
 
     def compatibility(w_type: str) -> Callable[[Any, Any], Any]:
         W = Ws if w_type == "start" else We

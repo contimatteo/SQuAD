@@ -5,7 +5,7 @@ from tensorflow.keras.losses import categorical_crossentropy  # , mae
 ###
 
 
-def OLD__drqa_crossentropy_loss(y_true, y_pred):
+def drqa_crossentropy_loss(y_true, y_pred):
     # tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
     # tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
 
@@ -30,7 +30,7 @@ def OLD__drqa_crossentropy_loss(y_true, y_pred):
     return _aggregate(loss_start, loss_end)
 
 
-def drqa_crossentropy_loss(y_true, logits):
+def drqa_logits_loss(y_true, logits):
     # breaking the tensor into two half's to get start and end label.
     start_label = y_true[:, :, 0]
     end_label = y_true[:, :, 1]
