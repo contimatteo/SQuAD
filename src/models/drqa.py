@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Concatenate, Dropout
@@ -9,7 +8,7 @@ import utils.configs as Configs
 
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
-from models.core import drqa_crossentropy_loss
+from models.core import drqa_crossentropy_loss, drqa_accuracy_metric
 from utils import learning_rate
 
 ###
@@ -18,7 +17,7 @@ from utils import learning_rate
 LOSS = [drqa_crossentropy_loss]
 
 # METRICS = [drqa_accuracy_metric]
-METRICS = ['acc']
+METRICS = ['acc', drqa_accuracy_metric]
 
 ###
 
