@@ -40,15 +40,15 @@ def __dataset_kfold(X, Y, indexes) -> list:
 def __callbacks() -> list:
     callbacks = []
 
-    callbacks.append(
-        EarlyStopping(
-            monitor='loss',
-            patience=5,
-            mode='min',
-            min_delta=1e-4,
-            restore_best_weights=True,
-        )
-    )
+    # callbacks.append(
+    #     EarlyStopping(
+    #         monitor='loss',
+    #         patience=5,
+    #         mode='min',
+    #         min_delta=1e-4,
+    #         restore_best_weights=True,
+    #     )
+    # )
 
     if not Configs.WANDB_DISABLED:
         callbacks.append(WandbCallback())
@@ -64,8 +64,9 @@ def __fit(model, X, Y, save_weights: bool) -> Any:
     gen = Generator(X, Y)
     dataset = gen.generate_dynamic_batches()
     steps_per_epoch = gen.get_steps_per_epoch()
+    history = model.fit(dataset, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks, steps_per_epoch=steps_per_epoch, max_queue_size=1)
 
-    history = model.fit(dataset, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks, steps_per_epoch=steps_per_epoch)
+    # history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks, max_queue_size=1)
 
     if save_weights is True:
         nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
@@ -100,7 +101,7 @@ def train():
     print("After numpy")
     memory_usage()
     delete_data()
-    print("After deletaed data")
+    print("After deleted data")
     memory_usage()
 
     model = DRQA(glove_matrix)

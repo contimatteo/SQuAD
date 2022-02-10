@@ -44,6 +44,7 @@ class Generator:
             X_list = []
             for i in range(6):
                 X_list.append(self.X[i][steps:NN_BATCH_SIZE+steps])
+            assert self.X[0].shape[0] > 0
             yield X_list, self.Y[steps:NN_BATCH_SIZE+steps]
             steps = steps + NN_BATCH_SIZE
-            gc.collect()
+
