@@ -58,27 +58,21 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         activation="sigmoid",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
     nn2_start = Dense(
         nn1_units,
         activation="softmax",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
     nn2_end = Dense(
         nn1_units,
         activation="softmax",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
 
     def __nn1_add_complementar_bit(tensor: Any) -> Any:

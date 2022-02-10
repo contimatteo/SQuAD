@@ -50,9 +50,7 @@ def WeightedSumSelfAttention():
         use_bias=False,
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
 
     def compatibility(keys: Any, *_) -> Any:
@@ -80,9 +78,7 @@ def AlignedAttention() -> Callable[[Any, Any], Any]:
         activation="relu",
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
 
     def compatibility(a: Any, b: Any) -> Any:
@@ -138,9 +134,7 @@ def BiLinearSimilarityAttention():
         use_bias=False,
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
     We = Dense(
         256,
@@ -148,9 +142,7 @@ def BiLinearSimilarityAttention():
         use_bias=False,
         kernel_regularizer='l2',
         activity_regularizer='l2',
-        bias_regularizer='l2',
-        kernel_initializer='he_normal',
-        bias_initializer='zeros'
+        bias_regularizer='l2'
     )
 
     def compatibility(w_type: str) -> Callable[[Any, Any], Any]:
