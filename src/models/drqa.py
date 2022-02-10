@@ -17,7 +17,7 @@ LOSS = ['binary_crossentropy']
 # LOSS = [drqa_crossentropy_loss]
 
 # METRICS = [drqa_accuracy_metric]
-METRICS = ['acc', drqa_accuracy_metric]
+METRICS = ['acc', drqa_accuracy_metric, drqa_crossentropy_loss]
 
 ###
 

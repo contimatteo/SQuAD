@@ -7,6 +7,8 @@ APP_DEBUG: bool = True
 
 WANDB_DISABLED = "WANDB_DISABLED" not in os.environ or os.environ["WANDB_DISABLED"] == "true"
 
+CUDA_ENABLED = "CUDA_VISIBLE_DEVICES" in os.environ and os.environ["CUDA_VISIBLE_DEVICES"] != "-1"
+
 ###################
 ##  NN FEATURES  ##
 
@@ -24,8 +26,8 @@ DIM_TOKEN_TF: int = 1
 ##  NN + TRAIN  ##
 
 NN_EPOCHS = 1
-NN_BATCH_SIZE = 128
-NN_LEARNING_RATE = 5e-4
+NN_BATCH_SIZE = 64
+NN_LEARNING_RATE = 5e-3
 NN_LEARNING_RATE_TYPE = "static"
 
 N_KFOLD_BUCKETS = 5
