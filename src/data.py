@@ -1,9 +1,10 @@
 import pandas as pd
 from data.data import get_data, load_data
-import numpy as np
-import ast
+from utils.memory_usage import memory_usage
 from utils.data import get_argv
 ###
+from data.data import delete_data
+import gc
 
 
 def load():
@@ -14,7 +15,9 @@ def load():
 
 
 def data():
+    memory_usage()
     load()
+    memory_usage()
     print("\n---------------\n")
     data_data = get_data("features")
     question_index, passage, question, pos, ner, tf, exact_match = data_data
@@ -52,3 +55,11 @@ def data():
 
 if __name__ == "__main__":
     data()
+    print("After preprocessing")
+    memory_usage()
+    delete_data()
+    print("After deleting glove and dataset")
+    memory_usage()
+    print("After using garbage collector")
+    gc.collect()
+    memory_usage()

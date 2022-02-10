@@ -11,6 +11,12 @@ lemmatize_question_dict = {}
 ###
 
 
+def delete_cache_lemmatize():
+    global lemmatize_passage_dict, lemmatize_question_dict
+    lemmatize_passage_dict = None
+    lemmatize_question_dict = None
+
+
 def get_wordnet_pos(tag):
     if tag.startswith('J'):
         return wordnet.ADJ
@@ -54,4 +60,3 @@ def apply_lemmatize(df: pd.DataFrame):
     # df["lemmatized_passage"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_passage_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_passage")
     # df["lemmatized_question"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_question_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_question")
     return df
-

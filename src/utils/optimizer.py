@@ -37,7 +37,7 @@ def __lr_exponential_decay() -> Any:
 
 def learning_rate(config_name: str) -> Any:
     if config_name == "static":
-        return 5e-4
+        return Configs.NN_LEARNING_RATE
 
     if config_name == "cosine":
         return __lr_cosine_decay()

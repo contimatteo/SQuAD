@@ -1,14 +1,14 @@
-from typing import Callable, Any, List
+from typing import Callable, Any
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
-import utils.configs as Configs
-
-from tensorflow.keras.layers import Dense, Dropout, Dot
-from tensorflow.keras.layers import Embedding, Bidirectional, LSTM
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.initializers import Constant
+from tensorflow.keras.layers import Dense, Embedding
+from tensorflow.keras.layers import Bidirectional, LSTM, RNN, LSTMCell
+
+import utils.configs as Configs
 
 ###
 
@@ -19,18 +19,15 @@ def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any
     i_dim = initializer.shape[0]  # size of the vocabulary
     o_dim = Configs.DIM_EMBEDDING  # dimension of the 'dense' embedding
 
-    def _nn(inp: Any) -> Any:
-        x = Embedding(
+    with tf.device('/cpu:0'):
+        return Embedding(
             i_dim,
             o_dim,
             input_length=input_length,
             embeddings_initializer=Constant(initializer),
-            trainable=False
-        )(inp)
-        x = Dropout(.3)(x)
-        return x
-
-    return _nn
+            trainable=False,
+            mask_zero=True
+        )
 
 
 ###
@@ -41,7 +38,8 @@ def DrqaRnn() -> Callable[[Any], Any]:
     initializer = 'glorot_uniform'
 
     def _lstm() -> LSTM:
-        return LSTM(units, dropout=.3, recurrent_initializer=initializer, return_sequences=True)
+        cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
+        return RNN(cell, return_sequences=True)
 
     def _nn(inp: Any) -> Any:
         x = Bidirectional(_lstm(), merge_mode="concat")(inp)
@@ -88,8 +86,6 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         return output_new
 
     def __nn2(output: Any) -> Any:
-        units = Configs.N_PASSAGE_TOKENS + 1
-
         out_start = output[:, :, 0]
         ### --> (_, n_tokens)
         out_end = output[:, :, 1]
@@ -108,4 +104,5 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
         return out_new
 
-    return __nn2
+    return __nn1
+    # return __nn2

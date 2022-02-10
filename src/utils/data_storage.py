@@ -49,7 +49,7 @@ def save_processed_data(
         pickle.dump(df_c, handle)
 
 
-def load_processed_data(WTI, glove_dim: str, file_name: str):
+def load_processed_data(WTI, glove_dim, file_name: str):
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
@@ -96,21 +96,21 @@ def load_config_data():
         return Configuration()
 
 
-def save_glove_matrix(glove_matrix, glove_dim: str):
+def save_glove_matrix(glove_matrix, glove_dim):
     name = add_glove_dim_to_name(GLOVE_MATRIX_FILE_NAME, glove_dim)
     save_pickle(glove_matrix, name, get_processed_data_dir())
 
 
-def load_glove_matrix(glove_dim: str):
+def load_glove_matrix(glove_dim):
     name = add_glove_dim_to_name(GLOVE_MATRIX_FILE_NAME, glove_dim)
     return load_pickle(name, get_processed_data_dir())
 
 
-def save_WTI(WTI, glove_dim: str):
+def save_WTI(WTI, glove_dim):
     name = add_glove_dim_to_name(WORD_TO_INDEX_FILE_NAME, glove_dim)
     save_pickle(WTI, name, get_processed_data_dir())
 
 
-def load_WTI(glove_dim: str):
+def load_WTI(glove_dim):
     name = add_glove_dim_to_name(WORD_TO_INDEX_FILE_NAME, glove_dim)
     return load_pickle(name, get_processed_data_dir())

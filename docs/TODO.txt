@@ -6,6 +6,7 @@ FRA-MATTEO
   [ ] variable batch-size 
   [ ] support Keras (generator)
   [ ] we have to be sure that the model weights are the BEST ones
+  [ ] consider avoiding gradient exploding (through `clipnorm` optimizer param)
 
 
 PRIMIANO-LUCIANO
