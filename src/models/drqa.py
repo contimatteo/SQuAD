@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Concatenate, Dropout
@@ -13,10 +14,11 @@ from utils import learning_rate
 
 ###
 
-LOSS = ['binary_crossentropy']
-# LOSS = [drqa_prob_sum_loss]
+# LOSS = ['binary_crossentropy']
+LOSS = [drqa_crossentropy_loss]
 
-METRICS = [drqa_accuracy_metric, drqa_crossentropy_loss, drqa_prob_sum_loss]
+# METRICS = [drqa_accuracy_metric, drqa_prob_sum_loss]
+METRICS = ['acc']
 
 ###
 

@@ -5,9 +5,9 @@ from tensorflow.keras.losses import categorical_crossentropy  # , mae
 ###
 
 
-def drqa_crossentropy_loss(y_true, y_pred):
-    tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
-    tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
+def OLD__drqa_crossentropy_loss(y_true, y_pred):
+    # tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
+    # tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
 
     def _aggregate(loss_start, loss_end):
         ### TODO: reason about the following alternatives:
@@ -30,9 +30,27 @@ def drqa_crossentropy_loss(y_true, y_pred):
     return _aggregate(loss_start, loss_end)
 
 
+def drqa_crossentropy_loss(y_true, logits):
+    # breaking the tensor into two half's to get start and end label.
+    start_label = y_true[:, :, 0]
+    end_label = y_true[:, :, 1]
+
+    # braking the logits tensor into start and end part for loss calcultion.
+    start_logit = logits[:, :, 0]
+    end_logit = logits[:, :, 1]
+
+    start_loss = tf.keras.backend.categorical_crossentropy(start_label, start_logit)
+    end_loss = tf.keras.backend.categorical_crossentropy(end_label, end_logit)
+
+    return start_loss + end_loss
+
+
+###
+
+
 def drqa_prob_sum_loss(y_true, y_pred):
-    tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
-    tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
+    # tf.debugging.assert_all_finite(y_true, message="Loss received `nan` values.")
+    # tf.debugging.assert_all_finite(y_pred, message="Loss received `nan` values.")
 
     def _aggregate(loss_start, loss_end):
         return loss_start + loss_end

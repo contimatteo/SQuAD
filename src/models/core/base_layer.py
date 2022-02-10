@@ -1,14 +1,14 @@
 from typing import Callable, Any
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
-import utils.configs as Configs
-
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.layers import Embedding, Bidirectional, LSTM
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.initializers import Constant
+from tensorflow.keras.layers import Dense, Embedding
+from tensorflow.keras.layers import Bidirectional, LSTM, RNN, LSTMCell
+
+import utils.configs as Configs
 
 ###
 
@@ -19,13 +19,15 @@ def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any
     i_dim = initializer.shape[0]  # size of the vocabulary
     o_dim = Configs.DIM_EMBEDDING  # dimension of the 'dense' embedding
 
-    return Embedding(
-        i_dim,
-        o_dim,
-        input_length=input_length,
-        embeddings_initializer=Constant(initializer),
-        trainable=False
-    )
+    with tf.device('/cpu:0'):
+        return Embedding(
+            i_dim,
+            o_dim,
+            input_length=input_length,
+            embeddings_initializer=Constant(initializer),
+            trainable=False,
+            mask_zero=True,
+        )
 
 
 ###
@@ -36,7 +38,8 @@ def DrqaRnn() -> Callable[[Any], Any]:
     initializer = 'glorot_uniform'
 
     def _lstm() -> LSTM:
-        return LSTM(units, dropout=.3, recurrent_initializer=initializer, return_sequences=True)
+        # return LSTM(units, dropout=.3, recurrent_initializer=initializer, return_sequences=True)
+        return RNN(LSTMCell(units, dropout=.3), return_sequences=True)
 
     def _nn(inp: Any) -> Any:
         x = Bidirectional(_lstm(), merge_mode="concat")(inp)
