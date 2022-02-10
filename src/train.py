@@ -41,9 +41,9 @@ def __callbacks() -> list:
 
     # callbacks.append(
     #     EarlyStopping(
-    #         monitor='acc',
+    #         monitor='loss',
     #         patience=5,
-    #         mode='max',
+    #         mode='min',
     #         min_delta=1e-4,
     #         restore_best_weights=True,
     #     )
@@ -70,15 +70,14 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
         model.load_weights(str(nn_checkpoint_directory))
 
     ### train
-    history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
-    # history = model.fit(
-    #     dataset,
-    #     epochs=nn_epochs,
-    #     batch_size=nn_batch,
-    #     callbacks=nn_callbacks,
-    #     steps_per_epoch=steps_per_epoch,
-    #     max_queue_size=1
-    # )
+    history = model.fit(
+        dataset,
+        epochs=nn_epochs,
+        batch_size=nn_batch,
+        callbacks=nn_callbacks,
+        steps_per_epoch=steps_per_epoch,
+        max_queue_size=1
+    )
 
     if save_weights is True:
         nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
