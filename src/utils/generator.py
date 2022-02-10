@@ -35,11 +35,11 @@ class Generator:
     #         gc.collect()
 
     def generate_dynamic_batches(self):
-        steps = 0
+        steps = -NN_BATCH_SIZE
         while True:
-            #print(steps)
+            # print(steps)
             if steps > self.nrows:
-                #print("steps")
+                # print("steps: ")
                 steps = 0
             X_list = []
             for i in range(6):
@@ -47,14 +47,3 @@ class Generator:
             yield X_list, self.Y[steps:NN_BATCH_SIZE+steps]
             steps = steps + NN_BATCH_SIZE
             gc.collect()
-
-    # def generate(self):
-    #     steps = 0
-    #     nrows = self.X[0].shape[0]
-    #     while steps <= nrows:
-    #         X_list = []
-    #         for i in range(6):
-    #             X_list.append(self.X[i][steps:steps + NN_BATCH_SIZE])
-    #         yield X_list, self.Y[steps:steps + NN_BATCH_SIZE]
-    #
-    #         steps = steps + NN_BATCH_SIZE
