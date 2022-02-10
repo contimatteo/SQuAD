@@ -59,9 +59,8 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
     nn_callbacks = __callbacks()
 
     ### load weights
-    if preload_weights is True:
-        nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
-        assert nn_checkpoint_directory.is_file()
+    nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
+    if preload_weights is True and nn_checkpoint_directory.is_file():
         model.load_weights(str(nn_checkpoint_directory))
 
     history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
