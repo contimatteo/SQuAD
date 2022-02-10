@@ -38,7 +38,7 @@ def load_training_set(json_path):
     print("Data downloaded at position: " + raw_file + "\n")
     print("Converting json to dataframe")
 
-    with open(raw_file, 'r', encoding="utf8", errors='ignore') as j:
+    with open(raw_file, 'r', encoding="utf-8", errors='ignore') as j:
         contents = json.loads(j.read().encode('utf-8').strip(), encoding='unicode_escape')
 
     contents = contents["data"]

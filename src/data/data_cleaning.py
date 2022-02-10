@@ -16,12 +16,19 @@ passage_index_dict = {}
 
 ###
 
+
+def delete_cache_data_cleaning():
+    global span_tokenize_dict, sentence_tokenize_dict, passage_index_dict
+    span_tokenize_dict = None
+    sentence_tokenize_dict = None
+    passage_index_dict = None
+
+
 # def __regex_separator(text,separator):
 #   # separator =["�"]#["�"]
 #    for sep in separator:
 #       text= text.replace(sep," ")
 #    return text
-#
 #
 # def separate_words(df,separator=["-"]):
 #    columns=["passage","answer","question"]
@@ -174,4 +181,3 @@ def data_cleaning(df: pd.DataFrame):
     df = add_split_into_words(df)
     print("Data cleaned \n")
     return df
-
