@@ -141,7 +141,7 @@ def load_data(debug=False, json_path=None):
         #     print("[DATA BACKUP] saved")
 
         if debug:
-            df = df[0:5].copy()
+            df = df[0:100].copy()
 
         df, _ = reduce_mem_usage(df)
         df = data_preprocessing(df, wti)

@@ -18,8 +18,10 @@ from models.core import drqa_start_accuracy, drqa_end_accuracy, drqa_tot_accurac
 from models.core import drqa_start_mae, drqa_end_mae, drqa_tot_mae
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset
+from utils.generator import Generator
 from utils.memory_usage import memory_usage
 
+import tensorflow as tf
 ###
 
 os.environ["WANDB_JOB_TYPE"] = "training"
@@ -59,7 +61,11 @@ def __fit(model, X, Y, save_weights: bool) -> Any:
     nn_batch = Configs.NN_BATCH_SIZE
     nn_callbacks = __callbacks()
 
-    history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
+    gen = Generator(X, Y)
+    dataset = gen.generate_dynamic_batches()
+    steps_per_epoch = gen.get_steps_per_epoch()
+
+    history = model.fit(dataset, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks, steps_per_epoch=steps_per_epoch)
 
     if save_weights is True:
         nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
