@@ -39,15 +39,16 @@ def __dataset_kfold(X, Y, indexes) -> list:
 def __callbacks() -> list:
     callbacks = []
 
-    # callbacks.append(
-    #     EarlyStopping(
-    #         monitor='loss',
-    #         patience=5,
-    #         mode='min',
-    #         min_delta=1e-4,
-    #         restore_best_weights=True,
-    #     )
-    # )
+    callbacks.append(
+        EarlyStopping(
+            monitor='loss',
+            patience=5,
+            mode='min',
+            min_delta=1e-4,
+            restore_best_weights=True,
+        )
+    )
+
     # if not Configs.WANDB_DISABLED:
     #     callbacks.append(WandbCallback())
 
@@ -97,11 +98,6 @@ def __evaluation(Y_true, Y_pred):
     start_accuracy = drqa_start_accuracy_metric(Y_true, Y_pred).numpy()
     end_accuracy = drqa_end_accuracy_metric(Y_true, Y_pred).numpy()
     tot_accuracy = drqa_accuracy_metric(Y_true, Y_pred).numpy()
-
-    # start_mae = drqa_start_mae(Y_true, Y_pred).numpy()
-    # end_mae = drqa_end_mae(Y_true, Y_pred).numpy()
-    # tot_mae = drqa_tot_mae(Y_true, Y_pred).numpy()
-    # return [start_accuracy, end_accuracy, tot_accuracy, start_mae, end_mae, tot_mae]
 
     return [start_accuracy, end_accuracy, tot_accuracy]
 
@@ -168,7 +164,7 @@ def kfold_train():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v1.json")
+    # load_data(json_path="./data/raw/train.v3.json")
     load_data()
 
     print("After preprocessing")

@@ -41,7 +41,7 @@ def __predict():
     assert nn_checkpoint_directory.is_file()
     model.load_weights(str(nn_checkpoint_directory))
 
-    Y_pred = model.predict(X, batch_size=Configs.NN_BATCH_SIZE, verbose=1)
+    Y_pred = model.predict(X, batch_size=128, verbose=1)
 
     return Y_pred
 
@@ -169,19 +169,19 @@ def test():
 
     #
 
-    # ### TODO: remove the following code ...
-    # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    ### TODO: remove the following code ...
+    Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
 
-    # ### TODO: remove the following code ...
-    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
-    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    # __store_answers_predictions(answers_for_question, "training.true")
+    ### TODO: remove the following code ...
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
+    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    __store_answers_predictions(answers_for_question, "training.true")
 
 
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v1.json")
+    # load_data(json_path="./data/raw/train.v2.json")
     load_data()
 
     test()

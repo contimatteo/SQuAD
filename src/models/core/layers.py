@@ -41,10 +41,14 @@ def DrqaRnn() -> Callable[[Any], Any]:
         cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
         return RNN(cell, return_sequences=True)
 
-    def _nn(inp: Any) -> Any:
-        x = Bidirectional(_lstm(), merge_mode="concat")(inp)
-        x = Bidirectional(_lstm(), merge_mode="concat")(x)
-        x = Bidirectional(_lstm(), merge_mode="concat")(x)
+    rnn1 = Bidirectional(_lstm(), merge_mode="concat")
+    rnn2 = Bidirectional(_lstm(), merge_mode="concat")
+    rnn3 = Bidirectional(_lstm(), merge_mode="concat")
+
+    def _nn(x: Any) -> Any:
+        x = rnn1(x)
+        x = rnn2(x)
+        x = rnn3(x)
         return x
 
     return _nn
@@ -66,7 +70,10 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         ### --> (_, 1)
         tensor_new = tf.concat([tensor, tensor_bit], axis=1)
         ### --> (_, n_tokens+1)
-        tensor_new = softmax(tensor_new)
+
+        tensor_new = softmax(tensor_new, axis=1)
+        # tensor_new = softmax(tensor_new)
+
         ### --> (_, n_tokens+1)
         tensor_new = tf.expand_dims(tensor_new, axis=2)
         ### --> (_, n_tokens+1, 1)
