@@ -164,8 +164,8 @@ def kfold_train():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v3.json")
-    load_data()
+    load_data(json_path="./data/raw/train.v3.json")
+    # load_data()
 
     print("After preprocessing")
     memory_usage()

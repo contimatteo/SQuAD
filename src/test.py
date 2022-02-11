@@ -181,7 +181,7 @@ def test():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v2.json")
-    load_data()
+    load_data(json_path="./data/raw/train.v3.json")
+    # load_data()
 
     test()
