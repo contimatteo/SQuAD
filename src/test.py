@@ -224,7 +224,7 @@ def test():
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
 
-    load_data(json_path="./data/raw/train.v6.json")
+    load_data(json_path="./data/raw/train.v4.json")
 
     # load_data()
 

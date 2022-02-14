@@ -134,7 +134,7 @@ def get_word_pstart_pend(interval: Tuple[int, int], dim: int):
 
 
 def get_answer_start_end(passage, answer_text, answer_start):
-    answer_end = len(answer_text) + answer_start
+    answer_end = len(answer_text) + answer_start -1
 
     if passage not in span_tokenize_dict.keys():
         span_tokenize_dict[passage] = span_tokenize(passage)
@@ -144,10 +144,13 @@ def get_answer_start_end(passage, answer_text, answer_start):
     #     if s >= answer_start and e <= answer_end
     # ]
     interval = []
-
+    if answer_end+1 < len(passage):
+        #print(passage[answer_start:answer_end + 2])
+        if passage[answer_end+1] == ' ':
+            answer_end+=1
     app_dict = {}
     for i, (s, e) in enumerate(span_tokenize_dict[passage]):
-        if s >= answer_start and e <= answer_end:  # (e == answer_end or e == answer_end - 1):
+        if e >= answer_start and s <= answer_end:  # (e == answer_end or e == answer_end - 1):
             interval.append(i)
             app_dict[i] = (s, e)
             # print()
@@ -155,8 +158,8 @@ def get_answer_start_end(passage, answer_text, answer_start):
             # print("answer_end - e: ", (answer_end - e))
             # print()
 
-    print()
-    print()
+    # print()
+    # print()
     # print()
     # # raise Exception("STOPPPPPPPPPPPPPPP")
 
@@ -168,27 +171,27 @@ def get_answer_start_end(passage, answer_text, answer_start):
 
     credi = get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
 
-    # (1, 0)(0, 1)
-    # (1, 1)
-
-    if (1, 0) in credi:
-        token_start_index = credi.index((1, 0))
-        token_end_index = credi.index((0, 1))
-
-    else:
-        token_start_index = credi.index((1, 1))
-        token_end_index = token_start_index
-
-    print()
-    print("MY OUTPUT")
-
-    s = app_dict[token_start_index]
-    e = app_dict[token_end_index]
-
-    print(token_start_index)
-    print(token_end_index)
-    print(passage[s[0]:e[1] + 1])
-    print()
+    # # (1, 0)(0, 1)
+    # # (1, 1)
+    #
+    # if (1, 0) in credi:
+    #     token_start_index = credi.index((1, 0))
+    #     token_end_index = credi.index((0, 1))
+    #
+    # else:
+    #     token_start_index = credi.index((1, 1))
+    #     token_end_index = token_start_index
+    #
+    # print()
+    # print("MY OUTPUT")
+    #
+    # s = app_dict[token_start_index]
+    # e = app_dict[token_end_index]
+    #
+    # print(token_start_index)
+    # print(token_end_index)
+    # print(passage[s[0]:e[1] + 1])
+    # print()
 
     return credi
 
