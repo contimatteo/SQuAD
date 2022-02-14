@@ -171,6 +171,7 @@ def test():
 
     ### TODO: remove the following code ...
     Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    # Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
@@ -181,7 +182,10 @@ def test():
 ###
 
 if __name__ == "__main__":
-    load_data(json_path="./data/raw/train.v3.json")
+    # load_data(json_path="./data/raw/train.v3.json")
+
+    load_data(json_path="./data/raw/train.small.json")
+
     # load_data()
 
     test()

@@ -5,7 +5,7 @@ from .layers import DrqaRnn
 from .layers import EnhancedProbabilities
 
 from .attention import AlignedAttention
-from .attention import BiLinearSimilarityAttention
+from .attention import BiLinearSimilarityAttention, BiLinearSimilarity
 from .attention import WeightedSumSelfAttention
 
 from .losses import drqa_crossentropy_loss, drqa_prob_sum_loss

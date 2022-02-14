@@ -244,13 +244,13 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     #
 
     assert isinstance(question_indexes, np.ndarray)
-    assert len(question_indexes.shape) == 1
+    # assert len(question_indexes.shape) == 1
 
     assert isinstance(passages, np.ndarray)
-    assert len(passages.shape) == 1
+    # assert len(passages.shape) == 1
 
     assert isinstance(questions, np.ndarray)
-    assert len(questions.shape) == 1
+    # assert len(questions.shape) == 1
 
     assert question_indexes.shape[0] == passages.shape[0]
     assert question_indexes.shape[0] == questions.shape[0]

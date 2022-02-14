@@ -1,22 +1,22 @@
 import numpy as np
 
 from tensorflow.keras import Model
-from tensorflow.keras.layers import Input, Concatenate, Dropout
+from tensorflow.keras.layers import Input, Concatenate, Dropout, Conv1D
 from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
-from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention
-from models.core import drqa_crossentropy_loss, drqa_accuracy_metric, drqa_prob_sum_loss
+from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
+from models.core import drqa_crossentropy_loss, drqa_accuracy_metric, drqa_prob_sum_loss, drqa_start_accuracy_metric, drqa_end_accuracy_metric
 from utils import learning_rate
 
 ###
 
-LOSS = ['binary_crossentropy']
-# LOSS = [drqa_crossentropy_loss]
+# LOSS = ['categorical_crossentropy']
+LOSS = [drqa_crossentropy_loss]
 
-METRICS = [drqa_accuracy_metric, drqa_crossentropy_loss]
+METRICS = [drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_crossentropy_loss]
 
 ###
 
@@ -42,6 +42,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
     N_POS_CLASSES = Configs.N_POS_CLASSES
     N_NER_CLASSES = Configs.N_NER_CLASSES
     DIM_TOKEN_TF = Configs.DIM_TOKEN_TF
+    EMBEDDING_DIM = Configs.DIM_EMBEDDING
 
     def _build() -> Model:
         q_tokens = Input(shape=(N_Q_TOKENS, ))
@@ -56,19 +57,26 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### embeddings
         q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
-        q_embeddings = Dropout(.3)(q_embeddings)
+        # q_embeddings = Dropout(.3)(q_embeddings)
 
         ### lstm
         q_rnn = DrqaRnn()(q_embeddings)
 
         ### self-attention (simplfied version)
         q_encoding = WeightedSumSelfAttention()(q_rnn)
+        q_encoding1 = Conv1D(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
+        # print()
+        # print("q_rnn: ", q_rnn.shape)
+        # print("q_encoding: ", q_encoding.shape)
+        # print("q_encoding1: ", q_encoding1.shape)
+        # print()
+        # print()
 
         ### PASSAGE ###############################################################
 
         ### embeddings
         p_embeddings = GloveEmbeddings(N_P_TOKENS, embeddings_initializer)(p_tokens)
-        p_embeddings = Dropout(.3)(p_embeddings)
+        # p_embeddings = Dropout(.3)(p_embeddings)
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
@@ -78,15 +86,23 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
             Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])
         )
 
+        # print()
+        # print("p_rnn: ", p_rnn.shape)
+        # print()
+        # print()
+        # raise Exception("stop")
         ### OUTPUT ################################################################
 
-        ### similarity
-        out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding])
+        # ### similarity
+        # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding])
 
-        ### last bit
-        out_probs = EnhancedProbabilities()(out_probs)
+        # out_probs = BiLinearSimilarity()([p_rnn, q_encoding])
+        out_probs = BiLinearSimilarity()([p_rnn, q_encoding1])
 
-        ###
+        # ### last bit
+        # out_probs = EnhancedProbabilities()(out_probs)
+
+        # ###
 
         return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probs, name="DRQA")
 

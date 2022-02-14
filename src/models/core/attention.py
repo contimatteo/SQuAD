@@ -3,7 +3,7 @@ from typing import Callable, Any, List
 import tensorflow as tf
 
 from tensorflow.keras.layers import Dot, Dense
-from tensorflow.keras.activations import softmax
+from tensorflow.keras.activations import softmax, exponential
 
 ###
 
@@ -203,3 +203,55 @@ class BiLinearSimilarityAttention(tf.keras.Model):
         probs = tf.transpose(probs, perm=[1, 2, 0])  ### --> (_, n_tokens, 2)
 
         return probs
+
+
+# pylint: disable=invalid-name
+def BiLinearSimilarity():
+    Ws = Dense(256, use_bias=False)
+    We = Dense(256, use_bias=False)
+
+    # EXPs = Dense(1, activation="exponential", use_bias=False)
+    # EXPe = Dense(1, activation="exponential", use_bias=False)
+
+    dot = Dot(axes=2, normalize=True)
+
+    def __bilinearterm(p_rnn: Any, q_rnn: Any, w_type: str):
+        # p_rnn:  (None, 50, 256)
+        # q_rnn:  (None, 1, 256)
+
+        W = Ws if w_type == "start" else We
+        # EXP = EXPs if w_type == "start" else EXPe
+
+        out_W = W(q_rnn)  ### --> (_, 256)
+        # out_W = tf.expand_dims(out_W, axis=1)  ### --> (_, 1, 256)
+        print()
+        print("[SIM] p_rnn: ", p_rnn.shape)
+        print("[SIM] out_W: ", out_W.shape)
+        print()
+        exp_input = dot([p_rnn, out_W])  ### --> (_, 50, 1)
+        exp_out = exponential(exp_input)  ### --> (_, 50, 1)
+        print("exp_out: ", exp_out.shape)
+        print()
+        print()
+
+        return exp_out
+
+    def _nn(passage_and_question: List[Any]) -> Any:
+        p_rnn, q_rnn = passage_and_question[0], passage_and_question[1]
+        out = []
+
+        out_start = __bilinearterm(p_rnn, q_rnn, "start")
+        out.append(out_start)
+        out_end = __bilinearterm(p_rnn, q_rnn, "end")
+        out.append(out_end)
+
+        out = tf.concat(out, axis=2)
+        # print()
+        # print()
+        # print("out: ", out.shape)
+        # print()
+        # print()
+        # raise Exception("stop")
+        return out
+
+    return _nn
