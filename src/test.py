@@ -3,6 +3,7 @@ from typing import Any, Tuple, List, Dict
 
 import os
 import json
+from xmlrpc.client import boolean
 import numpy as np
 import tensorflow as tf
 
@@ -46,7 +47,8 @@ def __predict():
     return Y_pred
 
 
-def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
+def __compute_answers_tokens_indexes(Y: np.ndarray,
+                                     complementar_bit=False) -> Dict[str, np.ndarray]:
     _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     question_indexes_unique = list(np.unique(question_indexes))
 
@@ -62,9 +64,37 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
 
     assert len(answers_tokens_probs_map.keys()) == len(question_indexes_unique)
 
+    # test_qid = "5733bf84d058e614000b61c1"
+    # whole_passage_answer_place = np.vstack(tuple(answers_tokens_probs_map[test_qid].tolist()))
+
+    # print()
+    # print()
+    # print(whole_passage_answer_place)
+    # print()
+
+    # start_index = -1
+    # end_index = -1
+    # try:
+    #     start_index = np.where(np.all(whole_passage_answer_place == np.array([1, 0]),
+    #                                   axis=1))[0].tolist()[0]
+    #     end_index = np.where(np.all(whole_passage_answer_place == np.array([0, 1]),
+    #                                 axis=1))[0].tolist()[0]
+    # except:
+    #     start_index = np.where(np.all(whole_passage_answer_place == np.array([1, 1]),
+    #                                   axis=1))[0].tolist()[0]
+    #     end_index = start_index
+
+    # print()
+    # print(start_index)
+    # print(end_index)
+    # print()
+
     #
 
-    __weigth_answer_probs = lambda answer: answer[0:-1] - answer[-1]
+    __weigth_answer_probs = lambda answer: answer
+
+    if complementar_bit == True:
+        __weigth_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
 
@@ -83,11 +113,16 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
             progress_bar()
 
     #
-
+    # print()
+    # print("NEW STEP")
+    # print(answers_tokens_indexes_map[test_qid])
+    # print()
+    # raise Exception("stop")
     return answers_tokens_indexes_map
 
 
 def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
+
     answers_for_question_map = {}
 
     qids, _, passages = QP_data_from_dataset(get_data("original"))
@@ -128,8 +163,11 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 # answ_char_end_index = len(" ".join(answ_span_to_end))
                 # ### extract answer from chars indexes
                 # answer = passage[answ_char_start_index:answ_char_end_index]
-                answer = " ".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1])
-                answer = str(answer).strip()
+                answer = " ".join(
+                    passage_tokens[answ_token_start_index:answer_token_end_index + 1]
+                ).strip()
+
+                # answer = str(answer).strip()
 
             # if qid in answers_tokens_indexes_map:
             #     answers_for_question_map[qid] = answer
@@ -171,7 +209,7 @@ def test():
 
     ### TODO: remove the following code ...
     Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    # Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
+    Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
@@ -184,7 +222,7 @@ def test():
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
 
-    load_data(json_path="./data/raw/train.small.json")
+    load_data(json_path="./data/raw/train.v6.json")
 
     # load_data()
 

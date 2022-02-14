@@ -139,17 +139,58 @@ def get_answer_start_end(passage, answer_text, answer_start):
     if passage not in span_tokenize_dict.keys():
         span_tokenize_dict[passage] = span_tokenize(passage)
 
-    interval = [
-        i for i, (s, e) in enumerate(span_tokenize_dict[passage])
-        if e >= answer_start and s <= answer_end
-    ]
+    # interval = [
+    #     i for i, (s, e) in enumerate(span_tokenize_dict[passage])
+    #     if s >= answer_start and e <= answer_end
+    # ]
+    interval = []
+
+    app_dict = {}
+    for i, (s, e) in enumerate(span_tokenize_dict[passage]):
+        if s >= answer_start and e <= answer_end:  # (e == answer_end or e == answer_end - 1):
+            interval.append(i)
+            app_dict[i] = (s, e)
+            # print()
+            # print(passage[s:e + 1])
+            # print("answer_end - e: ", (answer_end - e))
+            # print()
+
+    print()
+    print()
+    # print()
+    # # raise Exception("STOPPPPPPPPPPPPPPP")
+
     if len(interval) < 1:
         # raise Exception(interval + " is empty.")
         at = [answer_text]  # [str(passage)[96]]
         print(at)
         return [-1, -1]
 
-    return get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
+    credi = get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
+
+    # (1, 0)(0, 1)
+    # (1, 1)
+
+    if (1, 0) in credi:
+        token_start_index = credi.index((1, 0))
+        token_end_index = credi.index((0, 1))
+
+    else:
+        token_start_index = credi.index((1, 1))
+        token_end_index = token_start_index
+
+    print()
+    print("MY OUTPUT")
+
+    s = app_dict[token_start_index]
+    e = app_dict[token_end_index]
+
+    print(token_start_index)
+    print(token_end_index)
+    print(passage[s[0]:e[1] + 1])
+    print()
+
+    return credi
 
 
 def add_labels(df):
@@ -178,6 +219,7 @@ def data_cleaning(df: pd.DataFrame):
     df = add_passage_index(df)
     if "answer" in df:
         df = add_labels(df).drop(axis=1, columns='answer_start')
+
     df = add_split_into_words(df)
     print("Data cleaned \n")
     return df

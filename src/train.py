@@ -109,7 +109,7 @@ def train():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
 
-    # Y = Y[:, :Configs.N_PASSAGE_TOKENS, :]
+    Y = Y[:, :Configs.N_PASSAGE_TOKENS, :]
     glove_matrix = get_data("glove")
 
     print("After numpy")
@@ -167,7 +167,7 @@ def kfold_train():
 
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
-    load_data(json_path="./data/raw/train.small.json")
+    load_data(json_path="./data/raw/train.v6.json")
     # load_data()
 
     print("After preprocessing")

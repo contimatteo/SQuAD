@@ -25,8 +25,8 @@ DIM_TOKEN_TF: int = 1
 ##################
 ##  NN + TRAIN  ##
 
-NN_EPOCHS = 15
-NN_BATCH_SIZE = 2
+NN_EPOCHS = 3
+NN_BATCH_SIZE = 1
 NN_LEARNING_RATE = 1e-3
 NN_LEARNING_RATE_TYPE = "static"
 

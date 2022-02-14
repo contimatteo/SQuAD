@@ -16,7 +16,8 @@ from utils import learning_rate
 # LOSS = ['categorical_crossentropy']
 LOSS = [drqa_crossentropy_loss]
 
-METRICS = [drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_crossentropy_loss]
+# METRICS = [drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_crossentropy_loss]
+METRICS = [drqa_accuracy_metric]
 
 ###
 
