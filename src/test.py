@@ -168,6 +168,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                     passage_tokens[answ_token_start_index:answer_token_end_index + 1]
                 ).strip()
 
+                answer = answer.replace(" ' ", "'")
                 # answer = str(answer).strip()
 
             # if qid in answers_tokens_indexes_map:

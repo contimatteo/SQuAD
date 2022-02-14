@@ -23,8 +23,8 @@ def split_passage(df):
     df_clone = df.copy()
     # print(df.columns)
     passage_features = [
-        "word_tokens_passage", "word_index_passage", "pos", "pos_onehot", "ner",
-        "ner_onehot", "term_frequency", "exact_match"
+        "word_tokens_passage", "word_index_passage", "pos", "pos_onehot", "ner", "ner_onehot",
+        "term_frequency", "exact_match"
     ]
     if "label" in df:
         passage_features.append("label")
@@ -70,7 +70,9 @@ def apply_padding_to(
     # print(df.dtypes)
 
     word_index_passage = pad(df_padded['word_index_passage'], N_PASSAGE_TOKENS, PAD_WORD_ENCODING)
-    word_index_question = pad(df_padded['word_index_question'], N_QUESTION_TOKENS, PAD_WORD_ENCODING)
+    word_index_question = pad(
+        df_padded['word_index_question'], N_QUESTION_TOKENS, PAD_WORD_ENCODING
+    )
     word_tokens_passage = pad(df_padded['word_tokens_passage'], N_PASSAGE_TOKENS, PAD_WORD)
     word_tokens_question = pad(df_padded['word_tokens_question'], N_QUESTION_TOKENS, PAD_WORD)
     if "label" in df_padded:
