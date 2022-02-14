@@ -28,12 +28,12 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = None  # `None` for all rows :)
+N_ROWS_SUBSET = None  #  `None` for all rows :)
 
 ###
 
 
-def __dataset_kfold(X, Y, indexes) -> list:
+def __dataset_kfold(X, Y, indexes) -> Any:
     return [el[indexes] for el in X], Y[indexes]
 
 
@@ -110,7 +110,7 @@ def train():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
 
-    Y = Y[:, :Configs.N_PASSAGE_TOKENS, :]
+    # Y = Y[:, :Configs.N_PASSAGE_TOKENS, :]
     glove_matrix = get_data("glove")
 
     print("After numpy")

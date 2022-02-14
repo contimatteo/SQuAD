@@ -96,7 +96,7 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
     return Y_onehot_with_additional_case
 
 
-def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
+def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarray]:
     assert X_data is not None
     assert isinstance(X_data, list)
     assert len(X_data) == 7
@@ -190,7 +190,7 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     return X, q_indexes
 
 
-def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
+def Y_data_from_dataset(Y_data, n_examples_subset=None) -> np.ndarray:
     assert Y_data is not None
     assert isinstance(Y_data, list)
     assert len(Y_data) == 1
@@ -224,7 +224,7 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     return Y
 
 
-def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
+def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     assert data is not None
     assert isinstance(data, list)
     assert len(data) == 3

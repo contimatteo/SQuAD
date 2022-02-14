@@ -92,17 +92,17 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
     #
 
-    __weigth_answer_probs = lambda answer: answer
+    __weight_answer_probs = lambda answer: answer
 
-    if complementar_bit == True:
-        __weigth_answer_probs = lambda answer: answer[0:-1] - answer[-1]
+    if complementar_bit:
+        __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
 
     with alive_bar(len(list(answers_tokens_probs_map.items()))) as progress_bar:
         for (q_index, answers) in answers_tokens_probs_map.items():
             answer_tokens_probs = np.array(
-                [__weigth_answer_probs(answers[idx]) for idx in range(answers.shape[0])],
+                [__weight_answer_probs(answers[idx]) for idx in range(answers.shape[0])],
                 dtype=answers.dtype
             )
 
@@ -198,7 +198,7 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 def test():
     Y_pred = __predict()
 
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=True)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
@@ -211,10 +211,10 @@ def test():
 
     ### TODO: remove the following code ...
     Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
+    # Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=True)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.true")
 
