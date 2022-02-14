@@ -19,6 +19,7 @@ from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset
 from utils.generator import Generator
 from utils.memory_usage import memory_usage
+from utils.data import get_argv
 
 import tensorflow as tf
 ###
@@ -167,8 +168,12 @@ def kfold_train():
 
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
-    load_data(json_path="./data/raw/train.small.json")
-    # load_data()
+    # load_data(json_path="./data/raw/train.small.json")
+    json_path = get_argv()
+    if json_path is not None:
+        load_data(json_path=json_path)
+    else:
+        load_data(json_path="./data/raw/train.small.json")
 
     print("After preprocessing")
     memory_usage()

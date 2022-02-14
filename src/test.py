@@ -16,6 +16,7 @@ from data import get_data, load_data
 from models import DRQA
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
+from utils.data import get_argv
 
 ###
 
@@ -184,7 +185,11 @@ def test():
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
 
-    load_data(json_path="./data/raw/train.small.json")
+    json_path = get_argv()
+    if json_path is not None:
+        load_data(json_path=json_path)
+    else:
+        load_data(json_path="./data/raw/train.small.json")
 
     # load_data()
 
