@@ -198,7 +198,7 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 def test():
     Y_pred = __predict()
 
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=True)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=False)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
@@ -211,10 +211,10 @@ def test():
 
     ### TODO: remove the following code ...
     Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    # Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
+    Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=True)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=False)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.true")
 

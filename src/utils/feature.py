@@ -75,7 +75,7 @@ def __X_feature_tokens_subset(feature, n_tokens):
     return feature[:, 0:n_tokens]
 
 
-def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
+def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> np.ndarray:
     ### --> (n_examples, n_tokens, 2)
     Y_transposed = np.transpose(Y, axes=[0, 2, 1])
     ### --> (n_examples, 2, n_tokens)
