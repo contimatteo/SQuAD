@@ -95,7 +95,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### OUTPUT ################################################################
 
         # ### similarity
-        # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding])
+        # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
 
         # out_probs = BiLinearSimilarity()([p_rnn, q_encoding])
         out_probs = BiLinearSimilarity()([p_rnn, q_encoding1])

@@ -37,7 +37,7 @@ def DrqaRnn() -> Callable[[Any], Any]:
     units = 128
     initializer = 'glorot_uniform'
 
-    def _lstm() -> LSTM:
+    def _lstm() -> RNN:
         cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
         return RNN(cell, return_sequences=True)
 
@@ -111,5 +111,5 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
         return out_new
 
-    return __nn1
-    # return __nn2
+    # return __nn1
+    return __nn2
