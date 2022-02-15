@@ -92,7 +92,7 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
     #
 
-    __weight_answer_probs = lambda answer: answer # [0:-1]
+    __weight_answer_probs = lambda answer: answer[0:1]
 
     if complementar_bit:
         __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
@@ -197,7 +197,7 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 def test():
     Y_pred = __predict()
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=False)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=True)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
@@ -214,7 +214,7 @@ def test():
         Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=False)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=True)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.true")
 
@@ -224,7 +224,7 @@ def test():
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
 
-    load_data(json_path="./data/raw/train.v4.json")
+    load_data(json_path="./data/raw/train.v3.json")
 
     # load_data()
 

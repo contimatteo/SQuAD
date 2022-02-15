@@ -3,6 +3,7 @@
 from .layers import GloveEmbeddings
 from .layers import DrqaRnn
 from .layers import EnhancedProbabilities
+from .layers import WeightedSum, WeightedSumCustom
 
 from .attention import AlignedAttention
 from .attention import BiLinearSimilarityAttention, BiLinearSimilarity

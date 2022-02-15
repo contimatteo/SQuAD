@@ -6,7 +6,8 @@ import tensorflow as tf
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.initializers import Constant
 from tensorflow.keras.layers import Dense, Embedding
-from tensorflow.keras.layers import Bidirectional, LSTM, RNN, LSTMCell
+from tensorflow.keras.layers import Bidirectional, LSTM, RNN, LSTMCell, Conv1D
+from tensorflow.keras import layers
 
 import utils.configs as Configs
 
@@ -31,6 +32,20 @@ def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any
 
 
 ###
+
+def WeightedSum(channels_size, kernel_size):
+    return Conv1D(channels_size, kernel_size)
+
+
+def WeightedSumCustom(N_Q_TOKENS):
+    def _nn(q_rnn):
+        q_rnn = tf.transpose(q_rnn, perm=[0, 2, 1])
+        weighted_sum = WeightedSum(N_Q_TOKENS, 1)(q_rnn)  ### --> (_,1,emb_dim)
+        red_sum = tf.reduce_sum(weighted_sum, axis=2)
+        exp_dim = tf.expand_dims(red_sum, axis=2)
+        q_encoding1 = tf.transpose(exp_dim, perm=[0, 2, 1])
+        return q_encoding1
+    return _nn
 
 
 def DrqaRnn() -> Callable[[Any], Any]:

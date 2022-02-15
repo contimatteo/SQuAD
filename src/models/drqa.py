@@ -1,12 +1,13 @@
 import numpy as np
 
 from tensorflow.keras import Model
-from tensorflow.keras.layers import Input, Concatenate, Dropout, Conv1D
+from tensorflow.keras.layers import Input, Concatenate, Dropout, Add
 from tensorflow.keras.optimizers import Adam, Optimizer
+from tensorflow import transpose, reduce_sum, expand_dims
 
 import utils.configs as Configs
 
-from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities
+from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSum, WeightedSumCustom
 from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
 from models.core import drqa_crossentropy_loss, drqa_accuracy_metric, drqa_prob_sum_loss, drqa_start_accuracy_metric, drqa_end_accuracy_metric
 from utils import learning_rate
@@ -64,8 +65,10 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         q_rnn = DrqaRnn()(q_embeddings)
 
         ### self-attention (simplfied version)
-        q_encoding = WeightedSumSelfAttention()(q_rnn)
-        q_encoding1 = Conv1D(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
+        # q_encoding = WeightedSumSelfAttention()(q_rnn)
+        # q_encoding1 = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
+        q_encoding1 = WeightedSumCustom(N_Q_TOKENS)(q_rnn)
+
         # print()
         # print("q_rnn: ", q_rnn.shape)
         # print("q_encoding: ", q_encoding.shape)
