@@ -27,7 +27,7 @@ set_learning_phase(0)
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = None  # `None` for all rows :)
+N_ROWS_SUBSET = None  #  `None` for all rows :)
 
 ###
 
@@ -92,7 +92,7 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
     #
 
-    __weight_answer_probs = lambda answer: answer
+    __weight_answer_probs = lambda answer: answer # [0:-1]
 
     if complementar_bit:
         __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
@@ -197,7 +197,6 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 def test():
     Y_pred = __predict()
-
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=False)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
@@ -211,7 +210,8 @@ def test():
 
     ### TODO: remove the following code ...
     Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
+    if not Configs.COMPLEMENTAR_BIT:
+        Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=False)

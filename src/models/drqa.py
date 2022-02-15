@@ -101,7 +101,8 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         out_probs = BiLinearSimilarity()([p_rnn, q_encoding1])
 
         # ### last bit
-        # out_probs = EnhancedProbabilities()(out_probs)
+        if not Configs.COMPLEMENTAR_BIT:
+            out_probs = EnhancedProbabilities()(out_probs)
 
         # ###
 
