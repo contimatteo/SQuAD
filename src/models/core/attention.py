@@ -167,11 +167,13 @@ class BiLinearSimilarityAttention(tf.keras.Model):
         self.Ws = Dense(256, activation="exponential", use_bias=False)
         self.We = Dense(256, activation="exponential", use_bias=False)
 
-    def _distribution(self, scores):
+    @staticmethod
+    def _distribution(scores):
         return softmax(scores, axis=1)
         # return softmax(scores)
 
-    def _similarity(self, a: Any, b: Any) -> Any:
+    @staticmethod
+    def _similarity(a: Any, b: Any) -> Any:
         return Dot(axes=1, normalize=True)([a, b])
 
     def _compatibility(self, W, keys, query) -> Callable[[Any, Any], Any]:

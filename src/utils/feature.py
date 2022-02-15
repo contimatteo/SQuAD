@@ -1,5 +1,5 @@
 from typing import Tuple
-
+from typing import List
 from random import randint
 
 import numpy as np
@@ -14,7 +14,7 @@ N_ROWS = 500
 ###
 
 
-def X_train_faker() -> np.ndarray:
+def X_train_faker() -> List[np.ndarray]:
     ### [Q] tokens
     q_tokens = np.random.random_sample((N_ROWS, Configs.N_QUESTION_TOKENS))
     ### [P] tokens

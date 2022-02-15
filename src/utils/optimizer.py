@@ -1,7 +1,7 @@
 from typing import Any
 
 from tensorflow.keras.optimizers.schedules import CosineDecay, ExponentialDecay
-# from tensorflow_addons.optimizers import CyclicalLearningRate
+#  from tensorflow_addons.optimizers import CyclicalLearningRate
 
 import utils.configs as Configs
 

@@ -14,11 +14,11 @@ def apply_casting(df, col, NAlist):
     #     NAlist.append(col)
     #     df[col].fillna(mn - 1, inplace=True)
 
-        # test if column can be converted to an integer
+    # test if column can be converted to an integer
     asint = df[col].fillna(0).astype(np.int64)
     result = (df[col] - asint)
     result = result.sum()
-    if result > -0.01 and result < 0.01:
+    if -0.01 < result < 0.01:
         IsInt = True
 
     # Make Integer/unsigned Integer datatypes

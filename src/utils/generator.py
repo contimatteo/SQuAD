@@ -1,5 +1,4 @@
 from .configs import NN_BATCH_SIZE
-import gc
 # X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
 # Y = Y
 
