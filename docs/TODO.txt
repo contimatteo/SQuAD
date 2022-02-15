@@ -1,24 +1,23 @@
+  [ ] code cleaning
 
-
-FRA-MATTEO
   [x] K-Fold evaluation strategy {Fra}
   [ ] reason about the merging strategy for final evaluation
-  [ ] variable batch-size 
-  [ ] support Keras (generator)
+  [X] variable batch-size
+  [X] support Keras (generator)
   [ ] we have to be sure that the model weights are the BEST ones
-  [ ] consider avoiding gradient exploding (through `clipnorm` optimizer param)
-
-
-PRIMIANO-LUCIANO
-  [ ] adaptive batch-size 
+  [X] consider avoiding gradient exploding (through `clipnorm` optimizer param)
+  [X] adaptive batch-size
   [ ] split in multiple files
-  [ ] create Keras (generator)
+  [X] create Keras (generator)
+  [ ] attention boolean mask for reducing padded importance
 
+TEST:
+  [ ] train-test (ETA: 12300 minuts per 100 epochs)
 
 --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 
 PROJECT-WORK
-  [ ] BERT 
+  [ ] BERT
   [ ] Character-Level Word Embeddings (slide 10, page 43-44)
 
