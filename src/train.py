@@ -69,6 +69,7 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
     ### train
     if Configs.CUDA_ENABLED is True:
         ### generator
+        print("CUDA ENABLED: GPU ON")
         gen = Generator(X, Y)
         dataset = gen.generate_dynamic_batches()
         steps_per_epoch = gen.get_steps_per_epoch()
@@ -82,6 +83,7 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
             max_queue_size=1
         )
     else:
+        print("CUDA NOT ENABLED: GPU OFF")
         history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
 
     if save_weights is True:

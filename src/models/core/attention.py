@@ -224,15 +224,15 @@ def BiLinearSimilarity():
 
         out_W = W(q_rnn)  ### --> (_, 256)
         # out_W = tf.expand_dims(out_W, axis=1)  ### --> (_, 1, 256)
-        print()
-        print("[SIM] p_rnn: ", p_rnn.shape)
-        print("[SIM] out_W: ", out_W.shape)
-        print()
+        # print()
+        # print("[SIM] p_rnn: ", p_rnn.shape)
+        # print("[SIM] out_W: ", out_W.shape)
+        # print()
         exp_input = dot([p_rnn, out_W])  ### --> (_, 50, 1)
         exp_out = exponential(exp_input)  ### --> (_, 50, 1)
-        print("exp_out: ", exp_out.shape)
-        print()
-        print()
+        # print("exp_out: ", exp_out.shape)
+        # print()
+        # print()
 
         return exp_out
 
