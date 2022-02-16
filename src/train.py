@@ -14,7 +14,6 @@ import utils.configs as Configs
 
 from data import get_data, load_data, delete_data
 from models import DRQA
-from models.core import drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_accuracy_metric
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset
 from utils.generator import Generator
@@ -93,17 +92,15 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
     return history
 
 
-def __predict(model, X) -> np.ndarray:
-    return model.predict(X)
+# def __predict(model, X) -> np.ndarray:
+#     return model.predict(X)
 
+# def __evaluation(Y_true, Y_pred):
+#     start_accuracy = drqa_start_accuracy_metric(Y_true, Y_pred).numpy()
+#     end_accuracy = drqa_end_accuracy_metric(Y_true, Y_pred).numpy()
+#     tot_accuracy = drqa_accuracy_metric(Y_true, Y_pred).numpy()
 
-def __evaluation(Y_true, Y_pred):
-    start_accuracy = drqa_start_accuracy_metric(Y_true, Y_pred).numpy()
-    end_accuracy = drqa_end_accuracy_metric(Y_true, Y_pred).numpy()
-    tot_accuracy = drqa_accuracy_metric(Y_true, Y_pred).numpy()
-
-    return [start_accuracy, end_accuracy, tot_accuracy]
-
+#     return [start_accuracy, end_accuracy, tot_accuracy]
 
 ###
 
@@ -127,45 +124,44 @@ def train():
     _ = __fit(model, X, Y, True, True)
 
 
-def kfold_train():
-    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
-    Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    glove_matrix = get_data("glove")
+# def kfold_train():
+#     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+#     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+#     glove_matrix = get_data("glove")
 
-    metrics = []
+#     metrics = []
 
-    kf = KFold(n_splits=Configs.N_KFOLD_BUCKETS, shuffle=False)
+#     kf = KFold(n_splits=Configs.N_KFOLD_BUCKETS, shuffle=False)
 
-    for train_indexes, test_indexes in kf.split(Y):
-        model = DRQA(glove_matrix)
+#     for train_indexes, test_indexes in kf.split(Y):
+#         model = DRQA(glove_matrix)
 
-        ### split dataset in buckets
-        X_train, Y_train = __dataset_kfold(X, Y, train_indexes)
-        X_test, Y_test = __dataset_kfold(X, Y, test_indexes)
+#         ### split dataset in buckets
+#         X_train, Y_train = __dataset_kfold(X, Y, train_indexes)
+#         X_test, Y_test = __dataset_kfold(X, Y, test_indexes)
 
-        ### train
-        _ = __fit(model, X_train, Y_train, False, False)
-        ### predict
-        Y_test_pred = __predict(model, X_test)
+#         ### train
+#         _ = __fit(model, X_train, Y_train, False, False)
+#         ### predict
+#         Y_test_pred = __predict(model, X_test)
 
-        ### release Keras memory
-        clear_session()
+#         ### release Keras memory
+#         clear_session()
 
-        ### evaluation
-        metrics.append(__evaluation(Y_test, Y_test_pred))
+#         ### evaluation
+#         metrics.append(__evaluation(Y_test, Y_test_pred))
 
-    metrics = np.array(metrics)
+#     metrics = np.array(metrics)
 
-    print()
-    print("METRICS")
-    print("[accuracy] start: ", metrics[:, 0].mean())
-    print("[accuracy]   end: ", metrics[:, 1].mean())
-    print("[accuracy] total: ", metrics[:, 2].mean())
-    print("     [mae] start: ", metrics[:, 3].mean())
-    print("     [mae]   end: ", metrics[:, 4].mean())
-    print("     [mae] total: ", metrics[:, 5].mean())
-    print()
-
+#     print()
+#     print("METRICS")
+#     print("[accuracy] start: ", metrics[:, 0].mean())
+#     print("[accuracy]   end: ", metrics[:, 1].mean())
+#     print("[accuracy] total: ", metrics[:, 2].mean())
+#     print("     [mae] start: ", metrics[:, 3].mean())
+#     print("     [mae]   end: ", metrics[:, 4].mean())
+#     print("     [mae] total: ", metrics[:, 5].mean())
+#     print()
 
 ###
 
