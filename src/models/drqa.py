@@ -6,7 +6,7 @@ from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
-from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSumCustom
+from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSumCustom, WeightedSumSelfAttention
 from models.core import AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
 from models.core import drqa_crossentropy_loss, drqa_acc_answer
 from utils import learning_rate

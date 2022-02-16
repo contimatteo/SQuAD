@@ -44,7 +44,7 @@ def __callbacks() -> list:
             monitor='loss',
             patience=5,
             mode='min',
-            min_delta=1e-4,
+            min_delta=1e-3,
             restore_best_weights=True,
         )
     )

@@ -45,7 +45,7 @@ def AttentionModel(compatibility: Callable[[Any, Any], Any],
 
 # pylint: disable=invalid-name
 def WeightedSumSelfAttention():
-    W = Dense(1, use_bias=False)
+    W = Dense(256, use_bias=False)
 
     def compatibility(keys: Any, *_) -> Any:
         return W(keys)
@@ -55,7 +55,8 @@ def WeightedSumSelfAttention():
         # return softmax(scores)
 
     def _nn(keys: Any):
-        return AttentionModel(compatibility, distribution)([keys, None])
+        context_vector = AttentionModel(compatibility, distribution)([keys, None])
+        return tf.expand_dims(context_vector, axis=1)
 
     return _nn
 
