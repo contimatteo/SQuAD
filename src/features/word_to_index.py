@@ -5,6 +5,8 @@ import numpy as np
 
 class WordToIndex:
 
+    PAD_WORD = "."
+
     def fit_word(self, token: str):
         if token not in self.index_dict:
             self.index_dict[token] = self.get_index_len()

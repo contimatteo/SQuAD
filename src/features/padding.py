@@ -50,7 +50,7 @@ def pad(df_col, max_seq_len, pad_value):
 def apply_padding_to(
     df: pd.DataFrame, WTI: WordToIndex, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder
 ):
-    PAD_WORD = "."
+    PAD_WORD = WordToIndex.PAD_WORD
     # PAD_WORD_ENCODING = WTI.get_word_index(PAD_WORD)
     PAD_WORD_ENCODING = 0
     LABEL = (0, 0)
