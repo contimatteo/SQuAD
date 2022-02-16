@@ -51,7 +51,8 @@ def apply_padding_to(
     df: pd.DataFrame, WTI: WordToIndex, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder
 ):
     PAD_WORD = "."
-    PAD_WORD_ENCODING = WTI.get_word_index(PAD_WORD)
+    # PAD_WORD_ENCODING = WTI.get_word_index(PAD_WORD)
+    PAD_WORD_ENCODING = 0
     LABEL = (0, 0)
     EXACT_MATCH = (False, False, False)
     POS = pos_tag([PAD_WORD])[0][1]

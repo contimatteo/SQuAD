@@ -3,13 +3,12 @@ import numpy as np
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Concatenate, Dropout, Add
 from tensorflow.keras.optimizers import Adam, Optimizer
-from tensorflow import transpose, reduce_sum, expand_dims
 
 import utils.configs as Configs
 
-from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSum, WeightedSumCustom
-from models.core import WeightedSumSelfAttention, AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
-from models.core import drqa_crossentropy_loss, drqa_accuracy_metric, drqa_prob_sum_loss, drqa_start_accuracy_metric, drqa_end_accuracy_metric
+from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSumCustom
+from models.core import AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
+from models.core import drqa_crossentropy_loss, drqa_acc_exact_c_bit, drqa_acc_answer
 from utils import learning_rate
 
 ###
@@ -18,7 +17,7 @@ from utils import learning_rate
 LOSS = [drqa_crossentropy_loss]
 
 # METRICS = [drqa_start_accuracy_metric, drqa_end_accuracy_metric, drqa_crossentropy_loss]
-METRICS = [drqa_accuracy_metric]
+METRICS = [drqa_acc_exact_c_bit, drqa_acc_answer]
 
 ###
 
@@ -44,7 +43,6 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
     N_POS_CLASSES = Configs.N_POS_CLASSES
     N_NER_CLASSES = Configs.N_NER_CLASSES
     DIM_TOKEN_TF = Configs.DIM_TOKEN_TF
-    EMBEDDING_DIM = Configs.DIM_EMBEDDING
 
     def _build() -> Model:
         q_tokens = Input(shape=(N_Q_TOKENS, ))
