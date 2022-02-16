@@ -1,3 +1,4 @@
+from colorsys import yiq_to_rgb
 from tensorflow.keras.metrics import CategoricalAccuracy  # , MeanAbsoluteError
 from tensorflow import convert_to_tensor
 import utils.configs as Configs
@@ -34,6 +35,10 @@ def __drqa_accuracy_filtered_exact_c_bit(y_true, y_pred):
     if y_pred.shape[0] == 0:
         return 0
 
+    print()
+    print(y_true.shape)
+    print(y_pred.shape)
+    print()
     s_metric = CategoricalAccuracy()
     s_metric.update_state(y_true, y_pred)
     return s_metric.result()
@@ -58,7 +63,22 @@ def __drqa_accuracy_filtered(y_true, y_pred, accuracy_type="answer"):
 
         return y_true, y_pred
 
+    # print("PRE FILTER#######")
+    # print()
+    # for i in range(y_true.shape[0]):
+    #     print(y_true[i])
+    # print()
+    # print(y_true.shape)
+    # print(y_pred.shape)
+    # print()
     y_true, y_pred = filter_data()
+
+    if y_true.shape[0] == 0:
+        return 0
+    # print()
+    # print(y_true.shape)
+    # print(y_pred.shape)
+    # print("END CONTROL#######")
     s_metric = CategoricalAccuracy()
     s_metric.update_state(y_true, y_pred)
     return s_metric.result()
