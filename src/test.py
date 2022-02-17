@@ -126,7 +126,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     answers_for_question_map = {}
 
-    qids, _, passages = QP_data_from_dataset(get_data("original"))
+    qids, _, passages, pids = QP_data_from_dataset(get_data("original"))
     qids_unique = list(np.unique(qids))
 
     passage_by_question_map = {}

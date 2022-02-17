@@ -224,7 +224,7 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> np.ndarray:
     return Y
 
 
-def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     assert data is not None
     assert isinstance(data, list)
     assert len(data) == 3
@@ -240,7 +240,8 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     data[1] = None
     questions = pd_series_to_numpy(data[2])
     data[2] = None
-
+    passage_indexes = pd_series_to_numpy(data[3])
+    data[3] = None
     #
 
     assert isinstance(question_indexes, np.ndarray)
@@ -252,9 +253,11 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     assert isinstance(questions, np.ndarray)
     # assert len(questions.shape) == 1
 
+    assert isinstance(passage_indexes, np.ndarray)
+
     assert question_indexes.shape[0] == passages.shape[0]
     assert question_indexes.shape[0] == questions.shape[0]
 
     #
 
-    return question_indexes, questions, passages
+    return question_indexes, questions, passages, passage_indexes
