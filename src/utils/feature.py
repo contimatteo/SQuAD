@@ -227,7 +227,7 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> np.ndarray:
 def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     assert data is not None
     assert isinstance(data, list)
-    assert len(data) == 3
+    assert len(data) == 4
     assert data[0] is not None
     assert data[1] is not None
     assert data[2] is not None
