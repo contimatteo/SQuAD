@@ -79,12 +79,14 @@ def __data_to_list(df: pd.DataFrame):
     question_id = df["id"]
     passage_id = df["passage_index"]
     label = df["label_padded"] if "label_padded" in df else None
+    mask_p = df["mask_passage_padded"]
+    mask_q = df["mask_question_padded"]
 
     # evaluation_id_x = question_id
     evaluation_passage = df["word_tokens_passage_with_spaces"]
     evaluation_question = df["word_tokens_question"]
 
-    return question_id, passage, question, pos, ner, tf, exact_match, label, question_id, evaluation_passage, evaluation_question, passage_id
+    return question_id, passage, question, pos, ner, tf, exact_match, label, question_id, evaluation_passage, evaluation_question, passage_id, mask_p, mask_q
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
@@ -185,7 +187,7 @@ def get_data(ret: str):
     elif ret == "labels":
         return [df_np[7]]
     elif ret == "features":
-        return [df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]]
+        return [df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6], df_np[12], df_np[13]]
     elif ret == "glove":
         return glove_matrix
 

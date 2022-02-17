@@ -99,7 +99,7 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> np.ndarray:
 def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarray]:
     assert X_data is not None
     assert isinstance(X_data, list)
-    assert len(X_data) == 7
+    assert len(X_data) == 9
     assert X_data[0] is not None
     assert X_data[1] is not None
     assert X_data[2] is not None

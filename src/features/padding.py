@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from nltk import pos_tag
@@ -8,6 +9,16 @@ from .one_hot_encoder import OneHotEncoder
 from utils.configs import N_QUESTION_TOKENS, N_PASSAGE_TOKENS
 
 ###
+
+
+def apply_mask(df: pd.DataFrame):
+    df["mask_passage"] = df.apply(
+        lambda x: list(np.ones((len(x["word_tokens_passage"]),), dtype=int)), axis=1
+    )
+    df["mask_question"] = df.apply(
+        lambda x: list(np.ones((len(x["word_tokens_question"]),), dtype=int)), axis=1
+    )
+    return df
 
 
 def split_in_chunks(row, columns, step):
@@ -24,7 +35,7 @@ def split_passage(df):
     # print(df.columns)
     passage_features = [
         "word_tokens_passage", "word_index_passage", "pos", "pos_onehot", "ner", "ner_onehot",
-        "term_frequency", "exact_match"
+        "term_frequency", "exact_match", "mask_passage"
     ]
     if "label" in df:
         passage_features.append("label")
@@ -62,6 +73,8 @@ def apply_padding_to(
     NER_CATEGORICAL = OHE_ner.get_categorical_in_dict(NER)
     NER_ONEHOT = OHE_ner.get_OHE_in_dict(NER_CATEGORICAL)
     TF = 0.0
+
+    df = apply_mask(df)
     df_padded = split_passage(df)
     df_padded["question_index"] = df_padded.index  # df_padded["id"]
     df_padded["chunk_index"] = df_padded.groupby("question_index").cumcount()
@@ -87,6 +100,8 @@ def apply_padding_to(
     ner_categorical = pad(df_padded['ner_categorical'], N_PASSAGE_TOKENS, NER_CATEGORICAL)
     ner_onehot = pad(df_padded['ner_onehot'], N_PASSAGE_TOKENS, NER_ONEHOT)
     term_frequency = pad(df_padded['term_frequency'], N_PASSAGE_TOKENS, TF)
+    mask_passage = pad(df_padded['mask_passage'], N_PASSAGE_TOKENS, 0)
+    mask_question = pad(df_padded['mask_question'], N_QUESTION_TOKENS, 0)
 
     df_padded['word_tokens_passage_padded'] = list(word_tokens_passage)
     df_padded['word_tokens_passage_padded_with_spaces'] = list(word_tokens_passage_with_spaces)
@@ -107,6 +122,9 @@ def apply_padding_to(
     df_padded['ner_onehot_padded'] = list(ner_onehot)
 
     df_padded['term_frequency_padded'] = list(term_frequency)
+
+    df_padded['mask_passage_padded'] = list(mask_passage)
+    df_padded['mask_question_padded'] = list(mask_question)
     df_padded = df_padded.reset_index()
 
     # df_padded.set_index(["passage_index", "question_index", "chunk_index"], drop=False, inplace=True)

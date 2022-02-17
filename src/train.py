@@ -167,9 +167,9 @@ def train():
 
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
-    load_data(json_path="./data/raw/train.v7.json")
-    # json_path = get_argv()
-    # load_data(json_path=json_path)
+    # load_data(json_path="./data/raw/train.v7.json")
+    json_path = get_argv()
+    load_data(json_path=json_path)
 
     print("After preprocessing")
     memory_usage()
