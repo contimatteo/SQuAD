@@ -33,7 +33,7 @@ N_ROWS_SUBSET = None  #  `None` for all rows :)
 
 
 def __predict():
-    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    X, _, _, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
 
     model = DRQA(glove_matrix)
@@ -50,7 +50,7 @@ def __predict():
 
 def __compute_answers_tokens_indexes(Y: np.ndarray,
                                      complementar_bit=False) -> Dict[str, np.ndarray]:
-    _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    _, question_indexes, _, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     question_indexes_unique = list(np.unique(question_indexes))
 
     answers_tokens_probs_map = {}
