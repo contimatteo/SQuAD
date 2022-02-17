@@ -209,7 +209,7 @@ class BiLinearSimilarityAttention(tf.keras.Model):
 
 
 # pylint: disable=invalid-name
-def BiLinearSimilarity():
+def BiLinearSimilarity(p_mask, q_mask):
     Ws = Dense(256, use_bias=False)
     We = Dense(256, use_bias=False)
 
@@ -218,7 +218,7 @@ def BiLinearSimilarity():
 
     dot = Dot(axes=2, normalize=True)
 
-    def __bilinearterm(p_rnn: Any, q_rnn: Any, w_type: str):
+    def __bilinearterm(p_rnn: Any, q_rnn: Any, w_type: str, p_mask):
         # p_rnn:  (None, 50, 256)
         # q_rnn:  (None, 1, 256)
 
@@ -232,6 +232,13 @@ def BiLinearSimilarity():
         # print("[SIM] out_W: ", out_W.shape)
         # print()
         exp_input = dot([p_rnn, out_W])  ### --> (_, 50, 1)
+        p_mask = tf.convert_to_tensor(p_mask, dtype="float32")
+        print()
+        print("p_mask ", p_mask.shape)
+        print("exp_input ", exp_input.shape)
+        print()
+        exp_input_masked = exp_input * p_mask
+        # exp_out = exponential(exp_input)  ### --> (_, 50, 1)
         exp_out = exponential(exp_input)  ### --> (_, 50, 1)
         # print("exp_out: ", exp_out.shape)
         # print()
@@ -243,9 +250,9 @@ def BiLinearSimilarity():
         p_rnn, q_rnn = passage_and_question[0], passage_and_question[1]
         out = []
 
-        out_start = __bilinearterm(p_rnn, q_rnn, "start")
+        out_start = __bilinearterm(p_rnn, q_rnn, "start", p_mask)
         out.append(out_start)
-        out_end = __bilinearterm(p_rnn, q_rnn, "end")
+        out_end = __bilinearterm(p_rnn, q_rnn, "end", p_mask)
         out.append(out_end)
 
         out = tf.concat(out, axis=2)

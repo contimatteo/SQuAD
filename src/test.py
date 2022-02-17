@@ -33,10 +33,10 @@ N_ROWS_SUBSET = None  #  `None` for all rows :)
 
 
 def __predict():
-    X, _, _, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    X, _, p_mask, q_mask = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
 
-    model = DRQA(glove_matrix)
+    model = DRQA(glove_matrix, p_mask, q_mask)
 
     ### load weights
     nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)

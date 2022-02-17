@@ -36,7 +36,7 @@ def _compile(model) -> Model:
 
 
 # pylint: disable=invalid-name
-def DRQA(embeddings_initializer: np.ndarray) -> Model:
+def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndarray) -> Model:
     N_Q_TOKENS = Configs.N_QUESTION_TOKENS
     N_P_TOKENS = Configs.N_PASSAGE_TOKENS
     DIM_EXACT_MATCH = Configs.DIM_EXACT_MATCH
@@ -99,7 +99,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
 
         # out_probs = BiLinearSimilarity()([p_rnn, q_encoding])
-        out_probs = BiLinearSimilarity()([p_rnn, q_encoding1])
+        out_probs = BiLinearSimilarity(p_mask, q_mask)([p_rnn, q_encoding1])
 
         # ### last bit
         if Configs.COMPLEMENTAR_BIT:
