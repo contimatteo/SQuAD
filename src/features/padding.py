@@ -75,6 +75,7 @@ def apply_padding_to(
         df_padded['word_index_question'], N_QUESTION_TOKENS, PAD_WORD_ENCODING
     )
     word_tokens_passage = pad(df_padded['word_tokens_passage'], N_PASSAGE_TOKENS, PAD_WORD)
+    word_tokens_passage_with_spaces = pad(df_padded['word_tokens_passage_with_spaces'], N_PASSAGE_TOKENS, PAD_WORD)
     word_tokens_question = pad(df_padded['word_tokens_question'], N_QUESTION_TOKENS, PAD_WORD)
     if "label" in df_padded:
         label = pad(df_padded['label'], N_PASSAGE_TOKENS, LABEL)
@@ -88,6 +89,7 @@ def apply_padding_to(
     term_frequency = pad(df_padded['term_frequency'], N_PASSAGE_TOKENS, TF)
 
     df_padded['word_tokens_passage_padded'] = list(word_tokens_passage)
+    df_padded['word_tokens_passage_padded_with_spaces'] = list(word_tokens_passage_with_spaces)
     df_padded['word_index_passage_padded'] = list(word_index_passage)
     df_padded['word_tokens_question_padded'] = list(word_tokens_question)
     df_padded['word_index_question_padded'] = list(word_index_question)

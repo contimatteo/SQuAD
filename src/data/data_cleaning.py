@@ -110,6 +110,7 @@ def tokenize_with_spaces(sentence):
 
 def add_split_into_words(df):
     df["word_tokens_passage"] = df.apply(lambda x: tokenize_sentence(x["passage"]), axis=1)
+    df["word_tokens_passage_with_spaces"] = df.apply(lambda x: tokenize_with_spaces(x["passage"]), axis=1)
     df["word_tokens_question"] = df.apply(lambda x: tokenize_sentence(x["question"]), axis=1)
     return df
 
@@ -219,5 +220,6 @@ def data_cleaning(df: pd.DataFrame):
         df = add_labels(df).drop(axis=1, columns='answer_start')
 
     df = add_split_into_words(df)
+    # print(df["word_tokens_passage_with_spaces"])
     print("Data cleaned \n")
     return df

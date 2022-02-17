@@ -81,7 +81,7 @@ class DataframeCompression:
             subset=self.key_ques
         )
         self.passage_dict = df[self.key_pass +
-                               ["word_tokens_passage"]].drop_duplicates(subset=self.key_pass)
+                               ["word_tokens_passage_with_spaces"]].drop_duplicates(subset=self.key_pass)
         self.question_dict = df[self.key_ques +
                                 ["word_tokens_question"]].drop_duplicates(subset=self.key_ques)
         if "label_padded" in df:

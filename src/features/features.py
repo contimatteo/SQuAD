@@ -9,7 +9,7 @@ from .word_to_index import WordToIndex
 
 def drop_useless_columns(df: pd.DataFrame):
     useless_columns = [
-        "word_index_passage",
+        "word_index_passage", "word_tokens_passage",
         "word_index_question", "pos", "pos_onehot", "ner", "ner_onehot", "exact_match",
         "term_frequency"
     ]

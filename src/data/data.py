@@ -80,7 +80,7 @@ def __data_to_list(df: pd.DataFrame):
     label = df["label_padded"] if "label_padded" in df else None
 
     # evaluation_id_x = id_x
-    evaluation_passage = df["word_tokens_passage"]
+    evaluation_passage = df["word_tokens_passage_with_spaces"]
     evaluation_question = df["word_tokens_question"]
 
     return id_x, passage, question, pos, ner, tf, exact_match, label, id_x, evaluation_passage, evaluation_question
