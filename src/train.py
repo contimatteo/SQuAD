@@ -44,7 +44,7 @@ def __callbacks() -> list:
             monitor='loss',
             patience=5,
             mode='min',
-            min_delta=1e-3,
+            min_delta=1e-4,
             restore_best_weights=True,
         )
     )
@@ -168,7 +168,8 @@ def train():
 if __name__ == "__main__":
     # load_data(json_path="./data/raw/train.v3.json")
     load_data(json_path="./data/raw/train.v7.json")
-    # load_data()
+    # json_path = get_argv()
+    # load_data(json_path=json_path)
 
     print("After preprocessing")
     memory_usage()

@@ -76,14 +76,15 @@ def __data_to_list(df: pd.DataFrame):
     passage = df["word_index_passage_padded"]
     question = df["word_index_question_padded"]
     exact_match = df["exact_match_padded"]
-    id_x = df["id"]
+    question_id = df["id"]
+    passage_id = df["passage_index"]
     label = df["label_padded"] if "label_padded" in df else None
 
-    # evaluation_id_x = id_x
+    # evaluation_id_x = question_id
     evaluation_passage = df["word_tokens_passage_with_spaces"]
     evaluation_question = df["word_tokens_question"]
 
-    return id_x, passage, question, pos, ner, tf, exact_match, label, id_x, evaluation_passage, evaluation_question
+    return question_id, passage, question, pos, ner, tf, exact_match, label, question_id, evaluation_passage, evaluation_question, passage_id
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
@@ -180,7 +181,7 @@ def get_data(ret: str):
     assert isinstance(ret, str)
 
     if ret == "original":
-        return [df_np[8], df_np[9], df_np[10]]
+        return [df_np[8], df_np[9], df_np[10], df_np[11]]
     elif ret == "labels":
         return [df_np[7]]
     elif ret == "features":

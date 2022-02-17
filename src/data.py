@@ -16,7 +16,8 @@ def load():
 
 def data():
     memory_usage()
-    load_data(json_path="./data/raw/train.v7.json")
+    json_path = get_argv()
+    load_data(json_path=json_path)
     memory_usage()
     print("\n---------------\n")
     data_data = get_data("features")
@@ -38,9 +39,9 @@ def data():
 
     print("\n---------------\n")
     data_data = get_data("original")
-    eval_index, eval_passage, question_passage = data_data
+    eval_index, eval_passage, question_passage, pass_index = data_data
     print(
-        f"\nEVALUATION_INDEX\n{eval_index[0:1]}\nEVALUATION_PASSAGE\n{eval_passage[0:1]}\nEVALUATION_QUESTION\n{question_passage[0:1]}"
+        f"\nEVALUATION_INDEX\n{eval_index[0:1]}\nEVALUATION_PASSAGE\n{eval_passage[0:1]}\nEVALUATION_QUESTION\n{question_passage[0:1]}\nPASSAGE_INDEX\n{pass_index[0:1]}"
     )
 
     print("\n---------------\n")
