@@ -164,12 +164,19 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 # answ_char_end_index = len(" ".join(answ_span_to_end))
                 # ### extract answer from chars indexes
                 # answer = passage[answ_char_start_index:answ_char_end_index]
+
+                unicode_answer_list = [x for x in passage_tokens[answ_token_start_index:answer_token_end_index + 1] if not x.isascii()]
+
                 answer = " ".join(
                     passage_tokens[answ_token_start_index:answer_token_end_index + 1]
                 ).strip()
 
                 answer = answer.replace(" ' ", "'")
+                answer = answer.replace(" - ", "-")
                 # answer = str(answer).strip()
+
+                for unicode in unicode_answer_list:
+                    answer = answer.replace(" "+unicode, ""+unicode).replace(unicode+" ", unicode+"")
 
             # if qid in answers_tokens_indexes_map:
             #     answers_for_question_map[qid] = answer

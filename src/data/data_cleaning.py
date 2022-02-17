@@ -39,8 +39,8 @@ def delete_cache_data_cleaning():
 
 def tokenizers():
     # r'[\d.,]+|[A-Z][.A-Z]+\b\.*|\w+|\S'
-    tokenizer1 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S')  # |[A-Z][.A-Z]+\b\.*|
-    tokenizer2 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S|.')
+    tokenizer1 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S')  # |[A-Z][.A-Z]+\b\.*|
+    tokenizer2 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S|.')
     return tokenizer1, tokenizer2
 
 

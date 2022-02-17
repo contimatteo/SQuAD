@@ -71,7 +71,10 @@ def get_tokens(s):
 
 
 def compute_exact(a_gold, a_pred):
-    return int(normalize_answer(a_gold) == normalize_answer(a_pred))
+    ret =  int(normalize_answer(a_gold) == normalize_answer(a_pred))
+    if not ret == 1:
+        print(a_gold, "   ",a_pred)
+    return ret
 
 
 def compute_f1(a_gold, a_pred):
