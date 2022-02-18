@@ -144,7 +144,7 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
         p_match = __X_feature_examples_subset(p_match, n_examples_subset)
 
     p_tokens = __X_feature_tokens_subset(p_tokens, Configs.N_PASSAGE_TOKENS)
-    q_tokens = __X_feature_tokens_subset(q_tokens, Configs.N_PASSAGE_TOKENS)
+    q_tokens = __X_feature_tokens_subset(q_tokens, Configs.N_QUESTION_TOKENS)
     p_pos = __X_feature_tokens_subset(p_pos, Configs.N_PASSAGE_TOKENS)
     p_ner = __X_feature_tokens_subset(p_ner, Configs.N_PASSAGE_TOKENS)
     p_tf = __X_feature_tokens_subset(p_tf, Configs.N_PASSAGE_TOKENS)
