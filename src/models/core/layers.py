@@ -65,8 +65,8 @@ def DrqaRnn() -> Callable[[Any], Any]:
 
     def _nn(x: Any) -> Any:
         x = rnn1(x)
-        x = rnn2(x)
-        x = rnn3(x)
+        # x = rnn2(x)
+        # x = rnn3(x)
         return x
 
     return _nn
