@@ -61,9 +61,8 @@ def DrqaRnn() -> Callable[[Any], Any]:
         return RNN(cell, return_sequences=True)
 
     rnn1 = Bidirectional(_lstm(), merge_mode="concat")
-
-    # rnn2 = Bidirectional(_lstm(), merge_mode="concat")
-    # rnn3 = Bidirectional(_lstm(), merge_mode="concat")
+    rnn2 = Bidirectional(_lstm(), merge_mode="concat")
+    rnn3 = Bidirectional(_lstm(), merge_mode="concat")
 
     def _nn(x: Any) -> Any:
         x = rnn1(x)
