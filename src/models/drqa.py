@@ -59,7 +59,7 @@ def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndar
         q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
         # q_embeddings = Dropout(.3)(q_embeddings)
 
-        ### lstm
+        ### lstm #
         q_rnn = DrqaRnn()(q_embeddings)
 
         ### self-attention (simplfied version)
