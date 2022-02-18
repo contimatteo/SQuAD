@@ -1,5 +1,6 @@
 import numpy as np
 
+from tensorflow import expand_dims
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Concatenate, Dropout, Add
 from tensorflow.keras.optimizers import Adam, Optimizer
@@ -36,7 +37,7 @@ def _compile(model) -> Model:
 
 
 # pylint: disable=invalid-name
-def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndarray) -> Model:
+def DRQA(embeddings_initializer: np.ndarray) -> Model:
     N_Q_TOKENS = Configs.N_QUESTION_TOKENS
     N_P_TOKENS = Configs.N_PASSAGE_TOKENS
     DIM_EXACT_MATCH = Configs.DIM_EXACT_MATCH
@@ -46,6 +47,8 @@ def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndar
 
     def _build() -> Model:
         q_tokens = Input(shape=(N_Q_TOKENS, ))
+        q_mask = Input(shape=(N_Q_TOKENS, ))
+        p_mask = Input(shape=(N_P_TOKENS, ))
         p_tokens = Input(shape=(N_P_TOKENS, ))
 
         p_match = Input(shape=(N_P_TOKENS, DIM_EXACT_MATCH))
@@ -55,17 +58,22 @@ def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndar
 
         ### QUESTION ##############################################################
 
+        q_mask_expanded = expand_dims(q_mask, axis=2)
+        # print("q_mask_expanded: ", q_mask_expanded.shape)
         ### embeddings
         q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
         # q_embeddings = Dropout(.3)(q_embeddings)
 
         ### lstm #
+
         q_rnn = DrqaRnn()(q_embeddings)
+        # print("q_rnn: ", q_rnn.shape)
+        q_rnn_masked = q_mask_expanded * q_rnn
 
         ### self-attention (simplfied version)
         # q_encoding = WeightedSumSelfAttention()(q_rnn)
         # q_encoding1 = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
-        q_encoding1 = WeightedSumCustom(N_Q_TOKENS)(q_rnn)
+        q_encoding1 = WeightedSumCustom(N_Q_TOKENS)(q_rnn_masked)
 
         # print()
         # print("q_rnn: ", q_rnn.shape)
@@ -76,16 +84,21 @@ def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndar
 
         ### PASSAGE ###############################################################
 
+        p_mask_expanded = expand_dims(p_mask, axis=2)
+        # print("p_mask_expanded: ", p_mask_expanded.shape)
+
         ### embeddings
         p_embeddings = GloveEmbeddings(N_P_TOKENS, embeddings_initializer)(p_tokens)
         # p_embeddings = Dropout(.3)(p_embeddings)
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
+        # print("p_attention: ", p_attention.shape)
+        p_attention_masked = p_mask_expanded * p_attention
 
         ### lstm
         p_rnn = DrqaRnn()(
-            Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])
+            Concatenate(axis=2)([p_attention_masked, p_embeddings, p_match, p_pos, p_ner, p_tf])
         )
 
         # print()
@@ -99,7 +112,7 @@ def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndar
         # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
 
         # out_probs = BiLinearSimilarity()([p_rnn, q_encoding])
-        out_probs = BiLinearSimilarity(p_mask, q_mask)([p_rnn, q_encoding1])
+        out_probs = BiLinearSimilarity()([p_rnn, p_mask_expanded, q_encoding1])
 
         # ### last bit
         if Configs.COMPLEMENTAR_BIT:
@@ -107,7 +120,11 @@ def DRQA(embeddings_initializer: np.ndarray, p_mask: np.ndarray, q_mask: np.ndar
 
         # ###
 
-        return Model([q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf], out_probs, name="DRQA")
+        return Model(
+            [q_tokens, q_mask, p_mask, p_tokens, p_match, p_pos, p_ner, p_tf],
+            out_probs,
+            name="DRQA"
+        )
 
     #
 

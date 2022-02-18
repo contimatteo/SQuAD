@@ -33,10 +33,10 @@ N_ROWS_SUBSET = None  #  `None` for all rows :)
 
 
 def __predict():
-    X, _, p_mask, q_mask = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
 
-    model = DRQA(glove_matrix, p_mask, q_mask)
+    model = DRQA(glove_matrix)
 
     ### load weights
     nn_checkpoint_directory = LocalStorage.nn_checkpoint_url(model.name)
@@ -50,7 +50,7 @@ def __predict():
 
 def __compute_answers_tokens_indexes(Y: np.ndarray,
                                      complementar_bit=False) -> Dict[str, np.ndarray]:
-    _, question_indexes, _, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     question_indexes_unique = list(np.unique(question_indexes))
 
     answers_tokens_probs_map = {}
@@ -165,20 +165,19 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 # ### extract answer from chars indexes
                 # answer = passage[answ_char_start_index:answ_char_end_index]
 
-                unicode_answer_list = [x for x in passage_tokens[answ_token_start_index:answer_token_end_index + 1] if not x.isascii()]
+                unicode_answer_list = [
+                    x for x in passage_tokens[answ_token_start_index:answer_token_end_index + 1]
+                    if not x.isascii()
+                ]
 
-                answer = "".join(
-                    passage_tokens[answ_token_start_index:answer_token_end_index + 1]
-                ).strip()
+                answer = "".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1]
+                                 ).strip()
 
                 # answer = answer.replace(" ' ", "'")
                 # answer = answer.replace(" - ", "-")
 
-
                 # for unicode in unicode_answer_list:
                 #     answer = answer.replace(" "+unicode, ""+unicode).replace(unicode+" ", unicode+"")
-
-
 
             # if qid in answers_tokens_indexes_map:
             #     answers_for_question_map[qid] = answer

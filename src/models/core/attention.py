@@ -209,12 +209,9 @@ class BiLinearSimilarityAttention(tf.keras.Model):
 
 
 # pylint: disable=invalid-name
-def BiLinearSimilarity(p_mask, q_mask):
+def BiLinearSimilarity():
     Ws = Dense(256, use_bias=False)
     We = Dense(256, use_bias=False)
-
-    # EXPs = Dense(1, activation="exponential", use_bias=False)
-    # EXPe = Dense(1, activation="exponential", use_bias=False)
 
     dot = Dot(axes=2, normalize=True)
 
@@ -223,31 +220,20 @@ def BiLinearSimilarity(p_mask, q_mask):
         # q_rnn:  (None, 1, 256)
 
         W = Ws if w_type == "start" else We
-        # EXP = EXPs if w_type == "start" else EXPe
-
         out_W = W(q_rnn)  ### --> (_, 256)
-        # out_W = tf.expand_dims(out_W, axis=1)  ### --> (_, 1, 256)
-        # print()
-        # print("[SIM] p_rnn: ", p_rnn.shape)
-        # print("[SIM] out_W: ", out_W.shape)
-        # print()
+
         exp_input = dot([p_rnn, out_W])  ### --> (_, 50, 1)
-        p_mask = tf.convert_to_tensor(p_mask, dtype="float32")
-        # print()
-        # print("p_mask ", p_mask.shape)
-        # print("exp_input ", exp_input.shape)
-        # print()
-        # exp_input_masked = exp_input * p_mask
+        exp_input_masked = exp_input * p_mask
+
         # exp_out = exponential(exp_input)  ### --> (_, 50, 1)
-        exp_out = exponential(exp_input)  ### --> (_, 50, 1)
-        # print("exp_out: ", exp_out.shape)
-        # print()
-        # print()
+
+        exp_out = exponential(exp_input_masked)  ### --> (_, 50, 1)
 
         return exp_out
 
     def _nn(passage_and_question: List[Any]) -> Any:
-        p_rnn, q_rnn = passage_and_question[0], passage_and_question[1]
+        p_rnn, p_mask, q_rnn = passage_and_question[0], passage_and_question[
+            1], passage_and_question[2]
         out = []
 
         out_start = __bilinearterm(p_rnn, q_rnn, "start", p_mask)
@@ -256,12 +242,7 @@ def BiLinearSimilarity(p_mask, q_mask):
         out.append(out_end)
 
         out = tf.concat(out, axis=2)
-        # print()
-        # print()
-        # print("out: ", out.shape)
-        # print()
-        # print()
-        # raise Exception("stop")
+
         return out
 
     return _nn

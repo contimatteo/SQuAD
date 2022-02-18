@@ -106,7 +106,7 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
 
 
 def train():
-    X, _, p_mask, q_mask = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
 
     if not Configs.COMPLEMENTAR_BIT:
@@ -119,7 +119,7 @@ def train():
     print("After deleted data")
     memory_usage()
 
-    model = DRQA(glove_matrix, p_mask, q_mask)
+    model = DRQA(glove_matrix)
 
     _ = __fit(model, X, Y, True, True)
 
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # load_data(json_path=json_path)
 
     print("After preprocessing")
-    memory_usage() 
+    memory_usage()
 
     # kfold_train()
 
