@@ -128,7 +128,7 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     #
 
     assert p_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
-    assert q_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert q_tokens.shape[1] <= Configs.N_QUESTION_TOKENS
     assert p_pos.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_ner.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_tf.shape[1] <= Configs.N_PASSAGE_TOKENS
