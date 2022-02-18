@@ -42,7 +42,7 @@ def __callbacks() -> list:
     callbacks.append(
         EarlyStopping(
             monitor='loss',
-            patience=5,
+            patience=10,
             mode='min',
             min_delta=1e-4,
             restore_best_weights=True,
