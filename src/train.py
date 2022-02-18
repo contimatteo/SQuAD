@@ -6,7 +6,7 @@ import numpy as np
 
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.backend import clear_session
-from wandb.keras import WandbCallback
+# from wandb.keras import WandbCallback
 
 import utils.env_setup
 import utils.configs as Configs
