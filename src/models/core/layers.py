@@ -56,7 +56,8 @@ def DrqaRnn() -> Callable[[Any], Any]:
     initializer = 'glorot_uniform'
 
     def _lstm() -> RNN:
-        cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
+        # cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
+        cell = LSTMCell(units, recurrent_initializer=initializer)
         return RNN(cell, return_sequences=True)
 
     rnn1 = Bidirectional(_lstm(), merge_mode="concat")

@@ -33,7 +33,6 @@ def split_in_chunks(row, columns, step):
 
 def split_passage(df):
     df_clone = df.copy()
-    # print(df.columns)
     passage_features = [
         "word_tokens_passage", "word_index_passage", "pos", "pos_onehot", "ner", "ner_onehot",
         "term_frequency", "exact_match", "mask_passage"
@@ -79,10 +78,6 @@ def apply_padding_to(
     df_padded = split_passage(df)
     df_padded["question_index"] = df_padded.index  # df_padded["id"]
     df_padded["chunk_index"] = df_padded.groupby("question_index").cumcount()
-    # print("after split:")
-    # print(df_padded.index)
-
-    # print(df.dtypes)
 
     word_index_passage = pad(df_padded['word_index_passage'], N_PASSAGE_TOKENS, PAD_WORD_ENCODING)
     word_index_question = pad(

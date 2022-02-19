@@ -148,7 +148,6 @@ def get_answer_start_end(passage, answer_text, answer_start):
     # ]
     interval = []
     if answer_end + 1 < len(passage):
-        # print(passage[answer_start:answer_end + 2])
         if passage[answer_end + 1] == ' ':
             answer_end += 1
     app_dict = {}
@@ -156,10 +155,6 @@ def get_answer_start_end(passage, answer_text, answer_start):
         if e >= answer_start and s <= answer_end:  # (e == answer_end or e == answer_end - 1):
             interval.append(i)
             app_dict[i] = (s, e)
-            # print()
-            # print(passage[s:e + 1])
-            # print("answer_end - e: ", (answer_end - e))
-            # print()
 
     if len(interval) < 1:
         # raise Exception(interval + " is empty.")
@@ -180,16 +175,9 @@ def get_answer_start_end(passage, answer_text, answer_start):
     #     token_start_index = credi.index((1, 1))
     #     token_end_index = token_start_index
     #
-    # print()
-    # print("MY OUTPUT")
-    #
     # s = app_dict[token_start_index]
     # e = app_dict[token_end_index]
     #
-    # print(token_start_index)
-    # print(token_end_index)
-    # print(passage[s[0]:e[1] + 1])
-    # print()
 
     return get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
 
@@ -222,6 +210,5 @@ def data_cleaning(df: pd.DataFrame):
         df = add_labels(df).drop(axis=1, columns='answer_start')
 
     df = add_split_into_words(df)
-    # print(df["word_tokens_passage_with_spaces"])
     print("Data cleaned \n")
     return df

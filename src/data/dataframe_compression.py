@@ -156,7 +156,6 @@ class DataframeCompression:
         df.set_index(self.key_all, inplace=True, drop=False)
         # df.drop(self.key_pass, inplace=True, axis=1)
         print("Finished Building")
-        # print(pd.DataFrame.from_dict(self.passage_dict, columns=["passage_index", "question_index", "chunk_index"]))
         return df
 
     # def extract(self, WTI: WordToIndex):
@@ -180,7 +179,6 @@ class DataframeCompression:
     #     df.set_index(self.key_all, inplace=True, drop=False)
     #     df.drop(self.key_pass, inplace=True, axis=1)
     #     print("Finished Building")
-    #     # print(pd.DataFrame.from_dict(self.passage_dict, columns=["passage_index", "question_index", "chunk_index"]))
     #     return df
 
     @staticmethod
