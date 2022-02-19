@@ -18,12 +18,12 @@ def drop_useless_columns(df: pd.DataFrame):
     return df
 
 
-def add_features(df: pd.DataFrame, WTI: WordToIndex):
+def add_features(df: pd.DataFrame, wti: WordToIndex):
     print("Applying POS Tagging, name entity recognition(NER), term frequency(TF), lemmatization")
-    df, OHE_pos, OHE_ner = extract_features(df)
+    df, ohe_pos, ohe_ner = extract_features(df)
     print("Applied POS Tagging, name entity recognition(NER), term frequency(TF), lemmatization")
     print("Applying Padding")
-    df = apply_padding_to(df, WTI, OHE_pos, OHE_ner)
+    df = apply_padding_to(df, wti, ohe_pos, ohe_ner)
     df = drop_useless_columns(df)
     print("Applied Padding")
-    return df, OHE_pos, OHE_ner
+    return df, ohe_pos, ohe_ner

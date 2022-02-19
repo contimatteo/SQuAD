@@ -1,8 +1,10 @@
-from typing import Tuple
+from typing import Tuple, List
 from typing import List
 from random import randint
 
 import numpy as np
+from numpy import ndarray
+
 import utils.configs as Configs
 
 from utils.preprocessing import pd_series_to_numpy
@@ -96,8 +98,7 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> np.ndarray:
     return Y_onehot_with_additional_case
 
 
-def X_data_from_dataset(X_data,
-                        n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray, np.ndarray]:
+def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[List[ndarray], ndarray]:
     assert X_data is not None
     assert isinstance(X_data, list)
     assert len(X_data) == 9

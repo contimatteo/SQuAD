@@ -62,16 +62,16 @@ def inject_OOV_embeddings(df: pd.DataFrame, dictionary):
 
 def glove_embedding(glove_embeddings, glove_dim):
     PAD_WORD = WordToIndex.PAD_WORD
-    WTI = WordToIndex()
-    WTI.fit_on_list(glove_embeddings.keys())
+    wti = WordToIndex()
+    wti.fit_on_list(glove_embeddings.keys())
 
-    TOKENIZER_MAX_WORD_INDEX = WTI.get_index_len(
+    TOKENIZER_MAX_WORD_INDEX = wti.get_index_len(
     )  # np.array(list(tokenizer.word_index.values())).max()
     embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, glove_dim))
 
     for token in glove_embeddings.keys():
-        word_index = WTI.get_word_index(token)
+        word_index = wti.get_word_index(token)
         embeddings_matrix[word_index] = glove_embeddings[token]
 
     embeddings_matrix[0] = glove_embeddings[PAD_WORD]
-    return embeddings_matrix, WTI
+    return embeddings_matrix, wti

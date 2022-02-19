@@ -10,7 +10,7 @@ from features.word_to_index import WordToIndex
 
 class DataframeCompression:
 
-    def __init__(self, OHE_pos: dict = None, OHE_ner: dict = None):
+    def __init__(self, ohe_pos: dict = None, ohe_ner: dict = None):
         self.index_df = pd.DataFrame()
         self.passage_index_dict = pd.DataFrame()
         self.question_index_dict = pd.DataFrame()
@@ -28,9 +28,7 @@ class DataframeCompression:
         self.key_all = ["passage_index", "question_index", "chunk_index"]
         self.key_pass = ["passage_index", "chunk_index"]
         self.key_ques = ["question_index", "chunk_index"]
-        self.OHE = {"OHE_pos": OHE_pos, "OHE_ner": OHE_ner}
-        # self.OHE_pos = [OHE_pos]
-        # self.OHE_ner = [OHE_ner]
+        self.ohe = {"ohe_pos": ohe_pos, "ohe_ner": ohe_ner}
 
     def from_pickle(self, d: dict):
         self.index_df = d["index_df"]
@@ -49,9 +47,7 @@ class DataframeCompression:
         self.key_all = d["key_all"]
         self.key_pass = d["key_pass"]
         self.key_ques = d["key_ques"]
-        self.OHE = d["OHE"]
-        # self.OHE_pos = d["OHE_pos"]
-        # self.OHE_ner = d["OHE_ner"]
+        self.ohe = d["ohe"]
 
     def to_pickle(self):
         return {
@@ -71,9 +67,7 @@ class DataframeCompression:
             "key_all": self.key_all,
             "key_pass": self.key_pass,
             "key_ques": self.key_ques,
-            "OHE": self.OHE
-            # "OHE_pos": self.OHE_pos,
-            # "OHE_ner": self.OHE_ner,
+            "ohe": self.ohe
         }
 
     def compress(self, df):
@@ -114,16 +108,12 @@ class DataframeCompression:
             subset=self.key_ques
         )
 
-        # OHE_pos = OneHotEncoder(self.OHE["OHE_pos"])
-        # OHE_pos.reset_cache()
-        # OHE_ner = OneHotEncoder(self.OHE["OHE_ner"])
-        # OHE_ner.reset_cache()
-        self.OHE["OHE_pos"]["cache_categorical_dict"] = {}
-        self.OHE["OHE_pos"]["cache_one_hot_dict"] = {}
-        self.OHE["OHE_ner"]["cache_categorical_dict"] = {}
-        self.OHE["OHE_ner"]["cache_one_hot_dict"] = {}
+        self.ohe["ohe_pos"]["cache_categorical_dict"] = {}
+        self.ohe["ohe_pos"]["cache_one_hot_dict"] = {}
+        self.ohe["ohe_ner"]["cache_categorical_dict"] = {}
+        self.ohe["ohe_ner"]["cache_one_hot_dict"] = {}
 
-    def extract(self, WTI: WordToIndex):
+    def extract(self):
         df = self.index_df
         print("Rebuilding ID")
         df = pd.merge(df, self.id_dict, on=self.key_ques, how="inner")
@@ -158,7 +148,7 @@ class DataframeCompression:
         print("Finished Building")
         return df
 
-    # def extract(self, WTI: WordToIndex):
+    # def extract(self, wti: WordToIndex):
     #     df = self.index_df
     #     print("Rebuilding Columns WTI passage")
     #     df = self.add_column(df, self.key_pass, "word_index_passage_padded", self.passage_dict)
@@ -189,12 +179,12 @@ class DataframeCompression:
 
     def add_pos_ner_onehot(self, df):
         df["pos_onehot_padded"] = df.apply(
-            lambda x: OneHotEncoder(self.OHE["OHE_pos"]).
+            lambda x: OneHotEncoder(self.ohe["ohe_pos"]).
             transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]),
             axis=1
         )
         df["ner_onehot_padded"] = df.apply(
-            lambda x: OneHotEncoder(self.OHE["OHE_ner"]).
+            lambda x: OneHotEncoder(self.ohe["ohe_ner"]).
             transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]),
             axis=1
         )

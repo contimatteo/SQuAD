@@ -7,7 +7,7 @@ import utils.configs as Configs
 from features.features import add_features
 from utils.data_storage import save_processed_data, load_processed_data
 from utils.data_storage import save_glove_matrix, load_glove_matrix
-from utils.data_storage import save_WTI, load_WTI, create_tmp_directories
+from utils.data_storage import save_wti, load_wti, create_tmp_directories
 from utils.memory import reduce_mem_usage
 
 from .data_preprocessing import data_preprocessing
@@ -111,14 +111,14 @@ def load_data(debug=False, json_path=None):
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
 
-    wti = load_WTI(glove_dim)
+    wti = load_wti(glove_dim)
     print("[WTI] prepared.")
 
     # conf = load_config_data()
     file_name = "drive_dataset.pkl"
     if json_path is not None:
         file_name = os.path.basename(json_path).replace(".json", ".pkl")
-    df = load_processed_data(wti, glove_dim, file_name=file_name)
+    df = load_processed_data(glove_dim, file_name=file_name)
     # if debug is False and conf.get_argv_json_complete_name() is None:
     #     df = load_processed_data(wti, glove_dim)
     # elif not conf.argv_changed(json_path, debug):
@@ -132,7 +132,7 @@ def load_data(debug=False, json_path=None):
         glove = glove_reader(glove_dim)
         glove_matrix, wti = glove_embedding(glove, glove_dim)
         save_glove_matrix(glove_matrix, glove_dim)
-        save_WTI(wti, glove_dim)
+        save_wti(wti, glove_dim)
 
     if df is None:
         df = data_reader(json_path)

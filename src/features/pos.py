@@ -36,12 +36,12 @@ def apply_pos_one_hot(df: pd.DataFrame):
         'IN', 'FW', 'RP', 'JJR', 'JJS', 'PDT', 'MD', 'VB', 'WRB', 'NNP', 'EX', 'NNS', 'SYM', 'CC',
         'CD', 'POS', '#'
     ]
-    OHE = OneHotEncoder()
-    OHE.fit(pos_list)
+    ohe = OneHotEncoder()
+    ohe.fit(pos_list)
     df["pos_categorical"] = df.apply(
-        lambda x: np.uint8(OHE.transform_categorical(x["pos"], x["passage_index"])), axis=1
+        lambda x: np.uint8(ohe.transform_categorical(x["pos"], x["passage_index"])), axis=1
     )
     df["pos_onehot"] = df.apply(
-        lambda x: OHE.transform_one_hot(x["pos_categorical"], x["passage_index"]), axis=1
+        lambda x: ohe.transform_one_hot(x["pos_categorical"], x["passage_index"]), axis=1
     )
-    return df, OHE
+    return df, ohe

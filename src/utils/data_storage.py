@@ -39,12 +39,12 @@ def clean_all_data_cache():
 
 
 def save_processed_data(
-    df: pd.DataFrame, OHE_pos: OneHotEncoder, OHE_ner: OneHotEncoder, glove_dim: str, file_name: str
+    df: pd.DataFrame, ohe_pos: OneHotEncoder, ohe_ner: OneHotEncoder, glove_dim: str, file_name: str
 ):
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
-    df_c = DataframeCompression(OHE_pos.get_OHE_dicts(), OHE_ner.get_OHE_dicts())
+    df_c = DataframeCompression(ohe_pos.get_ohe_dicts(), ohe_ner.get_ohe_dicts())
     df_c.compress(df)
     df_c = df_c.to_pickle()
     with open(file, "wb") as handle:
@@ -52,7 +52,7 @@ def save_processed_data(
         pickle.dump(df_c, handle)
 
 
-def load_processed_data(WTI, glove_dim, file_name: str):
+def load_processed_data(glove_dim, file_name: str):
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
@@ -61,7 +61,7 @@ def load_processed_data(WTI, glove_dim, file_name: str):
     with open(file, "rb") as handle:
         df_c = DataframeCompression()
         df_c.from_pickle(pickle.load(handle))
-        return df_c.extract(WTI)
+        return df_c.extract()
 
 
 def save_pickle(obj, file_name: str, folder: str):
@@ -109,11 +109,11 @@ def load_glove_matrix(glove_dim):
     return load_pickle(name, get_processed_data_dir())
 
 
-def save_WTI(WTI, glove_dim):
+def save_wti(wti, glove_dim):
     name = add_glove_dim_to_name(WORD_TO_INDEX_FILE_NAME, glove_dim)
-    save_pickle(WTI, name, get_processed_data_dir())
+    save_pickle(wti, name, get_processed_data_dir())
 
 
-def load_WTI(glove_dim):
+def load_wti(glove_dim):
     name = add_glove_dim_to_name(WORD_TO_INDEX_FILE_NAME, glove_dim)
     return load_pickle(name, get_processed_data_dir())
