@@ -70,8 +70,8 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
         epochs=nn_epochs,
         batch_size=nn_batch,
         callbacks=nn_callbacks,
-        steps_per_epoch=generator.steps_per_epoch,
-        max_queue_size=1
+        steps_per_epoch=generator.steps_per_epoch
+        # max_queue_size=1
     )
 
     ### save weights

@@ -61,11 +61,7 @@ class Generator:
     def __batches_grouped_by_passage(self):
         X, Y = Generator.generate_batches_grouped_by_passage(self.X, self.Y, self.passage_indexes)
 
-        passage_batch_idx = 0
-
-        print()
-        print("variable batch index = ", passage_batch_idx)
-        print()
+        passage_batch_idx = -1
 
         while True:
             if passage_batch_idx >= len(X):
