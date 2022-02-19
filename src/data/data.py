@@ -2,13 +2,13 @@ import os.path
 
 import pandas as pd
 
+import utils.configs as Configs
+
 from features.features import add_features
 from utils.data_storage import save_processed_data, load_processed_data
 from utils.data_storage import save_glove_matrix, load_glove_matrix
 from utils.data_storage import save_WTI, load_WTI, create_tmp_directories
 from utils.memory import reduce_mem_usage
-
-import utils.configs as Configs
 
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
@@ -187,7 +187,10 @@ def get_data(ret: str):
     elif ret == "labels":
         return [df_np[7]]
     elif ret == "features":
-        return [df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6], df_np[12], df_np[13]]
+        return [
+            df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6], df_np[12],
+            df_np[13]
+        ]
     elif ret == "glove":
         return glove_matrix
 

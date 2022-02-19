@@ -108,9 +108,6 @@ def __fit(model, X, Y, save_weights: bool, preload_weights: bool) -> Any:
 def train():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-
-    if not Configs.COMPLEMENTAR_BIT:
-        Y = Y[:, :Configs.N_PASSAGE_TOKENS, :]
     glove_matrix = get_data("glove")
 
     print("After numpy")
@@ -166,14 +163,13 @@ def train():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v3.json")
-    load_data(json_path="./data/raw/train.v7.json")
-    # json_path = get_argv()
-    # load_data(json_path=json_path)
+    json_file_url = get_argv()
+    assert isinstance(json_file_url, str)
+    assert len(json_file_url) > 5
+    assert ".json" in json_file_url
+    load_data(json_path=json_file_url)
 
     print("After preprocessing")
     memory_usage()
-
-    # kfold_train()
 
     train()

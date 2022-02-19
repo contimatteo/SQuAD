@@ -1,6 +1,6 @@
 from .configs import NN_BATCH_SIZE
-# X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
-# Y = Y
+
+###
 
 
 class Generator:
@@ -42,8 +42,8 @@ class Generator:
 
             X_list = []
 
-            for i in range(6):
-                X_list.append(self.X[i][steps:NN_BATCH_SIZE + steps])
+            for feature in self.X:
+                X_list.append(feature[steps:NN_BATCH_SIZE + steps])
 
             yield X_list, self.Y[steps:NN_BATCH_SIZE + steps]
 

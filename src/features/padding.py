@@ -4,19 +4,20 @@ import pandas as pd
 from nltk import pos_tag
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
+from utils.configs import N_QUESTION_TOKENS, N_PASSAGE_TOKENS
+
 from .word_to_index import WordToIndex
 from .one_hot_encoder import OneHotEncoder
-from utils.configs import N_QUESTION_TOKENS, N_PASSAGE_TOKENS
 
 ###
 
 
 def apply_mask(df: pd.DataFrame):
     df["mask_passage"] = df.apply(
-        lambda x: list(np.ones((len(x["word_tokens_passage"]),), dtype=int)), axis=1
+        lambda x: list(np.ones((len(x["word_tokens_passage"]), ), dtype=int)), axis=1
     )
     df["mask_question"] = df.apply(
-        lambda x: list(np.ones((len(x["word_tokens_question"]),), dtype=int)), axis=1
+        lambda x: list(np.ones((len(x["word_tokens_question"]), ), dtype=int)), axis=1
     )
     return df
 
@@ -88,7 +89,9 @@ def apply_padding_to(
         df_padded['word_index_question'], N_QUESTION_TOKENS, PAD_WORD_ENCODING
     )
     word_tokens_passage = pad(df_padded['word_tokens_passage'], N_PASSAGE_TOKENS, PAD_WORD)
-    word_tokens_passage_with_spaces = pad(df_padded['word_tokens_passage_with_spaces'], N_PASSAGE_TOKENS, PAD_WORD)
+    word_tokens_passage_with_spaces = pad(
+        df_padded['word_tokens_passage_with_spaces'], N_PASSAGE_TOKENS, PAD_WORD
+    )
     word_tokens_question = pad(df_padded['word_tokens_question'], N_QUESTION_TOKENS, PAD_WORD)
     if "label" in df_padded:
         label = pad(df_padded['label'], N_PASSAGE_TOKENS, LABEL)

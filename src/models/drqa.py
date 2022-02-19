@@ -58,16 +58,13 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### QUESTION ##############################################################
 
-        q_mask_expanded = expand_dims(q_mask, axis=2)
-        # print("q_mask_expanded: ", q_mask_expanded.shape)
         ### embeddings
         q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
-        # q_embeddings = Dropout(.3)(q_embeddings)
 
         ### lstm #
-
         q_rnn = DrqaRnn()(q_embeddings)
-        # print("q_rnn: ", q_rnn.shape)
+
+        q_mask_expanded = expand_dims(q_mask, axis=2)
         q_rnn_masked = q_mask_expanded * q_rnn
 
         ### self-attention (simplfied version)
@@ -75,25 +72,15 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         # q_encoding1 = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
         q_encoding1 = WeightedSumCustom(N_Q_TOKENS)(q_rnn_masked)
 
-        # print()
-        # print("q_rnn: ", q_rnn.shape)
-        # print("q_encoding: ", q_encoding.shape)
-        # print("q_encoding1: ", q_encoding1.shape)
-        # print()
-        # print()
-
         ### PASSAGE ###############################################################
-
-        p_mask_expanded = expand_dims(p_mask, axis=2)
-        # print("p_mask_expanded: ", p_mask_expanded.shape)
 
         ### embeddings
         p_embeddings = GloveEmbeddings(N_P_TOKENS, embeddings_initializer)(p_tokens)
-        # p_embeddings = Dropout(.3)(p_embeddings)
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
-        # print("p_attention: ", p_attention.shape)
+
+        p_mask_expanded = expand_dims(p_mask, axis=2)
         p_attention_masked = p_mask_expanded * p_attention
 
         ### lstm
@@ -101,22 +88,14 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
             Concatenate(axis=2)([p_attention_masked, p_embeddings, p_match, p_pos, p_ner, p_tf])
         )
 
-        # print()
-        # print("p_rnn: ", p_rnn.shape)
-        # print()
-        # print()
-        # raise Exception("stop")
         ### OUTPUT ################################################################
 
         # ### similarity
         # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
-
-        # out_probs = BiLinearSimilarity()([p_rnn, q_encoding])
         out_probs = BiLinearSimilarity()([p_rnn, p_mask_expanded, q_encoding1])
 
-        # ### last bit
-        if Configs.COMPLEMENTAR_BIT:
-            out_probs = EnhancedProbabilities()(out_probs)
+        ### last bit
+        out_probs = EnhancedProbabilities()(out_probs)
 
         # ###
 

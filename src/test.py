@@ -48,8 +48,7 @@ def __predict():
     return Y_pred
 
 
-def __compute_answers_tokens_indexes(Y: np.ndarray,
-                                     complementar_bit=False) -> Dict[str, np.ndarray]:
+def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
     _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     question_indexes_unique = list(np.unique(question_indexes))
 
@@ -65,39 +64,13 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
     assert len(answers_tokens_probs_map.keys()) == len(question_indexes_unique)
 
-    # test_qid = "5733bf84d058e614000b61c1"
-    # whole_passage_answer_place = np.vstack(tuple(answers_tokens_probs_map[test_qid].tolist()))
-
-    # print()
-    # print()
-    # print(whole_passage_answer_place)
-    # print()
-
-    # start_index = -1
-    # end_index = -1
-    # try:
-    #     start_index = np.where(np.all(whole_passage_answer_place == np.array([1, 0]),
-    #                                   axis=1))[0].tolist()[0]
-    #     end_index = np.where(np.all(whole_passage_answer_place == np.array([0, 1]),
-    #                                 axis=1))[0].tolist()[0]
-    # except:
-    #     start_index = np.where(np.all(whole_passage_answer_place == np.array([1, 1]),
-    #                                   axis=1))[0].tolist()[0]
-    #     end_index = start_index
-
-    # print()
-    # print(start_index)
-    # print(end_index)
-    # print()
-
     #
 
-    __weight_answer_probs = lambda answer: answer[0:1]
-
-    if complementar_bit:
-        __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
-
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
+
+    ### weights the additional bit probability.
+    # __weight_answer_probs = lambda answer: answer[0:-1]
+    __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     with alive_bar(len(list(answers_tokens_probs_map.items()))) as progress_bar:
         for (q_index, answers) in answers_tokens_probs_map.items():
@@ -113,12 +86,6 @@ def __compute_answers_tokens_indexes(Y: np.ndarray,
 
             progress_bar()
 
-    #
-    # print()
-    # print("NEW STEP")
-    # print(answers_tokens_indexes_map[test_qid])
-    # print()
-    # raise Exception("stop")
     return answers_tokens_indexes_map
 
 
@@ -205,7 +172,7 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 def test():
     Y_pred = __predict()
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred, complementar_bit=True)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
@@ -218,11 +185,9 @@ def test():
 
     ### TODO: remove the following code ...
     Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    if not Configs.COMPLEMENTAR_BIT:
-        Y_true = Y_true[:, :Configs.N_PASSAGE_TOKENS, :]
 
     ### TODO: remove the following code ...
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true, complementar_bit=True)
+    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.true")
 
@@ -230,9 +195,11 @@ def test():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v3.json")
-
-    load_data(json_path="./data/raw/train.v7.json")
+    json_file_url = get_argv()
+    assert isinstance(json_file_url, str)
+    assert len(json_file_url) > 5
+    assert ".json" in json_file_url
+    load_data(json_path=json_file_url)
 
     # load_data()
 

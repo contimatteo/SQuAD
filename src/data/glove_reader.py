@@ -1,8 +1,9 @@
 import os
+from copy import copy
+
 import pandas as pd
 import numpy as np
 
-from copy import copy
 from features.word_to_index import WordToIndex
 
 from utils.data import copy_data, download_data, get_data_dir, get_tmp_data_dir
@@ -74,4 +75,3 @@ def glove_embedding(glove_embeddings, glove_dim):
 
     embeddings_matrix[0] = glove_embeddings[PAD_WORD]
     return embeddings_matrix, WTI
-
