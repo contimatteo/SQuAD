@@ -63,6 +63,10 @@ class Generator:
 
         passage_batch_idx = 0
 
+        print()
+        print("variable batch index = ", passage_batch_idx)
+        print()
+
         while True:
             if passage_batch_idx >= len(X):
                 passage_batch_idx = 0
