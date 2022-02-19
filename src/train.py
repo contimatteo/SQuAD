@@ -36,7 +36,7 @@ def __callbacks() -> list:
     callbacks.append(
         EarlyStopping(
             monitor='loss',
-            patience=5,
+            patience=10,
             mode='min',
             min_delta=1e-4,
             restore_best_weights=True,
@@ -87,14 +87,9 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
 
 def train():
     glove_matrix = get_data("glove")
-
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-
     _, _, _, passages_indexes = QP_data_from_dataset(get_data("original"))
-
-    if not Configs.COMPLEMENTAR_BIT:
-        Y = Y[:, :Configs.N_PASSAGE_TOKENS, :]
 
     print("After numpy")
     memory_usage()
@@ -115,9 +110,11 @@ def train():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v7.json")
-    # load_data(json_path="./data/raw/train.v1.json")
-    load_data(json_path=get_argv())
+    json_file_url = get_argv()
+    assert isinstance(json_file_url, str)
+    assert len(json_file_url) > 5
+    assert ".json" in json_file_url
+    load_data(json_path=json_file_url)
 
     print("After preprocessing")
     memory_usage()

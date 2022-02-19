@@ -1,4 +1,5 @@
 import pandas as pd
+
 from features.word_to_index import WordToIndex
 
 from .data_cleaning import data_cleaning
@@ -19,5 +20,4 @@ def apply_word_index(df: pd.DataFrame, wti: WordToIndex):
 def data_preprocessing(df: pd.DataFrame, wti):
     df = data_cleaning(df)
     df = apply_word_index(df, wti)
-    # print("data_preprocessing ended")
     return df

@@ -10,10 +10,6 @@ APP_DEBUG: bool = True
 
 WANDB_DISABLED = "WANDB_DISABLED" not in os.environ or os.environ["WANDB_DISABLED"] == "true"
 
-CUDA_ENABLED = "CUDA_VISIBLE_DEVICES" in os.environ and os.environ["CUDA_VISIBLE_DEVICES"] != "-1"
-
-COMPLEMENTAR_BIT = True
-
 ###################
 ##  NN FEATURES  ##
 

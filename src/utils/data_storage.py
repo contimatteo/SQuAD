@@ -1,18 +1,21 @@
 import os
-# import pickle5 as pickle
 import pickle
 import pandas as pd
 
+from data.config import Configuration
 from data.dataframe_compression import DataframeCompression
 from features.one_hot_encoder import OneHotEncoder
-from data.config import Configuration
 from utils.data import add_glove_dim_to_name, get_processed_data_dir, get_data_dir, get_tmp_data_dir
+
+###
 
 EVALUATION_DATA_FILE_NAME = "evaluation_data.pkl"
 # FINAL_DATA_FILE_NAME = "data.pkl"
 GLOVE_MATRIX_FILE_NAME = "glove_matrix.pkl"
 WORD_TO_INDEX_FILE_NAME = "word_to_index.pkl"
 CONFIG_FILE_NAME = "configuration.pkl"
+
+###
 
 
 def create_tmp_directories():

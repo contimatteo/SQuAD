@@ -78,11 +78,10 @@ class Generator:
                 steps = 0
 
             X_list = []
-            for i in range(6):
-                X_list.append(self.X[i][steps:NN_BATCH_SIZE + steps])
+            for feature in self.X:
+                X_list.append(feature[steps:NN_BATCH_SIZE + steps])
 
             yield X_list, self.Y[steps:NN_BATCH_SIZE + steps]
-
             steps = steps + NN_BATCH_SIZE
 
     #
@@ -95,17 +94,3 @@ class Generator:
             return self.__batches_grouped_by_passage()
 
         return None
-
-    #
-
-    # def generate(self):
-    #     steps = NN_BATCH_SIZE
-    #     while True:
-    #         if steps > self.nrows:
-    #             steps = NN_BATCH_SIZE
-    #         X_list = []
-    #         for i in range(6):
-    #             X_list.append(self.X[i][steps - NN_BATCH_SIZE:steps])
-    #         yield X_list, self.Y[steps - NN_BATCH_SIZE:steps]
-    #         steps = steps + NN_BATCH_SIZE
-    #         gc.collect()

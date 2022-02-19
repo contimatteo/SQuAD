@@ -1,4 +1,5 @@
 import pandas as pd
+
 from .exact_match import apply_exact_match
 from .lemmatize import apply_lemmatize
 from .name_entity_recognition import apply_ner, apply_ner_one_hot
@@ -28,6 +29,5 @@ def extract_features(df: pd.DataFrame):
     print("Applying EXACT MATCH")
     df = apply_exact_match(df)
     df = drop_useless_columns(df)
-    # print(ppl)
-    return df, OHE_pos, OHE_ner
 
+    return df, OHE_pos, OHE_ner

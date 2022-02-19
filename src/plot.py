@@ -9,7 +9,6 @@ from visualization import plot_drqa_model
 ###
 
 glove_matrix = np.zeros((1, Configs.DIM_EMBEDDING))
-
 ###
 
 if __name__ == "__main__":

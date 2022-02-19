@@ -1,9 +1,9 @@
 from typing import Tuple
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
 
-from copy import deepcopy
 from nltk.tokenize import RegexpTokenizer
 
 from utils.data import nltk_download_utilities
@@ -110,7 +110,9 @@ def tokenize_with_spaces(sentence):
 
 def add_split_into_words(df):
     df["word_tokens_passage"] = df.apply(lambda x: tokenize_sentence(x["passage"]), axis=1)
-    df["word_tokens_passage_with_spaces"] = df.apply(lambda x: tokenize_with_spaces(x["passage"]), axis=1)
+    df["word_tokens_passage_with_spaces"] = df.apply(
+        lambda x: tokenize_with_spaces(x["passage"]), axis=1
+    )
     df["word_tokens_question"] = df.apply(lambda x: tokenize_sentence(x["question"]), axis=1)
     return df
 
@@ -147,7 +149,7 @@ def get_answer_start_end(passage, answer_text, answer_start):
     interval = []
     if answer_end + 1 < len(passage):
         # print(passage[answer_start:answer_end + 2])
-        if passage[answer_end+1] == ' ':
+        if passage[answer_end + 1] == ' ':
             answer_end += 1
     app_dict = {}
     for i, (s, e) in enumerate(span_tokenize_dict[passage]):
