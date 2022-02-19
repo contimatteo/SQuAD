@@ -3,6 +3,7 @@ from typing import Callable, Any
 import numpy as np
 import tensorflow as tf
 
+from tensorflow import expand_dims
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.initializers import Constant
 from tensorflow.keras.layers import Dense, Embedding
@@ -70,6 +71,13 @@ def DrqaRnn() -> Callable[[Any], Any]:
         # x = rnn3(x)
         return x
 
+    return _nn
+
+
+def Mask_layer():
+    def _nn(rnn: Any, mask: Any) -> Any:
+        mask_expanded = expand_dims(mask, axis=2)
+        return mask_expanded * rnn
     return _nn
 
 

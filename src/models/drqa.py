@@ -1,6 +1,5 @@
 import numpy as np
 
-from tensorflow import expand_dims
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Input, Concatenate, Dropout, Add
 from tensorflow.keras.optimizers import Adam, Optimizer
@@ -9,7 +8,7 @@ import utils.configs as Configs
 
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSumCustom, WeightedSumSelfAttention
 from models.core import AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
-from models.core import drqa_crossentropy_loss, drqa_accuracy
+from models.core import drqa_crossentropy_loss, drqa_accuracy, Mask_layer
 from utils import learning_rate
 
 ###
@@ -61,14 +60,12 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### lstm #
         q_rnn = DrqaRnn()(q_embeddings)
-
-        q_mask_expanded = expand_dims(q_mask, axis=2)
-        q_rnn_masked = q_mask_expanded * q_rnn
+        q_rnn_masked = Mask_layer()(q_rnn, q_mask)
 
         ### self-attention (simplfied version)
         # q_encoding = WeightedSumSelfAttention()(q_rnn)
-        # q_encoding1 = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
-        q_encoding1 = WeightedSumCustom(N_Q_TOKENS)(q_rnn_masked)
+        # q_encoding = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
+        q_encoding = WeightedSumCustom(N_Q_TOKENS)(q_rnn_masked)
 
         ### PASSAGE ###############################################################
 
@@ -77,9 +74,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
-
-        p_mask_expanded = expand_dims(p_mask, axis=2)
-        p_attention_masked = p_mask_expanded * p_attention
+        p_attention_masked = Mask_layer()(p_attention, p_mask)
 
         ### lstm
         p_rnn = DrqaRnn()(
@@ -90,7 +85,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         # ### similarity
         # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
-        out_probs = BiLinearSimilarity()([p_rnn, p_mask_expanded, q_encoding1])
+        out_probs = BiLinearSimilarity()([p_rnn, p_mask, q_encoding])
 
         ### last bit
         out_probs = EnhancedProbabilities()(out_probs)

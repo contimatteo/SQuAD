@@ -1,7 +1,7 @@
 ###
 
 from .layers import GloveEmbeddings
-from .layers import DrqaRnn
+from .layers import DrqaRnn, Mask_layer
 from .layers import EnhancedProbabilities
 from .layers import WeightedSum, WeightedSumCustom
 
