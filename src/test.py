@@ -3,17 +3,14 @@ from typing import Any, Tuple, List, Dict
 
 import os
 import json
-from xmlrpc.client import boolean
 import numpy as np
-import tensorflow as tf
 
 from alive_progress import alive_bar
 from tensorflow.keras.backend import set_learning_phase
 
 import utils.env_setup
-import utils.configs as Configs
 
-from data import get_data, load_data
+from data import get_data, load_data, delete_data
 from models import DRQA
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
@@ -35,6 +32,8 @@ N_ROWS_SUBSET = None  #  `None` for all rows :)
 def __predict():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
+
+    delete_data()
 
     model = DRQA(glove_matrix)
 
@@ -122,32 +121,9 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 if answer_token_end_index < answ_token_start_index:
                     answer_token_end_index = answ_token_start_index
 
-                # answ_span_pre_start = passage_tokens[0:answ_token_start_index]
-                # answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
-                # ### INFO: we have always to consider the ENTIRE end token.
-                # answ_span_to_end += [str(passage_tokens[answer_token_end_index])]
-                # ### compute the chars range indexes
-                # answ_char_start_index = len(" ".join(answ_span_pre_start))
-                # answ_char_end_index = len(" ".join(answ_span_to_end))
-                # ### extract answer from chars indexes
-                # answer = passage[answ_char_start_index:answ_char_end_index]
-
-                unicode_answer_list = [
-                    x for x in passage_tokens[answ_token_start_index:answer_token_end_index + 1]
-                    if not x.isascii()
-                ]
-
                 answer = "".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1]
                                  ).strip()
 
-                # answer = answer.replace(" ' ", "'")
-                # answer = answer.replace(" - ", "-")
-
-                # for unicode in unicode_answer_list:
-                #     answer = answer.replace(" "+unicode, ""+unicode).replace(unicode+" ", unicode+"")
-
-            # if qid in answers_tokens_indexes_map:
-            #     answers_for_question_map[qid] = answer
             answers_for_question_map[qid] = answer
 
             progress_bar()
@@ -176,6 +152,10 @@ def test():
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
+    Y_pred = None
+    answers_tokens_indexes = None
+    answers_for_question = None
+
     print()
     print("The generated answers (json with predictions) file is available at:")
     print(str(LocalStorage.answers_predictions_url("training.pred")))
@@ -183,13 +163,13 @@ def test():
 
     #
 
-    ### TODO: remove the following code ...
-    Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-
-    ### TODO: remove the following code ...
-    answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
-    answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    __store_answers_predictions(answers_for_question, "training.true")
+    # ### TODO: remove the following code ...
+    # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    #
+    # ### TODO: remove the following code ...
+    # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
+    # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
+    # __store_answers_predictions(answers_for_question, "training.true")
 
 
 ###
@@ -200,7 +180,5 @@ if __name__ == "__main__":
     assert len(json_file_url) > 5
     assert ".json" in json_file_url
     load_data(json_path=json_file_url)
-
-    # load_data()
 
     test()
