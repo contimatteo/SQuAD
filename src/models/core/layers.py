@@ -75,9 +75,11 @@ def DrqaRnn() -> Callable[[Any], Any]:
 
 
 def Mask_layer():
-    def _nn(rnn: Any, mask: Any) -> Any:
+
+    def _nn(tensor: Any, mask: Any) -> Any:
         mask_expanded = expand_dims(mask, axis=2)
-        return mask_expanded * rnn
+        return mask_expanded * tensor
+
     return _nn
 
 

@@ -110,11 +110,11 @@ def train():
 ###
 
 if __name__ == "__main__":
-    json_file_url = get_argv()
-    assert isinstance(json_file_url, str)
-    assert len(json_file_url) > 5
-    assert ".json" in json_file_url
-    load_data(json_path=json_file_url)
+    # json_file_url = get_argv()
+    # assert isinstance(json_file_url, str)
+    # assert len(json_file_url) > 5
+    # assert ".json" in json_file_url
+    load_data(json_path="data/raw/train.v3.json")
 
     print("After preprocessing")
     memory_usage()
