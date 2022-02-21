@@ -60,12 +60,12 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### lstm #
         q_rnn = DrqaRnn()(q_embeddings)
-        q_rnn_masked = Mask_layer()(q_rnn, q_mask)
+        q_rnn = Mask_layer()(q_rnn, q_mask)
 
         ### self-attention (simplfied version)
         # q_encoding = WeightedSumSelfAttention()(q_rnn)
         # q_encoding = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
-        q_encoding = WeightedSumCustom(N_Q_TOKENS)(q_rnn_masked)
+        q_encoding = WeightedSumCustom(N_Q_TOKENS)(q_rnn)
 
         ### PASSAGE ###############################################################
 
@@ -74,11 +74,11 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
-        p_attention_masked = Mask_layer()(p_attention, p_mask)
+        p_attention = Mask_layer()(p_attention, p_mask)
 
         ### lstm
         p_rnn = DrqaRnn()(
-            Concatenate(axis=2)([p_attention_masked, p_embeddings, p_match, p_pos, p_ner, p_tf])
+            Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])
         )
 
         ### OUTPUT ################################################################
@@ -89,6 +89,8 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### last bit
         out_probs = EnhancedProbabilities()(out_probs)
+
+        out_probs = Mask()(out_probs, p_mask)
 
         # ###
 
