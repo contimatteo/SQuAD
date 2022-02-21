@@ -74,7 +74,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
-        p_attention = Mask_layer()(p_attention, p_mask)
+        # p_attention = Mask_layer()(p_attention, p_mask)
 
         ### lstm
         p_rnn = DrqaRnn()(
@@ -90,7 +90,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### last bit
         out_probs = EnhancedProbabilities()(out_probs)
 
-        out_probs = Mask()(out_probs, p_mask)
+        # out_probs = Mask_layer()(out_probs, p_mask)
 
         # ###
 
