@@ -224,7 +224,7 @@ def BiLinearSimilarity():
         W = Ws if w_type == "start" else We
         out_W = W(q_rnn)  ### --> (_, 256)
 
-        exp_input = dot([p_rnn_masked, out_W])  ### --> (_, 50, 1)
+        exp_input = dot([p_rnn, out_W])  ### --> (_, 50, 1)
 
         exp_out = exponential(exp_input)  ### --> (_, 50, 1)
 
