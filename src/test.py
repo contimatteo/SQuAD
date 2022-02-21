@@ -33,8 +33,6 @@ def __predict():
     X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
     glove_matrix = get_data("glove")
 
-    delete_data()
-
     model = DRQA(glove_matrix)
 
     ### load weights
@@ -152,6 +150,7 @@ def test():
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
+    delete_data()
     Y_pred = None
     answers_tokens_indexes = None
     answers_for_question = None
