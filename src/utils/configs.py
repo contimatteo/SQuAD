@@ -14,7 +14,7 @@ WANDB_DISABLED = "WANDB_DISABLED" not in os.environ or os.environ["WANDB_DISABLE
 ##  NN FEATURES  ##
 
 N_QUESTION_TOKENS: int = 30
-N_PASSAGE_TOKENS: int = 250
+N_PASSAGE_TOKENS: int = 15
 
 N_NER_CLASSES: int = 13
 N_POS_CLASSES: int = 46
