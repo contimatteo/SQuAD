@@ -3,6 +3,7 @@ from typing import Callable, Any, List
 import tensorflow as tf
 
 from tensorflow import expand_dims
+from models.core.layers import Mask_layer
 from tensorflow.keras.layers import Dot, Dense
 from tensorflow.keras.activations import softmax, exponential
 
@@ -224,9 +225,6 @@ def BiLinearSimilarity():
         out_W = W(q_rnn)  ### --> (_, 256)
 
         exp_input = dot([p_rnn, out_W])  ### --> (_, 50, 1)
-        # exp_input_masked = exp_input * expand_dims(p_mask, axis=2)
-
-        # exp_out = exponential(exp_input)  ### --> (_, 50, 1)
 
         exp_out = exponential(exp_input)  ### --> (_, 50, 1)
 
