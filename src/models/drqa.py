@@ -60,7 +60,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
 
         ### lstm #
         q_rnn = DrqaRnn()(q_embeddings)
-        q_rnn = Mask_layer()(q_rnn, q_mask)
+        # q_rnn = Mask_layer()(q_rnn, q_mask)
 
         ### self-attention (simplfied version)
         # q_encoding = WeightedSumSelfAttention()(q_rnn)
@@ -87,10 +87,10 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
         out_probs = BiLinearSimilarity()([p_rnn, p_mask, q_encoding])
 
+        # out_probs = Mask_layer()(out_probs, p_mask)
+
         ### last bit
         out_probs = EnhancedProbabilities()(out_probs)
-
-        # out_probs = Mask_layer()(out_probs, p_mask)
 
         # ###
 
