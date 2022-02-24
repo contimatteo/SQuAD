@@ -2,10 +2,8 @@
 from typing import Any
 
 import os
-import numpy as np
 
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.backend import clear_session
 # from wandb.keras import WandbCallback
 
 import utils.env_setup
