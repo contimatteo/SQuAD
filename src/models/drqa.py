@@ -9,7 +9,7 @@ import utils.configs as Configs
 from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSumCustom, WeightedSumSelfAttention
 from models.core import AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
 from models.core import drqa_crossentropy_loss, drqa_accuracy, Mask_layer
-from utils import learning_rate
+# from utils import learning_rate
 
 ###
 
@@ -21,8 +21,9 @@ METRICS = [drqa_accuracy]
 
 
 def _optimizer() -> Optimizer:
-    lr = learning_rate("static")
-    return Adam(learning_rate=lr, clipnorm=1)
+    # lr = learning_rate("static")
+    # return Adam(learning_rate=lr, clipnorm=1)
+    return Adam(clipnorm=1)
 
 
 def _compile(model) -> Model:

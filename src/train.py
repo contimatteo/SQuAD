@@ -18,6 +18,7 @@ from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
 from utils.generator import Generator
 from utils.memory_usage import memory_usage
 from utils.data import get_argv
+from utils.optimizer import learning_rate
 
 ###
 
@@ -42,6 +43,8 @@ def __callbacks() -> list:
             restore_best_weights=True,
         )
     )
+
+    callbacks.append(learning_rate(Configs.NN_LEARNING_RATE_TYPE))
 
     # if not Configs.WANDB_DISABLED:
     #     callbacks.append(WandbCallback())
