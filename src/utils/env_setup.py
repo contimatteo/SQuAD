@@ -1,6 +1,8 @@
 # pylint: disable=wrong-import-order,wrong-import-position
 from dotenv import load_dotenv
 
+import utils.configs as Configs
+
 load_dotenv()
 
 ###
@@ -31,6 +33,10 @@ import tensorflow as tf
 
 ### use 'eager' execution
 tf.config.run_functions_eagerly(True)
+
+import numpy as np
+
+np.random.seed(Configs.ENV_SEED)
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 # gpus = tf.config.list_physical_devices('GPU')
