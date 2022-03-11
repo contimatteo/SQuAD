@@ -31,14 +31,8 @@ def get_term_freq_normalized(token_list: List[str], passage_index: int):
     return ter_freq_dict[passage_index]
 
 
-# WC = WordCounting()
-
-
-def apply_term_frequency(df: pd.DataFrame, is_training=True):
-    # if is_training:
-    # WC.count_words(df)
+def apply_term_frequency(df: pd.DataFrame):
     df["term_frequency"] = df.apply(
         lambda x: get_term_freq_normalized(x["word_tokens_passage"], x["passage_index"]), axis=1
     )
-    # df["term_frequency"] = df.apply(lambda x: WC.get_term_freq_normalized(x["word_tokens_passage"]), axis=1)
     return df

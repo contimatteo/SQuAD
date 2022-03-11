@@ -10,7 +10,6 @@ from utils.data import add_glove_dim_to_name, get_processed_data_dir, get_data_d
 ###
 
 EVALUATION_DATA_FILE_NAME = "evaluation_data.pkl"
-# FINAL_DATA_FILE_NAME = "data.pkl"
 GLOVE_MATRIX_FILE_NAME = "glove_matrix.pkl"
 WORD_TO_INDEX_FILE_NAME = "word_to_index.pkl"
 CONFIG_FILE_NAME = "configuration.pkl"
@@ -48,7 +47,6 @@ def save_processed_data(
     df_c.compress(df)
     df_c = df_c.to_pickle()
     with open(file, "wb") as handle:
-        # pickle.dump(df_c, handle, protocol=pickle.DEFAULT_PROTOCOL)
         pickle.dump(df_c, handle)
 
 

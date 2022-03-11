@@ -8,6 +8,8 @@ load_dotenv()
 
 APP_DEBUG: bool = True
 
+ENV_SEED = 5
+
 WANDB_DISABLED = "WANDB_DISABLED" not in os.environ or os.environ["WANDB_DISABLED"] == "true"
 
 ###################
@@ -30,8 +32,3 @@ NN_EPOCHS = 1
 NN_BATCH_SIZE = 1536
 NN_LEARNING_RATE = 5e-3
 NN_LEARNING_RATE_TYPE = "static"
-
-N_KFOLD_BUCKETS = 5
-
-ENV_SEED = 5
-

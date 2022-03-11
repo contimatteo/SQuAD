@@ -19,13 +19,17 @@ def extract_features(df: pd.DataFrame):
     print("Applying POS")
     df = apply_pos_tag(df)
     df, ohe_pos = apply_pos_one_hot(df)
+
     print("Applying NER")
     df = apply_ner(df)
     df, ohe_ner = apply_ner_one_hot(df)
+
     print("Applying TF")
     df = apply_term_frequency(df)
+
     print("Applying LEMMATIZATION")
     df = apply_lemmatize(df)
+
     print("Applying EXACT MATCH")
     df = apply_exact_match(df)
     df = drop_useless_columns(df)

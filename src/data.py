@@ -1,10 +1,11 @@
+import gc
 import pandas as pd
-from data.data import get_data, load_data
+
+from data.data import get_data, load_data, delete_data
 from utils.memory_usage import memory_usage
 from utils.data import get_argv
+
 ###
-from data.data import delete_data
-import gc
 
 
 def load():

@@ -37,15 +37,19 @@ def apply_ner_one_hot(df: pd.DataFrame):
     ner_entities = ["FACILITY", "GPE", "GSP", "LOCATION", "ORGANIZATION", "PERSON"]
     ner_prefix = ["B-", "I-"]
     ner_list = ner_special
+
     for ent in ner_entities:
         for pref in ner_prefix:
             ner_list.append(pref + ent)
+
     ohe = OneHotEncoder()
     ohe.fit(ner_list)
+
     df["ner_categorical"] = df.apply(
         lambda x: ohe.transform_categorical(x["ner"], x["passage_index"]), axis=1
     )
     df["ner_onehot"] = df.apply(
         lambda x: ohe.transform_one_hot(x["ner_categorical"], x["passage_index"]), axis=1
     )
+
     return df, ohe

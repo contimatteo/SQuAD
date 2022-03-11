@@ -18,8 +18,8 @@ import utils.configs as Configs
 def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any], Any]:
     assert isinstance(input_length, int)
 
-    i_dim = initializer.shape[0]  # size of the vocabulary
-    o_dim = Configs.DIM_EMBEDDING  # dimension of the 'dense' embedding
+    i_dim = initializer.shape[0]  ### size of the vocabulary
+    o_dim = Configs.DIM_EMBEDDING  ### dimension of the 'dense' embedding
 
     with tf.device('/cpu:0'):
         return Embedding(
@@ -58,10 +58,10 @@ def DrqaRnn() -> Callable[[Any], Any]:
 
     def _lstm() -> RNN:
         cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
-        # cell = LSTMCell(units, recurrent_initializer=initializer)
         return RNN(cell, return_sequences=True)
 
     rnn1 = Bidirectional(_lstm(), merge_mode="concat")
+
     # rnn2 = Bidirectional(_lstm(), merge_mode="concat")
     # rnn3 = Bidirectional(_lstm(), merge_mode="concat")
 
@@ -75,9 +75,11 @@ def DrqaRnn() -> Callable[[Any], Any]:
 
 
 def Mask_layer():
+
     def _nn(rnn: Any, mask: Any) -> Any:
         mask_expanded = expand_dims(mask, axis=2)
         return mask_expanded * rnn
+
     return _nn
 
 

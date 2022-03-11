@@ -26,10 +26,12 @@ def download_glove(glove_dim: int):
 
 def load_glove(glove_local_file):
     glove_embeddings = {}
+
     print("Loading Glove Model")
     with open(glove_local_file, encoding="utf8") as f:
         lines = f.readlines()
     print("Loaded Glove Model")
+
     print("Parsing Glove Model")
     for line in lines:
         splits = line.split()
@@ -65,8 +67,7 @@ def glove_embedding(glove_embeddings, glove_dim):
     wti = WordToIndex()
     wti.fit_on_list(glove_embeddings.keys())
 
-    TOKENIZER_MAX_WORD_INDEX = wti.get_index_len(
-    )  # np.array(list(tokenizer.word_index.values())).max()
+    TOKENIZER_MAX_WORD_INDEX = wti.get_index_len()
     embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, glove_dim))
 
     for token in glove_embeddings.keys():

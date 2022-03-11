@@ -1,4 +1,4 @@
-# pylint: disable=unused-import
+# pylint: disable=unused-import,pylint(not-callable)
 from typing import Any, Tuple, List, Dict
 
 import os
@@ -13,7 +13,7 @@ import utils.env_setup
 from data import get_data, load_data, delete_data
 from models import DRQA
 from utils import LocalStorageManager
-from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
+from utils import X_data_from_dataset, QP_data_from_dataset  # , Y_data_from_dataset
 from utils.data import get_argv
 
 ###
@@ -24,13 +24,11 @@ set_learning_phase(0)
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = None  #  `None` for all rows :)
-
 ###
 
 
 def __predict():
-    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    X, _ = X_data_from_dataset(get_data("features"))
     glove_matrix = get_data("glove")
 
     model = DRQA(glove_matrix)
@@ -46,7 +44,7 @@ def __predict():
 
 
 def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
-    _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    _, question_indexes = X_data_from_dataset(get_data("features"))
     question_indexes_unique = list(np.unique(question_indexes))
 
     answers_tokens_probs_map = {}
@@ -66,7 +64,6 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
 
     ### weights the additional bit probability.
-    # __weight_answer_probs = lambda answer: answer[0:-1]
     __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     with alive_bar(len(list(answers_tokens_probs_map.items()))) as progress_bar:
@@ -90,7 +87,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     answers_for_question_map = {}
 
-    qids, _, passages, pids = QP_data_from_dataset(get_data("original"))
+    qids, _, passages, _ = QP_data_from_dataset(get_data("original"))
     qids_unique = list(np.unique(qids))
 
     passage_by_question_map = {}
@@ -162,10 +159,7 @@ def test():
 
     #
 
-    # ### TODO: remove the following code ...
     # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    #
-    # ### TODO: remove the following code ...
     # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     # __store_answers_predictions(answers_for_question, "training.true")
@@ -174,10 +168,10 @@ def test():
 ###
 
 if __name__ == "__main__":
-    json_file_url = get_argv()
-    assert isinstance(json_file_url, str)
-    assert len(json_file_url) > 5
-    assert ".json" in json_file_url
-    load_data(json_path=json_file_url)
+    file_url = get_argv()
+    assert isinstance(file_url, str)
+    assert len(file_url) > 5
+    assert ".json" in file_url
+    load_data(json_path=file_url)
 
     test()

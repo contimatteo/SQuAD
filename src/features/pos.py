@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+
 from nltk import pos_tag
 
 from .one_hot_encoder import OneHotEncoder
@@ -19,6 +20,7 @@ def delete_cache_pos():
 def pos_tag_cache(words: str, passage_index: int):
     if passage_index not in pos_tag_dict.keys():
         pos_tag_dict[passage_index] = [p[1] for p in pos_tag(words)]
+
     return pos_tag_dict[passage_index]
 
 
@@ -36,12 +38,15 @@ def apply_pos_one_hot(df: pd.DataFrame):
         'IN', 'FW', 'RP', 'JJR', 'JJS', 'PDT', 'MD', 'VB', 'WRB', 'NNP', 'EX', 'NNS', 'SYM', 'CC',
         'CD', 'POS', '#'
     ]
+
     ohe = OneHotEncoder()
     ohe.fit(pos_list)
+
     df["pos_categorical"] = df.apply(
         lambda x: np.uint8(ohe.transform_categorical(x["pos"], x["passage_index"])), axis=1
     )
     df["pos_onehot"] = df.apply(
         lambda x: ohe.transform_one_hot(x["pos_categorical"], x["passage_index"]), axis=1
     )
+
     return df, ohe

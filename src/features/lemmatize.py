@@ -45,6 +45,7 @@ def lemmatize(lemmatizer, tokens, pos_tag, lemmatize_dict, sentence):
 
 def apply_lemmatize(df: pd.DataFrame):
     lemmatizer = WordNetLemmatizer()
+
     df["lemmatized_passage"] = df.apply(
         lambda x: lemmatize(
             lemmatizer, x["word_tokens_passage"], x["pos"], lemmatize_passage_dict, x["passage"]
@@ -57,6 +58,5 @@ def apply_lemmatize(df: pd.DataFrame):
         ),
         axis=1
     )
-    # df["lemmatized_passage"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_passage_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_passage")
-    # df["lemmatized_question"] = df_apply_function_with_dict(df, lemmatize, "lemmatize_question_dict", "passage", lemmatizer=lemmatizer, word_tokens_name="word_tokens_question")
+
     return df

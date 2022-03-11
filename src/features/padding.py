@@ -79,7 +79,9 @@ def apply_padding_to(
     df_padded["question_index"] = df_padded.index  # df_padded["id"]
     df_padded["chunk_index"] = df_padded.groupby("question_index").cumcount()
 
-    word_index_passage = pad(df_padded['word_index_passage'], Configs.N_PASSAGE_TOKENS, PAD_WORD_ENCODING)
+    word_index_passage = pad(
+        df_padded['word_index_passage'], Configs.N_PASSAGE_TOKENS, PAD_WORD_ENCODING
+    )
     word_index_question = pad(
         df_padded['word_index_question'], Configs.N_QUESTION_TOKENS, PAD_WORD_ENCODING
     )
@@ -87,7 +89,9 @@ def apply_padding_to(
     word_tokens_passage_with_spaces = pad(
         df_padded['word_tokens_passage_with_spaces'], Configs.N_PASSAGE_TOKENS, PAD_WORD
     )
-    word_tokens_question = pad(df_padded['word_tokens_question'], Configs.N_QUESTION_TOKENS, PAD_WORD)
+    word_tokens_question = pad(
+        df_padded['word_tokens_question'], Configs.N_QUESTION_TOKENS, PAD_WORD
+    )
     if "label" in df_padded:
         label = pad(df_padded['label'], Configs.N_PASSAGE_TOKENS, LABEL)
     exact_match = pad(df_padded['exact_match'], Configs.N_PASSAGE_TOKENS, EXACT_MATCH)

@@ -41,34 +41,6 @@ def delete_data():
     glove_matrix = None
 
 
-# def __cast_to_numpy_float(arr: np.ndarray) -> np.ndarray:
-#     return arr.astype(np.float)
-#
-# def __data_to_numpy(df: pd.DataFrame):
-#     tf = pd_series_to_numpy(df["term_frequency_padded"])
-#     pos = pd_series_to_numpy(df["pos_onehot_padded"])
-#     ner = pd_series_to_numpy(df["ner_onehot_padded"])
-#     passage = pd_series_to_numpy(df["word_index_passage_padded"])
-#     question = pd_series_to_numpy(df["word_index_question_padded"])
-#     exact_match = pd_series_to_numpy(df["exact_match_padded"])
-#     id_x = pd_series_to_numpy(df["id"])
-#     label = None
-#     if "label_padded" in df:
-#         label = pd_series_to_numpy(df["label_padded"])
-#     evaluation_id_x = id_x
-#     evaluation_passage = pd_series_to_numpy(df["word_tokens_passage"], dtype=object)
-#     evaluation_question = pd_series_to_numpy(df["word_tokens_question"], dtype=object)
-#     tf = __cast_to_numpy_float(tf)
-#     pos = __cast_to_numpy_float(pos)
-#     ner = __cast_to_numpy_float(ner)
-#     passage = __cast_to_numpy_float(passage)
-#     question = __cast_to_numpy_float(question)
-#     exact_match = __cast_to_numpy_float(exact_match)
-#     if "label_padded" in df:
-#         label = __cast_to_numpy_float(label)
-#     return id_x, passage, question, pos, ner, tf, exact_match, label, evaluation_id_x, evaluation_passage, evaluation_question
-
-
 def __data_to_list(df: pd.DataFrame):
     tf = df["term_frequency_padded"]
     pos = df["pos_onehot_padded"]
@@ -82,7 +54,6 @@ def __data_to_list(df: pd.DataFrame):
     mask_p = df["mask_passage_padded"]
     mask_q = df["mask_question_padded"]
 
-    # evaluation_id_x = question_id
     evaluation_passage = df["word_tokens_passage_with_spaces"]
     evaluation_question = df["word_tokens_question"]
 
@@ -114,19 +85,10 @@ def load_data(debug=False, json_path=None):
     wti = load_wti(glove_dim)
     print("[WTI] prepared.")
 
-    # conf = load_config_data()
     file_name = "drive_dataset.pkl"
     if json_path is not None:
         file_name = os.path.basename(json_path).replace(".json", ".pkl")
     df = load_processed_data(glove_dim, file_name=file_name)
-    # if debug is False and conf.get_argv_json_complete_name() is None:
-    #     df = load_processed_data(wti, glove_dim)
-    # elif not conf.argv_changed(json_path, debug):
-    #     df = load_processed_data(wti, glove_dim)
-    # else:
-    # clean_all_data_cache()
-
-    # evaluation_data = load_evaluation_data_df()
 
     if glove_matrix is None or wti is None:
         glove = glove_reader(glove_dim)
@@ -137,11 +99,6 @@ def load_data(debug=False, json_path=None):
     if df is None:
         df = data_reader(json_path)
         print("[Data] downloaded.")
-
-        # if evaluation_data is None:
-        #     print("[DATA BACKUP] saving")
-        #     save_evaluation_data_df(df)
-        #     print("[DATA BACKUP] saved")
 
         if debug:
             df = df[0:100].copy()
@@ -154,19 +111,10 @@ def load_data(debug=False, json_path=None):
         print("[Data] processed.")
 
         __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name)
-        # conf.set_argv_json_complete_name(json_path, debug)
-        # save_config_data(conf)
         print("[Data] exported.")
     else:
         print("[Data] loaded.")
 
-    # conf.set_argv_json_complete_name(json_path, debug)
-    # save_config_data(conf)
-    # evaluation_data = load_evaluation_data_df()
-    # if evaluation_data is None:
-    #     print("[DATA BACKUP] saving")
-    #     evaluation_data = save_evaluation_data_df(data_reader(json_path))
-    #     print("[DATA BACKUP] saved")
     print("Deleting cache")
     delete_cache()
     print("Deleted cache")

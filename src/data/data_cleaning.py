@@ -24,22 +24,8 @@ def delete_cache_data_cleaning():
     passage_index_dict = None
 
 
-# def __regex_separator(text,separator):
-#   # separator =["�"]#["�"]
-#    for sep in separator:
-#       text= text.replace(sep," ")
-#    return text
-#
-# def separate_words(df,separator=["-"]):
-#    columns=["passage","answer","question"]
-#    for col in columns:
-#        df[col] = df.apply(lambda x: __regex_separator(x[col],separator), axis = 1)
-#    return df
-
-
 def tokenizers():
-    # r'[\d.,]+|[A-Z][.A-Z]+\b\.*|\w+|\S'
-    tokenizer1 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S')  # |[A-Z][.A-Z]+\b\.*|
+    tokenizer1 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S')
     tokenizer2 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S|.')
     return tokenizer1, tokenizer2
 
@@ -85,14 +71,6 @@ def tokenize_sentence(sentence):
     return sentence_tokenize_dict[sentence]
 
 
-# def tokenize_sentence(sentence):
-#    t1,_ = tokenizers()
-#    if sentence not in get_dict()["sentence_tokenize_dict"].keys():
-#        get_dict()["sentence_tokenize_dict"][sentence] = t1.tokenize(sentence)
-#
-#    return get_dict()["sentence_tokenize_dict"][sentence]
-
-
 def tokenize_with_spaces(sentence):
     _, t2 = tokenizers()
 
@@ -100,12 +78,6 @@ def tokenize_with_spaces(sentence):
     sentence_tokenized_with_spaces = t2.tokenize(sentence)
     t_grouped = group_tokens(sentence_tokenized, sentence_tokenized_with_spaces)
     return t_grouped
-
-
-# def split_into_words(df):
-#     df["word_tokens_passage"] = df_apply_function_with_dict(df,tokenize_sentence_df,"sentence_tokenize_dict","passage",sentence_name="passage")
-#     df["word_tokens_question"] = df_apply_function_with_dict(df, tokenize_sentence_df,"sentence_tokenize_dict","question",sentence_name="question")
-#    return df
 
 
 def add_split_into_words(df):
@@ -142,42 +114,21 @@ def get_answer_start_end(passage, answer_text, answer_start):
     if passage not in span_tokenize_dict.keys():
         span_tokenize_dict[passage] = span_tokenize(passage)
 
-    # interval = [
-    #     i for i, (s, e) in enumerate(span_tokenize_dict[passage])
-    #     if s >= answer_start and e <= answer_end
-    # ]
     interval = []
     if answer_end + 1 < len(passage):
         if passage[answer_end + 1] == ' ':
             answer_end += 1
+
     app_dict = {}
     for i, (s, e) in enumerate(span_tokenize_dict[passage]):
-        if e >= answer_start and s <= answer_end:  # (e == answer_end or e == answer_end - 1):
+        if e >= answer_start and s <= answer_end:
             interval.append(i)
             app_dict[i] = (s, e)
 
     if len(interval) < 1:
-        # raise Exception(interval + " is empty.")
-        at = [answer_text]  # [str(passage)[96]]
+        at = [answer_text]
         print(at)
         return [-1, -1]
-
-    # credi = get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
-    #
-    #  # (1, 0)(0, 1)
-    # # (1, 1)
-    #
-    # if (1, 0) in credi:
-    #     token_start_index = credi.index((1, 0))
-    #     token_end_index = credi.index((0, 1))
-    #
-    # else:
-    #     token_start_index = credi.index((1, 1))
-    #     token_end_index = token_start_index
-    #
-    # s = app_dict[token_start_index]
-    # e = app_dict[token_end_index]
-    #
 
     return get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
 
@@ -201,9 +152,8 @@ def add_passage_index(df: pd.DataFrame):
 
 
 def data_cleaning(df: pd.DataFrame):
-    # df = separate_words(df)
     nltk_download_utilities()
-    print()
+
     print("Data cleaning")
     df = add_passage_index(df)
     if "answer" in df:
@@ -211,4 +161,5 @@ def data_cleaning(df: pd.DataFrame):
 
     df = add_split_into_words(df)
     print("Data cleaned \n")
+
     return df

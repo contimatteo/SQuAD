@@ -1,8 +1,8 @@
 from typing import Tuple, List
-from typing import List
 from random import randint
 
 import numpy as np
+
 from numpy import ndarray
 
 import utils.configs as Configs
@@ -44,10 +44,6 @@ def Y_train_faker() -> np.ndarray:
         return [num] + _generator(n - 1, k - num)
 
     def _Y_start_end():
-        # Y_start = np.array(_generator(Configs.N_PASSAGE_TOKENS, 100), dtype=np.float)
-        # Y_start /= 100
-        # Y_end = np.array(_generator(Configs.N_PASSAGE_TOKENS, 100), dtype=np.float)
-        # Y_end = Y_end[::-1] / 100
         Y_start = np.zeros((Configs.N_PASSAGE_TOKENS, ))
         Y_end = np.zeros((Configs.N_PASSAGE_TOKENS, ))
         Y_start_index = randint(0, Configs.N_PASSAGE_TOKENS - 2)

@@ -4,24 +4,19 @@ import numpy as np
 
 
 def apply_casting(df, col, NAlist):
-    # make variables for Int, max and min
+    ### make variables for Int, max and min
     IsInt = False
     mx = df[col].max()
     mn = df[col].min()
 
-    # Integer does not support NA, therefore, NA needs to be filled
-    # if not np.isfinite(df[col]).all():
-    #     NAlist.append(col)
-    #     df[col].fillna(mn - 1, inplace=True)
-
-    # test if column can be converted to an integer
+    ### test if column can be converted to an integer
     asint = df[col].fillna(0).astype(np.int64)
     result = (df[col] - asint)
     result = result.sum()
     if -0.01 < result < 0.01:
         IsInt = True
 
-    # Make Integer/unsigned Integer datatypes
+    ### Make Integer/unsigned Integer datatypes
     if IsInt:
         if mn >= 0:
             if mx < 255:
@@ -42,7 +37,7 @@ def apply_casting(df, col, NAlist):
             elif mn > np.iinfo(np.int64).min and mx < np.iinfo(np.int64).max:
                 df[col] = df[col].astype(np.int64)
 
-                # Make float datatypes 32 bit
+                ### Make float datatypes 32 bit
     else:
         df[col] = df[col].astype(np.float32)
 
@@ -51,9 +46,9 @@ def reduce_mem_usage(df, debug=False):
     start_mem_usg = df.memory_usage().sum() / 1024**2
     if debug:
         print("Memory usage of properties dataframe is :", start_mem_usg, " MB")
-    NAlist = []  # Keeps track of columns that have missing values filled in.
+    NAlist = []  ### Keeps track of columns that have missing values filled in.
     for col in df.columns:
-        if df[col].dtype != object:  # Exclude strings
+        if df[col].dtype != object:  #### Exclude strings
             if debug:
                 print("******************************")
                 print("Column: ", col)
@@ -69,4 +64,5 @@ def reduce_mem_usage(df, debug=False):
         mem_usg = df.memory_usage().sum() / 1024**2
         print("Memory usage is: ", mem_usg, " MB")
         print("This is ", 100 * mem_usg / start_mem_usg, "% of the initial size")
+
     return df, NAlist

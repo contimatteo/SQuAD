@@ -75,7 +75,7 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### aligend-attention
         p_attention = AlignedAttention()([p_embeddings, q_embeddings])
         p_attention = Mask_layer()(p_attention, p_mask)
-        
+
         ### lstm
         p_rnn = DrqaRnn()(
             Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])

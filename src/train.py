@@ -4,7 +4,6 @@ from typing import Any
 import os
 
 from tensorflow.keras.callbacks import EarlyStopping
-# from wandb.keras import WandbCallback
 
 import utils.env_setup
 import utils.configs as Configs
@@ -23,8 +22,6 @@ os.environ["WANDB_JOB_TYPE"] = "training"
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = None
-
 ###
 
 
@@ -40,9 +37,6 @@ def __callbacks() -> list:
             restore_best_weights=True,
         )
     )
-
-    # if not Configs.WANDB_DISABLED:
-    #     callbacks.append(WandbCallback())
 
     return callbacks
 
@@ -62,14 +56,12 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
     # generator = Generator(X, Y, "passage", passages_indexes)
 
     ### train
-    # history = model.fit(X, Y, epochs=nn_epochs, batch_size=nn_batch, callbacks=nn_callbacks)
     history = model.fit(
         generator.batches(),
         epochs=nn_epochs,
         batch_size=nn_batch,
         callbacks=nn_callbacks,
         steps_per_epoch=generator.steps_per_epoch
-        # max_queue_size=1
     )
 
     ### save weights
@@ -85,22 +77,17 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
 
 def train():
     glove_matrix = get_data("glove")
-    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
-    Y = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    X, _ = X_data_from_dataset(get_data("features"))
+    Y = Y_data_from_dataset(get_data("labels"))
     _, _, _, passages_indexes = QP_data_from_dataset(get_data("original"))
 
-    print("After numpy")
-    memory_usage()
+    ### save RAM memory
     delete_data()
-    print("After deleted data")
-    memory_usage()
 
     #
 
     model = DRQA(glove_matrix)
 
-    ### batches by length
-    # _ = __fit(model, X, Y, None, True, True)
     ### batches by passage
     _ = __fit(model, X, Y, passages_indexes, True, True)
 
@@ -113,8 +100,5 @@ if __name__ == "__main__":
     assert len(json_file_url) > 5
     assert ".json" in json_file_url
     load_data(json_path=json_file_url)
-
-    print("After preprocessing")
-    memory_usage()
 
     train()
