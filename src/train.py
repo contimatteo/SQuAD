@@ -51,8 +51,8 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
         model.load_weights(str(nn_checkpoint_directory))
 
     ### generator
-    generator = Generator(X, Y, "size")
-    # generator = Generator(X, Y, "passage", passages_indexes)
+    # generator = Generator(X, Y, "size")
+    generator = Generator(X, Y, "passage", passages_indexes)
 
     ### train
     history = model.fit(

@@ -147,11 +147,6 @@ def test():
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
-    Dataset.optimize_memory()
-    Y_pred = None
-    answers_tokens_indexes = None
-    answers_for_question = None
-
     print()
     print("The generated answers (json with predictions) file is available at:")
     print(str(LocalStorage.answers_predictions_url("training.pred")))
@@ -159,10 +154,17 @@ def test():
 
     #
 
-    # Y_true = Y_data_from_dataset(Dataset.extract("labels"), N_ROWS_SUBSET)
+    # Y_true = Y_data_from_dataset(Dataset.extract("labels"))
     # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     # __store_answers_predictions(answers_for_question, "training.true")
+
+    #
+
+    Dataset.optimize_memory()
+    Y_pred = None
+    answers_tokens_indexes = None
+    answers_for_question = None
 
 
 ###
