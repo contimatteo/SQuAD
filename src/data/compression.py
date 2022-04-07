@@ -1,9 +1,6 @@
-from typing import List
-
 import pandas as pd
 
 from features.one_hot_encoder import OneHotEncoder
-from features.word_to_index import WordToIndex
 
 ###
 
@@ -29,6 +26,30 @@ class DataframeCompression:
         self.key_pass = ["passage_index", "chunk_index"]
         self.key_ques = ["question_index", "chunk_index"]
         self.ohe = {"ohe_pos": ohe_pos, "ohe_ner": ohe_ner}
+
+    #
+
+    # @staticmethod
+    # def add_column(df: pd.DataFrame, key_columns, new_col_name: str, dictionary):
+    #     df[new_col_name] = df.apply(lambda x: x["passage_index"], axis=1)
+    #     return df
+
+    #
+
+    def __add_pos_ner_onehot(self, df):
+        df["pos_onehot_padded"] = df.apply(
+            lambda x: OneHotEncoder(self.ohe["ohe_pos"]).
+            transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]),
+            axis=1
+        )
+        df["ner_onehot_padded"] = df.apply(
+            lambda x: OneHotEncoder(self.ohe["ohe_ner"]).
+            transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]),
+            axis=1
+        )
+        return df
+
+    #
 
     def from_pickle(self, d: dict):
         self.index_df = d["index_df"]
@@ -152,26 +173,8 @@ class DataframeCompression:
         df = df.sort_values(by=self.key_all)
 
         print("Rebuilding ONEHOT")
-        df = self.add_pos_ner_onehot(df)
+        df = self.__add_pos_ner_onehot(df)
         df.set_index(self.key_all, inplace=True, drop=False)
 
         print("Finished Building")
-        return df
-
-    @staticmethod
-    def add_column(df: pd.DataFrame, key_columns: List[str], new_col_name: str, dictionary):
-        df[new_col_name] = df.apply(lambda x: x["passage_index"], axis=1)
-        return df
-
-    def add_pos_ner_onehot(self, df):
-        df["pos_onehot_padded"] = df.apply(
-            lambda x: OneHotEncoder(self.ohe["ohe_pos"]).
-            transform_one_hot(x["pos_categorical_padded"], x["passage_index"], x["chunk_index"]),
-            axis=1
-        )
-        df["ner_onehot_padded"] = df.apply(
-            lambda x: OneHotEncoder(self.ohe["ohe_ner"]).
-            transform_one_hot(x["ner_categorical_padded"], x["passage_index"], x["chunk_index"]),
-            axis=1
-        )
         return df

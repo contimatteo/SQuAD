@@ -1,5 +1,5 @@
-# pylint: disable=unused-import,pylint(not-callable)
-from typing import Any, Tuple, List, Dict
+# pylint: disable=unused-import,not-callable,import-error
+from typing import Any, Dict
 
 import os
 import json
@@ -10,7 +10,7 @@ from tensorflow.keras.backend import set_learning_phase
 
 import utils.env_setup
 
-from data import get_data, load_data, delete_data
+from data import Dataset
 from models import DRQA
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, QP_data_from_dataset  # , Y_data_from_dataset
@@ -28,8 +28,8 @@ LocalStorage = LocalStorageManager()
 
 
 def __predict():
-    X, _ = X_data_from_dataset(get_data("features"))
-    glove_matrix = get_data("glove")
+    X, _ = X_data_from_dataset(Dataset.extract("features"))
+    glove_matrix = Dataset.extract("glove")
 
     model = DRQA(glove_matrix)
 
@@ -44,7 +44,7 @@ def __predict():
 
 
 def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
-    _, question_indexes = X_data_from_dataset(get_data("features"))
+    _, question_indexes = X_data_from_dataset(Dataset.extract("features"))
     question_indexes_unique = list(np.unique(question_indexes))
 
     answers_tokens_probs_map = {}
@@ -87,7 +87,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     answers_for_question_map = {}
 
-    qids, _, passages, _ = QP_data_from_dataset(get_data("original"))
+    qids, _, passages, _ = QP_data_from_dataset(Dataset.extract("original"))
     qids_unique = list(np.unique(qids))
 
     passage_by_question_map = {}
@@ -147,7 +147,7 @@ def test():
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
-    delete_data()
+    Dataset.optimize_memory()
     Y_pred = None
     answers_tokens_indexes = None
     answers_for_question = None
@@ -159,7 +159,7 @@ def test():
 
     #
 
-    # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
+    # Y_true = Y_data_from_dataset(Dataset.extract("labels"), N_ROWS_SUBSET)
     # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     # __store_answers_predictions(answers_for_question, "training.true")
@@ -172,6 +172,6 @@ if __name__ == "__main__":
     assert isinstance(file_url, str)
     assert len(file_url) > 5
     assert ".json" in file_url
-    load_data(json_path=file_url)
+    Dataset.load(json_path=file_url)
 
     test()

@@ -1,4 +1,4 @@
-# pylint: disable=unused-import
+# pylint: disable=unused-import,import-error
 from typing import Any
 
 import os
@@ -8,12 +8,11 @@ from tensorflow.keras.callbacks import EarlyStopping
 import utils.env_setup
 import utils.configs as Configs
 
-from data import get_data, load_data, delete_data
+from data import Dataset
 from models import DRQA
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
 from utils.generator import Generator
-from utils.memory_usage import memory_usage
 from utils.data import get_argv
 
 ###
@@ -76,13 +75,13 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
 
 
 def train():
-    glove_matrix = get_data("glove")
-    X, _ = X_data_from_dataset(get_data("features"))
-    Y = Y_data_from_dataset(get_data("labels"))
-    _, _, _, passages_indexes = QP_data_from_dataset(get_data("original"))
+    glove_matrix = Dataset.extract("glove")
+    X, _ = X_data_from_dataset(Dataset.extract("features"))
+    Y = Y_data_from_dataset(Dataset.extract("labels"))
+    _, _, _, passages_indexes = QP_data_from_dataset(Dataset.extract("original"))
 
     ### save RAM memory
-    delete_data()
+    Dataset.optimize_memory()
 
     #
 
@@ -99,6 +98,6 @@ if __name__ == "__main__":
     assert isinstance(json_file_url, str)
     assert len(json_file_url) > 5
     assert ".json" in json_file_url
-    load_data(json_path=json_file_url)
+    Dataset.load(json_path=json_file_url)
 
     train()

@@ -2,8 +2,7 @@ import os
 import pickle
 import pandas as pd
 
-from data.config import Configuration
-from data.dataframe_compression import DataframeCompression
+from data import DataframeCompression
 from features.one_hot_encoder import OneHotEncoder
 from utils.data import add_glove_dim_to_name, get_processed_data_dir, get_data_dir, get_tmp_data_dir
 
@@ -43,8 +42,10 @@ def save_processed_data(
     name = add_glove_dim_to_name(file_name, glove_dim)
     folder = get_processed_data_dir()
     file = os.path.join(folder, name)
+
     df_c = DataframeCompression(ohe_pos.get_ohe_dicts(), ohe_ner.get_ohe_dicts())
     df_c.compress(df)
+
     df_c = df_c.to_pickle()
     with open(file, "wb") as handle:
         pickle.dump(df_c, handle)
@@ -90,11 +91,11 @@ def save_config_data(config):
     save_pickle(config, CONFIG_FILE_NAME, get_data_dir())
 
 
-def load_config_data():
-    if os.path.exists(os.path.join(get_data_dir(), CONFIG_FILE_NAME)):
-        return load_pickle(CONFIG_FILE_NAME, get_data_dir())
-    else:
-        return Configuration()
+# def load_config_data():
+#     if os.path.exists(os.path.join(get_data_dir(), CONFIG_FILE_NAME)):
+#         return load_pickle(CONFIG_FILE_NAME, get_data_dir())
+#     else:
+#         return Configuration()
 
 
 def save_glove_matrix(glove_matrix, glove_dim):
