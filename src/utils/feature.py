@@ -1,8 +1,10 @@
-from typing import Tuple
-
+from typing import Tuple, List
+from typing import List
 from random import randint
 
 import numpy as np
+from numpy import ndarray
+
 import utils.configs as Configs
 
 from utils.preprocessing import pd_series_to_numpy
@@ -14,7 +16,7 @@ N_ROWS = 500
 ###
 
 
-def X_train_faker() -> np.ndarray:
+def X_train_faker() -> List[np.ndarray]:
     ### [Q] tokens
     q_tokens = np.random.random_sample((N_ROWS, Configs.N_QUESTION_TOKENS))
     ### [P] tokens
@@ -75,7 +77,7 @@ def __X_feature_tokens_subset(feature, n_tokens):
     return feature[:, 0:n_tokens]
 
 
-def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
+def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> np.ndarray:
     ### --> (n_examples, n_tokens, 2)
     Y_transposed = np.transpose(Y, axes=[0, 2, 1])
     ### --> (n_examples, 2, n_tokens)
@@ -96,10 +98,10 @@ def __prepare_Y_true_onehot_encoding(Y: np.ndarray) -> int:
     return Y_onehot_with_additional_case
 
 
-def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
+def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[List[ndarray], ndarray]:
     assert X_data is not None
     assert isinstance(X_data, list)
-    assert len(X_data) == 7
+    assert len(X_data) == 9
     assert X_data[0] is not None
     assert X_data[1] is not None
     assert X_data[2] is not None
@@ -107,6 +109,8 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     assert X_data[4] is not None
     assert X_data[5] is not None
     assert X_data[6] is not None
+    assert X_data[7] is not None
+    assert X_data[8] is not None
 
     #
 
@@ -124,15 +128,21 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     X_data[5] = None
     p_match = pd_series_to_numpy(X_data[6], np.float16)
     X_data[6] = None
+    p_mask = pd_series_to_numpy(X_data[7], np.float16)
+    X_data[7] = None
+    q_mask = pd_series_to_numpy(X_data[8], np.float16)
+    X_data[8] = None
 
     #
 
     assert p_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
-    assert q_tokens.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert q_tokens.shape[1] <= Configs.N_QUESTION_TOKENS
     assert p_pos.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_ner.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_tf.shape[1] <= Configs.N_PASSAGE_TOKENS
     assert p_match.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert p_mask.shape[1] <= Configs.N_PASSAGE_TOKENS
+    assert q_mask.shape[1] <= Configs.N_QUESTION_TOKENS
 
     if n_examples_subset is not None and isinstance(n_examples_subset, int):
         q_indexes = __X_feature_examples_subset(q_indexes, n_examples_subset)
@@ -142,13 +152,17 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
         p_ner = __X_feature_examples_subset(p_ner, n_examples_subset)
         p_tf = __X_feature_examples_subset(p_tf, n_examples_subset)
         p_match = __X_feature_examples_subset(p_match, n_examples_subset)
+        p_mask = __X_feature_examples_subset(p_mask, n_examples_subset)
+        q_mask = __X_feature_examples_subset(q_mask, n_examples_subset)
 
     p_tokens = __X_feature_tokens_subset(p_tokens, Configs.N_PASSAGE_TOKENS)
-    q_tokens = __X_feature_tokens_subset(q_tokens, Configs.N_PASSAGE_TOKENS)
+    q_tokens = __X_feature_tokens_subset(q_tokens, Configs.N_QUESTION_TOKENS)
     p_pos = __X_feature_tokens_subset(p_pos, Configs.N_PASSAGE_TOKENS)
     p_ner = __X_feature_tokens_subset(p_ner, Configs.N_PASSAGE_TOKENS)
     p_tf = __X_feature_tokens_subset(p_tf, Configs.N_PASSAGE_TOKENS)
     p_match = __X_feature_tokens_subset(p_match, Configs.N_PASSAGE_TOKENS)
+    p_mask = __X_feature_tokens_subset(p_mask, Configs.N_PASSAGE_TOKENS)
+    q_mask = __X_feature_tokens_subset(q_mask, Configs.N_QUESTION_TOKENS)
 
     #
 
@@ -183,14 +197,22 @@ def X_data_from_dataset(X_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     assert len(q_indexes.shape) == 1
     assert q_indexes.shape[0] == q_tokens.shape[0]
 
+    assert isinstance(p_mask, np.ndarray)
+    assert len(p_mask.shape) == 2
+    assert p_mask.shape[1] == Configs.N_PASSAGE_TOKENS
+
+    assert isinstance(q_mask, np.ndarray)
+    assert len(q_mask.shape) == 2
+    assert q_mask.shape[1] == Configs.N_QUESTION_TOKENS
+
     #
 
-    X = [q_tokens, p_tokens, p_match, p_pos, p_ner, p_tf]
+    X = [q_tokens, q_mask, p_mask, p_tokens, p_match, p_pos, p_ner, p_tf]
 
     return X, q_indexes
 
 
-def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarray, np.ndarray]:
+def Y_data_from_dataset(Y_data, n_examples_subset=None) -> np.ndarray:
     assert Y_data is not None
     assert isinstance(Y_data, list)
     assert len(Y_data) == 1
@@ -224,13 +246,15 @@ def Y_data_from_dataset(Y_data, n_examples_subset=None) -> Tuple[list, np.ndarra
     return Y
 
 
-def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
+def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     assert data is not None
     assert isinstance(data, list)
-    assert len(data) == 3
+    assert len(data) == 4
+
     assert data[0] is not None
     assert data[1] is not None
     assert data[2] is not None
+    assert data[3] is not None
 
     #
 
@@ -240,6 +264,8 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     data[1] = None
     questions = pd_series_to_numpy(data[2])
     data[2] = None
+    passage_indexes = pd_series_to_numpy(data[3])
+    data[3] = None
 
     #
 
@@ -247,14 +273,18 @@ def QP_data_from_dataset(data) -> Tuple[np.ndarray, np.ndarray]:
     assert len(question_indexes.shape) == 1
 
     assert isinstance(passages, np.ndarray)
-    assert len(passages.shape) == 1
+    # assert len(passages.shape) == 1
 
     assert isinstance(questions, np.ndarray)
-    assert len(questions.shape) == 1
+    # assert len(questions.shape) == 1
 
-    assert question_indexes.shape[0] == passages.shape[0]
+    assert isinstance(passage_indexes, np.ndarray)
+    # assert len(passage_indexes.shape) == 1
+
     assert question_indexes.shape[0] == questions.shape[0]
+    assert question_indexes.shape[0] == passages.shape[0]
+    assert question_indexes.shape[0] == passage_indexes.shape[0]
 
     #
 
-    return question_indexes, questions, passages
+    return question_indexes, questions, passages, passage_indexes

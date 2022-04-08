@@ -3,7 +3,7 @@ from pathlib import Path
 ###
 
 
-class LocalStorageDirectoryManager():
+class LocalStorageDirectoryManager:
 
     def __init__(self) -> None:
         self.root = None

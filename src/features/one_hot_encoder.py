@@ -2,7 +2,6 @@ from typing import List
 
 import numpy as np
 
-
 ###
 
 
@@ -13,7 +12,7 @@ class OneHotEncoder:
     def fit(self, pos_list):
         # self.one_hot_dict = {}
         pos_len = len(pos_list)
-        # print(pos_list)
+
         id_m = np.identity(pos_len, dtype="int8")
         pos_dict = {}
         for i, el in enumerate(pos_list):
@@ -40,7 +39,9 @@ class OneHotEncoder:
             self.cache_categorical_dict[passage_index] = return_list
         return self.cache_categorical_dict[passage_index]
 
-    def transform_one_hot(self, categorical: List[int], passage_index: int, chunk_index: int = None):
+    def transform_one_hot(
+        self, categorical: List[int], passage_index: int, chunk_index: int = None
+    ):
         key = passage_index
         if chunk_index is not None:
             key = (passage_index, chunk_index)
@@ -62,7 +63,7 @@ class OneHotEncoder:
             print("element not found in categorical_encoder")
             return None
 
-    def get_OHE_in_dict(self, el):
+    def get_ohe_in_dict(self, el):
         if el in self.one_hot_dict.keys():
             return self.one_hot_dict[el]
         else:
@@ -82,7 +83,7 @@ class OneHotEncoder:
         else:
             self.set_OHE_dicts(d)
 
-    def get_OHE_dicts(self):
+    def get_ohe_dicts(self):
         return {
             "one_hot_dict": self.one_hot_dict,
             "categorical_dict": self.categorical_dict,

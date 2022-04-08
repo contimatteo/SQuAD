@@ -4,18 +4,17 @@ from typing import Any, Tuple, List, Dict
 import os
 import json
 import numpy as np
-import tensorflow as tf
 
 from alive_progress import alive_bar
 from tensorflow.keras.backend import set_learning_phase
 
 import utils.env_setup
-import utils.configs as Configs
 
-from data import get_data, load_data
+from data import get_data, load_data, delete_data
 from models import DRQA
 from utils import LocalStorageManager
 from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
+from utils.data import get_argv
 
 ###
 
@@ -25,7 +24,7 @@ set_learning_phase(0)
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = None  # `None` for all rows :)
+N_ROWS_SUBSET = None  #  `None` for all rows :)
 
 ###
 
@@ -41,7 +40,7 @@ def __predict():
     assert nn_checkpoint_directory.is_file()
     model.load_weights(str(nn_checkpoint_directory))
 
-    Y_pred = model.predict(X, batch_size=Configs.NN_BATCH_SIZE, verbose=1)
+    Y_pred = model.predict(X, batch_size=128, verbose=1)
 
     return Y_pred
 
@@ -64,14 +63,16 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
 
     #
 
-    __weigth_answer_probs = lambda answer: answer[0:-1] - answer[-1]
-
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
+
+    ### weights the additional bit probability.
+    # __weight_answer_probs = lambda answer: answer[0:-1]
+    __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     with alive_bar(len(list(answers_tokens_probs_map.items()))) as progress_bar:
         for (q_index, answers) in answers_tokens_probs_map.items():
             answer_tokens_probs = np.array(
-                [__weigth_answer_probs(answers[idx]) for idx in range(answers.shape[0])],
+                [__weight_answer_probs(answers[idx]) for idx in range(answers.shape[0])],
                 dtype=answers.dtype
             )
 
@@ -82,15 +83,14 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
 
             progress_bar()
 
-    #
-
     return answers_tokens_indexes_map
 
 
 def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, str]:
+
     answers_for_question_map = {}
 
-    qids, _, passages = QP_data_from_dataset(get_data("original"))
+    qids, _, passages, pids = QP_data_from_dataset(get_data("original"))
     qids_unique = list(np.unique(qids))
 
     passage_by_question_map = {}
@@ -119,20 +119,9 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
                 if answer_token_end_index < answ_token_start_index:
                     answer_token_end_index = answ_token_start_index
 
-                # answ_span_pre_start = passage_tokens[0:answ_token_start_index]
-                # answ_span_to_end = passage_tokens[0:answer_token_end_index + 1]
-                # ### INFO: we have always to consider the ENTIRE end token.
-                # answ_span_to_end += [str(passage_tokens[answer_token_end_index])]
-                # ### compute the chars range indexes
-                # answ_char_start_index = len(" ".join(answ_span_pre_start))
-                # answ_char_end_index = len(" ".join(answ_span_to_end))
-                # ### extract answer from chars indexes
-                # answer = passage[answ_char_start_index:answ_char_end_index]
-                answer = " ".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1])
-                answer = str(answer).strip()
+                answer = "".join(passage_tokens[answ_token_start_index:answer_token_end_index + 1]
+                                 ).strip()
 
-            # if qid in answers_tokens_indexes_map:
-            #     answers_for_question_map[qid] = answer
             answers_for_question_map[qid] = answer
 
             progress_bar()
@@ -157,10 +146,14 @@ def __store_answers_predictions(answers_predictions_map: Dict[str, str], file_na
 
 def test():
     Y_pred = __predict()
-
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
+
+    delete_data()
+    Y_pred = None
+    answers_tokens_indexes = None
+    answers_for_question = None
 
     print()
     print("The generated answers (json with predictions) file is available at:")
@@ -171,7 +164,7 @@ def test():
 
     # ### TODO: remove the following code ...
     # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-
+    #
     # ### TODO: remove the following code ...
     # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
@@ -181,7 +174,10 @@ def test():
 ###
 
 if __name__ == "__main__":
-    # load_data(json_path="./data/raw/train.v1.json")
-    load_data()
+    json_file_url = get_argv()
+    assert isinstance(json_file_url, str)
+    assert len(json_file_url) > 5
+    assert ".json" in json_file_url
+    load_data(json_path=json_file_url)
 
     test()

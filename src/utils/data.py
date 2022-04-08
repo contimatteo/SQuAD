@@ -1,9 +1,10 @@
 import os
 import sys
+from shutil import copyfile
+
+import nltk
 
 from google_drive_downloader import GoogleDriveDownloader as gdd
-from shutil import copyfile
-import nltk
 
 ###
 
@@ -67,5 +68,3 @@ def get_argv():
         return sys.argv[1]
     else:
         return None
-
-
