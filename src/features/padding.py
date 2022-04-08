@@ -12,7 +12,7 @@ from .one_hot_encoder import OneHotEncoder
 ###
 
 
-def apply_mask(df: pd.DataFrame):
+def __apply_mask(df: pd.DataFrame):
     df["mask_passage"] = df.apply(
         lambda x: list(np.ones((len(x["word_tokens_passage"]), ), dtype=int)), axis=1
     )
@@ -22,7 +22,7 @@ def apply_mask(df: pd.DataFrame):
     return df
 
 
-def split_in_chunks(row, columns, step):
+def __split_in_chunks(row, columns, step):
     new_row = row.copy()
     for col in columns:
         new_row[col] = []
@@ -31,7 +31,7 @@ def split_in_chunks(row, columns, step):
     return new_row
 
 
-def split_passage(df):
+def __split_passage(df):
     df_clone = df.copy()
     passage_features = [
         "word_tokens_passage", "word_index_passage", "pos", "pos_onehot", "ner", "ner_onehot",
@@ -40,14 +40,14 @@ def split_passage(df):
     if "label" in df:
         passage_features.append("label")
     df_clone = df_clone.apply(
-        lambda x: split_in_chunks(x, passage_features, Configs.N_PASSAGE_TOKENS), axis=1
+        lambda x: __split_in_chunks(x, passage_features, Configs.N_PASSAGE_TOKENS), axis=1
     )
 
     df_final = df_clone.explode(passage_features)
     return df_final
 
 
-def pad(df_col, max_seq_len, pad_value):
+def __pad(df_col, max_seq_len, pad_value):
     return pad_sequences(
         df_col.to_list(),
         maxlen=max_seq_len,
@@ -58,7 +58,10 @@ def pad(df_col, max_seq_len, pad_value):
     )
 
 
-def apply_padding_to(
+###
+
+
+def apply_padding_to_df(
     df: pd.DataFrame, wti: WordToIndex, ohe_pos: OneHotEncoder, ohe_ner: OneHotEncoder
 ):
     PAD_WORD = WordToIndex.PAD_WORD
@@ -74,36 +77,38 @@ def apply_padding_to(
     NER_ONEHOT = ohe_ner.get_ohe_in_dict(NER_CATEGORICAL)
     TF = 0.0
 
-    df = apply_mask(df)
-    df_padded = split_passage(df)
+    df = __apply_mask(df)
+    df_padded = __split_passage(df)
     df_padded["question_index"] = df_padded.index  # df_padded["id"]
     df_padded["chunk_index"] = df_padded.groupby("question_index").cumcount()
 
-    word_index_passage = pad(
+    word_index_passage = __pad(
         df_padded['word_index_passage'], Configs.N_PASSAGE_TOKENS, PAD_WORD_ENCODING
     )
-    word_index_question = pad(
+    word_index_question = __pad(
         df_padded['word_index_question'], Configs.N_QUESTION_TOKENS, PAD_WORD_ENCODING
     )
-    word_tokens_passage = pad(df_padded['word_tokens_passage'], Configs.N_PASSAGE_TOKENS, PAD_WORD)
-    word_tokens_passage_with_spaces = pad(
+    word_tokens_passage = __pad(
+        df_padded['word_tokens_passage'], Configs.N_PASSAGE_TOKENS, PAD_WORD
+    )
+    word_tokens_passage_with_spaces = __pad(
         df_padded['word_tokens_passage_with_spaces'], Configs.N_PASSAGE_TOKENS, PAD_WORD
     )
-    word_tokens_question = pad(
+    word_tokens_question = __pad(
         df_padded['word_tokens_question'], Configs.N_QUESTION_TOKENS, PAD_WORD
     )
     if "label" in df_padded:
-        label = pad(df_padded['label'], Configs.N_PASSAGE_TOKENS, LABEL)
-    exact_match = pad(df_padded['exact_match'], Configs.N_PASSAGE_TOKENS, EXACT_MATCH)
-    pos = pad(df_padded['pos'], Configs.N_PASSAGE_TOKENS, POS)
-    pos_categorical = pad(df_padded['pos_categorical'], Configs.N_PASSAGE_TOKENS, POS_CATEGORICAL)
-    pos_onehot = pad(df_padded['pos_onehot'], Configs.N_PASSAGE_TOKENS, POS_ONEHOT)
-    ner = pad(df_padded['ner'], Configs.N_PASSAGE_TOKENS, NER)
-    ner_categorical = pad(df_padded['ner_categorical'], Configs.N_PASSAGE_TOKENS, NER_CATEGORICAL)
-    ner_onehot = pad(df_padded['ner_onehot'], Configs.N_PASSAGE_TOKENS, NER_ONEHOT)
-    term_frequency = pad(df_padded['term_frequency'], Configs.N_PASSAGE_TOKENS, TF)
-    mask_passage = pad(df_padded['mask_passage'], Configs.N_PASSAGE_TOKENS, 0)
-    mask_question = pad(df_padded['mask_question'], Configs.N_QUESTION_TOKENS, 0)
+        label = __pad(df_padded['label'], Configs.N_PASSAGE_TOKENS, LABEL)
+    exact_match = __pad(df_padded['exact_match'], Configs.N_PASSAGE_TOKENS, EXACT_MATCH)
+    pos = __pad(df_padded['pos'], Configs.N_PASSAGE_TOKENS, POS)
+    pos_categorical = __pad(df_padded['pos_categorical'], Configs.N_PASSAGE_TOKENS, POS_CATEGORICAL)
+    pos_onehot = __pad(df_padded['pos_onehot'], Configs.N_PASSAGE_TOKENS, POS_ONEHOT)
+    ner = __pad(df_padded['ner'], Configs.N_PASSAGE_TOKENS, NER)
+    ner_categorical = __pad(df_padded['ner_categorical'], Configs.N_PASSAGE_TOKENS, NER_CATEGORICAL)
+    ner_onehot = __pad(df_padded['ner_onehot'], Configs.N_PASSAGE_TOKENS, NER_ONEHOT)
+    term_frequency = __pad(df_padded['term_frequency'], Configs.N_PASSAGE_TOKENS, TF)
+    mask_passage = __pad(df_padded['mask_passage'], Configs.N_PASSAGE_TOKENS, 0)
+    mask_question = __pad(df_padded['mask_question'], Configs.N_QUESTION_TOKENS, 0)
 
     df_padded['word_tokens_passage_padded'] = list(word_tokens_passage)
     df_padded['word_tokens_passage_padded_with_spaces'] = list(word_tokens_passage_with_spaces)

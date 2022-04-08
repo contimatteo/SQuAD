@@ -1,6 +1,6 @@
 import pandas as pd
 
-from features.word_to_index import WordToIndex
+from features import WordToIndex
 
 from .cleaner import clean_data
 

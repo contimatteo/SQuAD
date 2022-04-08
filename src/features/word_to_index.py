@@ -9,6 +9,12 @@ class WordToIndex:
 
     PAD_WORD = "."
 
+    def __init__(self):
+        self.index_dict = {}
+        self.word_dict = {}
+
+    #
+
     def fit_word(self, token: str):
         if token not in self.index_dict:
             self.index_dict[token] = self.get_index_len()
@@ -40,7 +46,3 @@ class WordToIndex:
 
     def get_len_dicts(self):
         return self.get_index_len()
-
-    def __init__(self):
-        self.index_dict = {}
-        self.word_dict = {}

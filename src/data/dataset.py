@@ -1,11 +1,9 @@
 import os.path
-
 import pandas as pd
-from requests import delete
 
 import utils.configs as Configs
 
-from features.features import add_features
+from features import Features
 from utils.data_storage import save_processed_data, load_processed_data
 from utils.data_storage import save_glove_matrix, load_glove_matrix
 from utils.data_storage import save_wti, load_wti, create_tmp_directories
@@ -28,15 +26,14 @@ class Dataset:
     @staticmethod
     def __delete_cache():
         from .cleaner import delete_cache_cleaner
-        from features.lemmatize import delete_cache_lemmatize
-        from features.name_entity_recognition import delete_cache_ner
-        from features.pos import delete_cache_pos
-        from features.term_frequency import delete_cache_tf
+        from features import Lemmatizer, NER, POS, TermFrequency
+
         delete_cache_cleaner()
-        delete_cache_lemmatize()
-        delete_cache_ner()
-        delete_cache_pos()
-        delete_cache_tf()
+
+        Lemmatizer.delete_cache()
+        NER.delete_cache()
+        POS.delete_cache()
+        TermFrequency.delete_cache()
 
     @staticmethod
     def __data_to_list(df: pd.DataFrame):
@@ -113,7 +110,7 @@ class Dataset:
             df, _ = reduce_mem_usage(df)
             df = DataPreprocessing.apply(df, wti)
             df, _ = reduce_mem_usage(df)
-            df, onehot_pos, onehot_ner = add_features(df, wti)
+            df, onehot_pos, onehot_ner = Features.build(df, wti)
             df, _ = reduce_mem_usage(df)
             print("[Data] processed.")
 
