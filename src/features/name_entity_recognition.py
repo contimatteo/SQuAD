@@ -1,4 +1,5 @@
 import pandas as pd
+
 from nltk import ne_chunk
 from nltk.chunk import tree2conlltags
 
@@ -39,12 +40,12 @@ def apply_ner_one_hot(df: pd.DataFrame):
     for ent in ner_entities:
         for pref in ner_prefix:
             ner_list.append(pref + ent)
-    OHE = OneHotEncoder()
-    OHE.fit(ner_list)
+    ohe = OneHotEncoder()
+    ohe.fit(ner_list)
     df["ner_categorical"] = df.apply(
-        lambda x: OHE.transform_categorical(x["ner"], x["passage_index"]), axis=1
+        lambda x: ohe.transform_categorical(x["ner"], x["passage_index"]), axis=1
     )
     df["ner_onehot"] = df.apply(
-        lambda x: OHE.transform_one_hot(x["ner_categorical"], x["passage_index"]), axis=1
+        lambda x: ohe.transform_one_hot(x["ner_categorical"], x["passage_index"]), axis=1
     )
-    return df, OHE
+    return df, ohe

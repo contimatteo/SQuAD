@@ -3,10 +3,12 @@ from typing import Callable, Any
 import numpy as np
 import tensorflow as tf
 
+from tensorflow import expand_dims
 from tensorflow.keras.activations import softmax
 from tensorflow.keras.initializers import Constant
 from tensorflow.keras.layers import Dense, Embedding
-from tensorflow.keras.layers import Bidirectional, LSTM, RNN, LSTMCell
+from tensorflow.keras.layers import Bidirectional, LSTM, RNN, LSTMCell, Conv1D
+from tensorflow.keras import layers
 
 import utils.configs as Configs
 
@@ -33,20 +35,49 @@ def GloveEmbeddings(input_length: int, initializer: np.ndarray) -> Callable[[Any
 ###
 
 
+def WeightedSum(channels_size, kernel_size):
+    return Conv1D(channels_size, kernel_size)
+
+
+def WeightedSumCustom(N_Q_TOKENS):
+
+    def _nn(q_rnn):
+        q_rnn = tf.transpose(q_rnn, perm=[0, 2, 1])
+        weighted_sum = WeightedSum(N_Q_TOKENS, 1)(q_rnn)  ### --> (_,1,emb_dim)
+        red_sum = tf.reduce_sum(weighted_sum, axis=2)
+        exp_dim = tf.expand_dims(red_sum, axis=2)
+        q_encoding1 = tf.transpose(exp_dim, perm=[0, 2, 1])
+        return q_encoding1
+
+    return _nn
+
+
 def DrqaRnn() -> Callable[[Any], Any]:
     units = 128
     initializer = 'glorot_uniform'
 
-    def _lstm() -> LSTM:
+    def _lstm() -> RNN:
         cell = LSTMCell(units, dropout=.3, recurrent_initializer=initializer)
+        # cell = LSTMCell(units, recurrent_initializer=initializer)
         return RNN(cell, return_sequences=True)
 
-    def _nn(inp: Any) -> Any:
-        x = Bidirectional(_lstm(), merge_mode="concat")(inp)
-        x = Bidirectional(_lstm(), merge_mode="concat")(x)
-        x = Bidirectional(_lstm(), merge_mode="concat")(x)
+    rnn1 = Bidirectional(_lstm(), merge_mode="concat")
+    # rnn2 = Bidirectional(_lstm(), merge_mode="concat")
+    # rnn3 = Bidirectional(_lstm(), merge_mode="concat")
+
+    def _nn(x: Any) -> Any:
+        x = rnn1(x)
+        # x = rnn2(x)
+        # x = rnn3(x)
         return x
 
+    return _nn
+
+
+def Mask_layer():
+    def _nn(rnn: Any, mask: Any) -> Any:
+        mask_expanded = expand_dims(mask, axis=2)
+        return mask_expanded * rnn
     return _nn
 
 
@@ -66,7 +97,10 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
         ### --> (_, 1)
         tensor_new = tf.concat([tensor, tensor_bit], axis=1)
         ### --> (_, n_tokens+1)
-        tensor_new = softmax(tensor_new)
+
+        tensor_new = softmax(tensor_new, axis=1)
+        # tensor_new = softmax(tensor_new)
+
         ### --> (_, n_tokens+1)
         tensor_new = tf.expand_dims(tensor_new, axis=2)
         ### --> (_, n_tokens+1, 1)
@@ -104,5 +138,5 @@ def EnhancedProbabilities() -> Callable[[Any], Any]:
 
         return out_new
 
-    return __nn1
-    # return __nn2
+    # return __nn1
+    return __nn2

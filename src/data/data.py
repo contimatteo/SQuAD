@@ -2,13 +2,13 @@ import os.path
 
 import pandas as pd
 
+import utils.configs as Configs
+
 from features.features import add_features
 from utils.data_storage import save_processed_data, load_processed_data
 from utils.data_storage import save_glove_matrix, load_glove_matrix
-from utils.data_storage import save_WTI, load_WTI, create_tmp_directories
+from utils.data_storage import save_wti, load_wti, create_tmp_directories
 from utils.memory import reduce_mem_usage
-
-import utils.configs as Configs
 
 from .data_preprocessing import data_preprocessing
 from .data_reader import data_reader, glove_reader
@@ -76,14 +76,17 @@ def __data_to_list(df: pd.DataFrame):
     passage = df["word_index_passage_padded"]
     question = df["word_index_question_padded"]
     exact_match = df["exact_match_padded"]
-    id_x = df["id"]
+    question_id = df["id"]
+    passage_id = df["passage_index"]
     label = df["label_padded"] if "label_padded" in df else None
+    mask_p = df["mask_passage_padded"]
+    mask_q = df["mask_question_padded"]
 
-    # evaluation_id_x = id_x
-    evaluation_passage = df["word_tokens_passage"]
+    # evaluation_id_x = question_id
+    evaluation_passage = df["word_tokens_passage_with_spaces"]
     evaluation_question = df["word_tokens_question"]
 
-    return id_x, passage, question, pos, ner, tf, exact_match, label, id_x, evaluation_passage, evaluation_question
+    return question_id, passage, question, pos, ner, tf, exact_match, label, question_id, evaluation_passage, evaluation_question, passage_id, mask_p, mask_q
 
 
 def __export_df(df, onehot_pos, onehot_ner, glove_dim, file_name):
@@ -108,14 +111,14 @@ def load_data(debug=False, json_path=None):
     glove_matrix = load_glove_matrix(glove_dim)
     print("[Glove] downloaded.")
 
-    wti = load_WTI(glove_dim)
+    wti = load_wti(glove_dim)
     print("[WTI] prepared.")
 
     # conf = load_config_data()
     file_name = "drive_dataset.pkl"
     if json_path is not None:
         file_name = os.path.basename(json_path).replace(".json", ".pkl")
-    df = load_processed_data(wti, glove_dim, file_name=file_name)
+    df = load_processed_data(glove_dim, file_name=file_name)
     # if debug is False and conf.get_argv_json_complete_name() is None:
     #     df = load_processed_data(wti, glove_dim)
     # elif not conf.argv_changed(json_path, debug):
@@ -129,7 +132,7 @@ def load_data(debug=False, json_path=None):
         glove = glove_reader(glove_dim)
         glove_matrix, wti = glove_embedding(glove, glove_dim)
         save_glove_matrix(glove_matrix, glove_dim)
-        save_WTI(wti, glove_dim)
+        save_wti(wti, glove_dim)
 
     if df is None:
         df = data_reader(json_path)
@@ -180,11 +183,14 @@ def get_data(ret: str):
     assert isinstance(ret, str)
 
     if ret == "original":
-        return [df_np[8], df_np[9], df_np[10]]
+        return [df_np[8], df_np[9], df_np[10], df_np[11]]
     elif ret == "labels":
         return [df_np[7]]
     elif ret == "features":
-        return [df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6]]
+        return [
+            df_np[0], df_np[1], df_np[2], df_np[3], df_np[4], df_np[5], df_np[6], df_np[12],
+            df_np[13]
+        ]
     elif ret == "glove":
         return glove_matrix
 

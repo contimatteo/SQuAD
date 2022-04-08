@@ -1,6 +1,6 @@
-from typing import List
-
 import numpy as np
+
+###
 
 
 def apply_casting(df, col, NAlist):
@@ -14,11 +14,11 @@ def apply_casting(df, col, NAlist):
     #     NAlist.append(col)
     #     df[col].fillna(mn - 1, inplace=True)
 
-        # test if column can be converted to an integer
+    # test if column can be converted to an integer
     asint = df[col].fillna(0).astype(np.int64)
     result = (df[col] - asint)
     result = result.sum()
-    if result > -0.01 and result < 0.01:
+    if -0.01 < result < 0.01:
         IsInt = True
 
     # Make Integer/unsigned Integer datatypes
@@ -48,7 +48,7 @@ def apply_casting(df, col, NAlist):
 
 
 def reduce_mem_usage(df, debug=False):
-    start_mem_usg = df.memory_usage().sum() / 1024 ** 2
+    start_mem_usg = df.memory_usage().sum() / 1024**2
     if debug:
         print("Memory usage of properties dataframe is :", start_mem_usg, " MB")
     NAlist = []  # Keeps track of columns that have missing values filled in.
@@ -66,7 +66,7 @@ def reduce_mem_usage(df, debug=False):
                 print("******************************")
     if debug:
         print("___MEMORY USAGE AFTER COMPLETION:___")
-        mem_usg = df.memory_usage().sum() / 1024 ** 2
+        mem_usg = df.memory_usage().sum() / 1024**2
         print("Memory usage is: ", mem_usg, " MB")
         print("This is ", 100 * mem_usg / start_mem_usg, "% of the initial size")
     return df, NAlist

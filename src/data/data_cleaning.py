@@ -1,9 +1,9 @@
 from typing import Tuple
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
 
-from copy import deepcopy
 from nltk.tokenize import RegexpTokenizer
 
 from utils.data import nltk_download_utilities
@@ -39,8 +39,8 @@ def delete_cache_data_cleaning():
 
 def tokenizers():
     # r'[\d.,]+|[A-Z][.A-Z]+\b\.*|\w+|\S'
-    tokenizer1 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S')  # |[A-Z][.A-Z]+\b\.*|
-    tokenizer2 = RegexpTokenizer(r'\d[.,]\d+|\w+|\S|.')
+    tokenizer1 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S')  # |[A-Z][.A-Z]+\b\.*|
+    tokenizer2 = RegexpTokenizer(r'\d+[.,]\d+\b\.*|[A-Z][.A-Z]+\b\.*|\w+|\S|.')
     return tokenizer1, tokenizer2
 
 
@@ -110,6 +110,9 @@ def tokenize_with_spaces(sentence):
 
 def add_split_into_words(df):
     df["word_tokens_passage"] = df.apply(lambda x: tokenize_sentence(x["passage"]), axis=1)
+    df["word_tokens_passage_with_spaces"] = df.apply(
+        lambda x: tokenize_with_spaces(x["passage"]), axis=1
+    )
     df["word_tokens_question"] = df.apply(lambda x: tokenize_sentence(x["question"]), axis=1)
     return df
 
@@ -134,20 +137,47 @@ def get_word_pstart_pend(interval: Tuple[int, int], dim: int):
 
 
 def get_answer_start_end(passage, answer_text, answer_start):
-    answer_end = len(answer_text) + answer_start
+    answer_end = len(answer_text) + answer_start - 1
 
     if passage not in span_tokenize_dict.keys():
         span_tokenize_dict[passage] = span_tokenize(passage)
 
-    interval = [
-        i for i, (s, e) in enumerate(span_tokenize_dict[passage])
-        if e >= answer_start and s <= answer_end
-    ]
+    # interval = [
+    #     i for i, (s, e) in enumerate(span_tokenize_dict[passage])
+    #     if s >= answer_start and e <= answer_end
+    # ]
+    interval = []
+    if answer_end + 1 < len(passage):
+        if passage[answer_end + 1] == ' ':
+            answer_end += 1
+    app_dict = {}
+    for i, (s, e) in enumerate(span_tokenize_dict[passage]):
+        if e >= answer_start and s <= answer_end:  # (e == answer_end or e == answer_end - 1):
+            interval.append(i)
+            app_dict[i] = (s, e)
+
     if len(interval) < 1:
         # raise Exception(interval + " is empty.")
         at = [answer_text]  # [str(passage)[96]]
         print(at)
         return [-1, -1]
+
+    # credi = get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
+    #
+    #  # (1, 0)(0, 1)
+    # # (1, 1)
+    #
+    # if (1, 0) in credi:
+    #     token_start_index = credi.index((1, 0))
+    #     token_end_index = credi.index((0, 1))
+    #
+    # else:
+    #     token_start_index = credi.index((1, 1))
+    #     token_end_index = token_start_index
+    #
+    # s = app_dict[token_start_index]
+    # e = app_dict[token_end_index]
+    #
 
     return get_word_pstart_pend((min(interval), max(interval)), len(span_tokenize_dict[passage]))
 
@@ -178,6 +208,7 @@ def data_cleaning(df: pd.DataFrame):
     df = add_passage_index(df)
     if "answer" in df:
         df = add_labels(df).drop(axis=1, columns='answer_start')
+
     df = add_split_into_words(df)
     print("Data cleaned \n")
     return df

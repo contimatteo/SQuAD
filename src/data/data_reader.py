@@ -1,10 +1,11 @@
 import os
 import json
 import pandas as pd
-import ast
+
 from utils.data import copy_data, download_data, get_tmp_data_dir
 from utils.data_storage import save_evaluation_data_data, load_evaluation_data_data
 from utils.data import get_default_raw_file_name
+
 from .glove_reader import load_glove, download_glove
 
 ###
@@ -42,10 +43,7 @@ def load_training_set(json_path):
         contents = json.loads(j.read().encode('utf-8').strip(), encoding='unicode_escape')
 
     contents = contents["data"]
-    df = pd.json_normalize(
-        contents, ['paragraphs', 'qas'],
-        ["title", ["paragraphs", "context"]]
-    )
+    df = pd.json_normalize(contents, ['paragraphs', 'qas'], ["title", ["paragraphs", "context"]])
     if "answers" in df:
         df = df[["id", "title", "paragraphs.context", "question", "answers"]]
         # df["answers"] = [i[0] for i in df["answers"]]
@@ -99,4 +97,3 @@ def glove_reader(glove_dim):
     glove_file = download_glove(glove_dim)
     glove = load_glove(glove_file)
     return glove
-

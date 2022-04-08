@@ -1,8 +1,9 @@
 import os
+from copy import copy
+
 import pandas as pd
 import numpy as np
 
-from copy import copy
 from features.word_to_index import WordToIndex
 
 from utils.data import copy_data, download_data, get_data_dir, get_tmp_data_dir
@@ -60,15 +61,17 @@ def inject_OOV_embeddings(df: pd.DataFrame, dictionary):
 
 
 def glove_embedding(glove_embeddings, glove_dim):
-    WTI = WordToIndex()
-    WTI.fit_on_list(glove_embeddings.keys())
+    PAD_WORD = WordToIndex.PAD_WORD
+    wti = WordToIndex()
+    wti.fit_on_list(glove_embeddings.keys())
 
-    TOKENIZER_MAX_WORD_INDEX = WTI.get_index_len(
+    TOKENIZER_MAX_WORD_INDEX = wti.get_index_len(
     )  # np.array(list(tokenizer.word_index.values())).max()
     embeddings_matrix = np.zeros((TOKENIZER_MAX_WORD_INDEX, glove_dim))
 
     for token in glove_embeddings.keys():
-        word_index = WTI.get_word_index(token)
+        word_index = wti.get_word_index(token)
         embeddings_matrix[word_index] = glove_embeddings[token]
 
-    return embeddings_matrix, WTI
+    embeddings_matrix[0] = glove_embeddings[PAD_WORD]
+    return embeddings_matrix, wti
