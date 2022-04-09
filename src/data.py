@@ -2,8 +2,7 @@ import gc
 import pandas as pd
 
 from data import Dataset
-from utils.memory_usage import memory_usage
-from utils.data import get_argv
+from utils import MemoryUtils, DataUtils
 
 ###
 
@@ -11,13 +10,14 @@ from utils.data import get_argv
 def load():
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
-    json_path = get_argv()
+    json_path = DataUtils.get_first_argv()
 
     Dataset.load(debug=False, json_path=json_path)
 
 
 def data():
-    memory_usage()
+    MemoryUtils.print_total_PID_usage()
+
     print("\n---------------\n")
     data_data = Dataset.extract("features")
     question_index, passage, question, pos, ner, tf, exact_match, mask_passage, mask_question = data_data
@@ -56,9 +56,9 @@ def data():
 ###
 
 if __name__ == "__main__":
-    memory_usage()
+    MemoryUtils.print_total_PID_usage()
 
-    json_file_url = get_argv()
+    json_file_url = DataUtils.get_first_argv()
     assert isinstance(json_file_url, str)
     assert len(json_file_url) > 5
     assert ".json" in json_file_url
@@ -66,13 +66,13 @@ if __name__ == "__main__":
 
     data()
     print("After preprocessing")
-    memory_usage()
+    MemoryUtils.print_total_PID_usage()
 
     Dataset.optimize_memory()
 
     print("After deleting glove and dataset")
-    memory_usage()
+    MemoryUtils.print_total_PID_usage()
 
     gc.collect()
     print("After using garbage collector")
-    memory_usage()
+    MemoryUtils.print_total_PID_usage()

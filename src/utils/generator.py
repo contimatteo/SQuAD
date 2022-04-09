@@ -5,7 +5,7 @@ from .configs import NN_BATCH_SIZE
 ###
 
 
-class Generator:
+class DataGenerator:
 
     def __init__(self, X, Y, batch_mode: str, passage_indexes=None):
         assert isinstance(X, list)
@@ -59,7 +59,9 @@ class Generator:
     #
 
     def __batches_grouped_by_passage(self):
-        X, Y = Generator.generate_batches_grouped_by_passage(self.X, self.Y, self.passage_indexes)
+        X, Y = DataGenerator.generate_batches_grouped_by_passage(
+            self.X, self.Y, self.passage_indexes
+        )
 
         passage_batch_idx = -1
 

@@ -3,7 +3,7 @@ import numpy as np
 
 from features import WordToIndex
 
-from utils.data import copy_data, download_data, get_data_dir, get_tmp_data_dir
+from utils import DataUtils, GoogleDriveUtils
 from utils.data_storage import create_tmp_directories
 
 ###
@@ -11,22 +11,20 @@ from utils.data_storage import create_tmp_directories
 
 class GloVe:
 
-    # @staticmethod
-    # def __OOV_embedding(token):
-    #     return np.array([0] * 50)
-
-    #
-
     @staticmethod
     def download(glove_dim: int):
         DRIVE_ID = "15mTrPUQ4PAxfepzmRZfXNeKOJ3AubXrJ"
-        RAW_FILE = os.path.join(get_data_dir(), "GloVe_" + str(glove_dim) + ".txt")
-        REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "glove.6B." + str(glove_dim) + "d.txt")
-        ZIP_FILE = os.path.join(get_tmp_data_dir(), "GloVe.6B.zip")
+        RAW_FILE = os.path.join(DataUtils.data_dir(), "GloVe_" + str(glove_dim) + ".txt")
+        REQUIRED_FILE = os.path.join(
+            DataUtils.tmp_data_dir(), "glove.6B." + str(glove_dim) + "d.txt"
+        )
+        ZIP_FILE = os.path.join(DataUtils.tmp_data_dir(), "GloVe.6B.zip")
 
         create_tmp_directories()
-        download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
-        copy_data(REQUIRED_FILE, RAW_FILE)
+
+        GoogleDriveUtils.download_resource_by_id(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
+        DataUtils.copy_file_content_to(REQUIRED_FILE, RAW_FILE)
+
         return RAW_FILE
 
     @staticmethod

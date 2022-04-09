@@ -10,10 +10,7 @@ import utils.configs as Configs
 
 from data import Dataset
 from models import DRQA
-from utils import LocalStorageManager
-from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
-from utils.generator import Generator
-from utils.data import get_argv
+from utils import LocalStorageManager, DataGenerator, FeaturesUtils, DataUtils
 
 ###
 
@@ -51,8 +48,8 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
         model.load_weights(str(nn_checkpoint_directory))
 
     ### generator
-    # generator = Generator(X, Y, "size")
-    generator = Generator(X, Y, "passage", passages_indexes)
+    # generator = DataGenerator(X, Y, "size")
+    generator = DataGenerator(X, Y, "passage", passages_indexes)
 
     ### train
     history = model.fit(
@@ -76,9 +73,9 @@ def __fit(model, X, Y, passages_indexes, save_weights: bool, preload_weights: bo
 
 def train():
     glove_matrix = Dataset.extract("glove")
-    X, _ = X_data_from_dataset(Dataset.extract("features"))
-    Y = Y_data_from_dataset(Dataset.extract("labels"))
-    _, _, _, passages_indexes = QP_data_from_dataset(Dataset.extract("original"))
+    X, _ = FeaturesUtils.X_from_raw_features(Dataset.extract("features"))
+    Y = FeaturesUtils.Y_from_raw_labels(Dataset.extract("labels"))
+    _, _, _, passages_indexes = FeaturesUtils.QP_data_from_dataset(Dataset.extract("original"))
 
     ### save RAM memory
     Dataset.optimize_memory()
@@ -94,7 +91,7 @@ def train():
 ###
 
 if __name__ == "__main__":
-    json_file_url = get_argv()
+    json_file_url = DataUtils.get_first_argv()
     assert isinstance(json_file_url, str)
     assert len(json_file_url) > 5
     assert ".json" in json_file_url

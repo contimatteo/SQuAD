@@ -2,9 +2,8 @@ import os
 import json
 import pandas as pd
 
-from utils.data import copy_data, download_data, get_tmp_data_dir
 # from utils.data_storage import save_evaluation_data_data, load_evaluation_data_data
-from utils.data import get_default_raw_file_name
+from utils import DataUtils, GoogleDriveUtils
 
 from .glove import GloVe
 
@@ -16,12 +15,13 @@ class DataReader:
     @staticmethod
     def __download_training_set():
         DRIVE_ID = "19byT_6Hhx4Di1pzbd6bmxQ8sKwCSPhqg"
-        RAW_FILE = get_default_raw_file_name()
-        REQUIRED_FILE = os.path.join(get_tmp_data_dir(), "training_set.json")
-        ZIP_FILE = os.path.join(get_tmp_data_dir(), "training_set.zip")
+        RAW_FILE = DataUtils.default_training_file_name()
+        REQUIRED_FILE = os.path.join(DataUtils.tmp_data_dir(), "training_set.json")
+        ZIP_FILE = os.path.join(DataUtils.tmp_data_dir(), "training_set.zip")
 
-        download_data(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
-        copy_data(REQUIRED_FILE, RAW_FILE)
+        GoogleDriveUtils.download_resource_by_id(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
+        DataUtils.copy_file_content_to(REQUIRED_FILE, RAW_FILE)
+
         return RAW_FILE
 
     @staticmethod

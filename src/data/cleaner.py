@@ -6,7 +6,7 @@ import pandas as pd
 
 from nltk.tokenize import RegexpTokenizer
 
-from utils.data import nltk_download_utilities
+from utils import NltkUtils
 
 ###
 
@@ -155,7 +155,7 @@ def delete_cache_cleaner():
 
 
 def clean_data(df: pd.DataFrame):
-    nltk_download_utilities()
+    NltkUtils.download_utilities()
 
     print("Data cleaning")
     df = __add_passage_index(df)

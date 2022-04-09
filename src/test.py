@@ -12,9 +12,7 @@ import utils.env_setup
 
 from data import Dataset
 from models import DRQA
-from utils import LocalStorageManager
-from utils import X_data_from_dataset, QP_data_from_dataset  # , Y_data_from_dataset
-from utils.data import get_argv
+from utils import LocalStorageManager, FeaturesUtils, DataUtils
 
 ###
 
@@ -28,7 +26,7 @@ LocalStorage = LocalStorageManager()
 
 
 def __predict():
-    X, _ = X_data_from_dataset(Dataset.extract("features"))
+    X, _ = FeaturesUtils.X_from_raw_features(Dataset.extract("features"))
     glove_matrix = Dataset.extract("glove")
 
     model = DRQA(glove_matrix)
@@ -44,7 +42,7 @@ def __predict():
 
 
 def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
-    _, question_indexes = X_data_from_dataset(Dataset.extract("features"))
+    _, question_indexes = FeaturesUtils.X_from_raw_features(Dataset.extract("features"))
     question_indexes_unique = list(np.unique(question_indexes))
 
     answers_tokens_probs_map = {}
@@ -87,7 +85,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     answers_for_question_map = {}
 
-    qids, _, passages, _ = QP_data_from_dataset(Dataset.extract("original"))
+    qids, _, passages, _ = FeaturesUtils.QP_data_from_dataset(Dataset.extract("original"))
     qids_unique = list(np.unique(qids))
 
     passage_by_question_map = {}
@@ -154,7 +152,7 @@ def test():
 
     #
 
-    # Y_true = Y_data_from_dataset(Dataset.extract("labels"))
+    # Y_true = FeaturesUtils.Y_from_raw_labels(Dataset.extract("labels"))
     # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     # __store_answers_predictions(answers_for_question, "training.true")
@@ -170,7 +168,7 @@ def test():
 ###
 
 if __name__ == "__main__":
-    file_url = get_argv()
+    file_url = DataUtils.get_first_argv()
     assert isinstance(file_url, str)
     assert len(file_url) > 5
     assert ".json" in file_url

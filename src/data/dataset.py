@@ -7,7 +7,7 @@ from features import Features
 from utils.data_storage import save_processed_data, load_processed_data
 from utils.data_storage import save_glove_matrix, load_glove_matrix
 from utils.data_storage import save_wti, load_wti, create_tmp_directories
-from utils.memory import reduce_mem_usage
+from utils import MemoryUtils
 
 from .preprocessing import DataPreprocessing
 from .reader import DataReader
@@ -107,11 +107,11 @@ class Dataset:
             if debug:
                 df = df[0:100].copy()
 
-            df, _ = reduce_mem_usage(df)
+            df, _ = MemoryUtils.reduce_df_storage(df)
             df = DataPreprocessing.apply(df, wti)
-            df, _ = reduce_mem_usage(df)
+            df, _ = MemoryUtils.reduce_df_storage(df)
             df, onehot_pos, onehot_ner = Features.build(df, wti)
-            df, _ = reduce_mem_usage(df)
+            df, _ = MemoryUtils.reduce_df_storage(df)
             print("[Data] processed.")
 
             Dataset.__export_df(df, onehot_pos, onehot_ner, glove_dim, file_name)
