@@ -26,6 +26,7 @@
   "python.linting.pylintPath": "pylint",
   "python.linting.pylintEnabled": true,
   "python.envFile": "${workspaceFolder}/.env",
+  "python.terminal.activateEnvironment": true,
 
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
