@@ -80,8 +80,8 @@ class NltkUtils:
 
     @staticmethod
     def download_utilities():
-        nltk.download('wordnet')
-        nltk.download('averaged_perceptron_tagger')
-        nltk.download('omw-1.4')
-        nltk.download('maxent_ne_chunker')
-        nltk.download('words')
+        nltk.download('wordnet', quiet=True)
+        nltk.download('averaged_perceptron_tagger', quiet=True)
+        nltk.download('omw-1.4', quiet=True)
+        nltk.download('maxent_ne_chunker', quiet=True)
+        nltk.download('words', quiet=True)
