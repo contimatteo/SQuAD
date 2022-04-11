@@ -1,21 +1,22 @@
 import numpy as np
 
 from tensorflow.keras import Model
-from tensorflow.keras.layers import Input, Concatenate, Dropout, Add
+from tensorflow.keras.layers import Input, Concatenate
 from tensorflow.keras.optimizers import Adam, Optimizer
 
 import utils.configs as Configs
 
-from models.core import GloveEmbeddings, DrqaRnn, EnhancedProbabilities, WeightedSumCustom, WeightedSumSelfAttention
-from models.core import AlignedAttention, BiLinearSimilarityAttention, BiLinearSimilarity
-from models.core import drqa_crossentropy_loss, drqa_accuracy, Mask_layer
+from models.core import DrQaLayers
+from models.core import DrQaAttentionLayers
+from models.core import DrQaLosses
+from models.core import DrQAMetrics
 from utils import LearningRate
 
 ###
 
-LOSS = [drqa_crossentropy_loss]
+LOSS = [DrQaLosses.crossentropy]
 
-METRICS = [drqa_accuracy]
+METRICS = [DrQAMetrics.accuracy]
 
 ###
 
@@ -56,41 +57,39 @@ def DRQA(embeddings_initializer: np.ndarray) -> Model:
         ### QUESTION ##############################################################
 
         ### embeddings
-        q_embeddings = GloveEmbeddings(N_Q_TOKENS, embeddings_initializer)(q_tokens)
+        q_embeddings = DrQaLayers.GloveEmbedding(N_Q_TOKENS, embeddings_initializer)(q_tokens)
 
         ### lstm #
-        q_rnn = DrqaRnn()(q_embeddings)
-        # q_rnn = Mask_layer()(q_rnn, q_mask)
+        q_rnn = DrQaLayers.RNN()(q_embeddings)
 
         ### self-attention (simplfied version)
-        # q_encoding = WeightedSumSelfAttention()(q_rnn)
-        # q_encoding = WeightedSum(q_rnn.shape[2], N_Q_TOKENS)(q_rnn)  ### --> (_,1,emb_dim)
-        q_encoding = WeightedSumCustom(N_Q_TOKENS)(q_rnn)
+        q_encoding = DrQaLayers.WeightedSum(N_Q_TOKENS)(q_rnn)
 
         ### PASSAGE ###############################################################
 
         ### embeddings
-        p_embeddings = GloveEmbeddings(N_P_TOKENS, embeddings_initializer)(p_tokens)
+        p_embeddings = DrQaLayers.GloveEmbedding(N_P_TOKENS, embeddings_initializer)(p_tokens)
 
         ### aligend-attention
-        p_attention = AlignedAttention()([p_embeddings, q_embeddings])
-        p_attention = Mask_layer()(p_attention, p_mask)
+        p_attention = DrQaAttentionLayers.PassageAndQuestionAlignment()(
+            [p_embeddings, q_embeddings]
+        )
+        p_attention = DrQaLayers.CustomMasking()(p_attention, p_mask)
 
         ### lstm
-        p_rnn = DrqaRnn()(
+        p_rnn = DrQaLayers.RNN()(
             Concatenate(axis=2)([p_attention, p_embeddings, p_match, p_pos, p_ner, p_tf])
         )
 
         ### OUTPUT ################################################################
 
         # ### similarity
-        # out_probs = BiLinearSimilarityAttention()([p_rnn, q_encoding1])
-        out_probs = BiLinearSimilarity()([p_rnn, p_mask, q_encoding])
+        out_probs = DrQaAttentionLayers.BilinearSimilarity()([p_rnn, p_mask, q_encoding])
 
-        out_probs = Mask_layer()(out_probs, p_mask)
+        out_probs = DrQaLayers.CustomMasking()(out_probs, p_mask)
 
         ### last bit
-        out_probs = EnhancedProbabilities()(out_probs)
+        out_probs = DrQaLayers.ComplementaryBit()(out_probs)
 
         # ###
 
