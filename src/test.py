@@ -1,5 +1,5 @@
-# pylint: disable=unused-import
-from typing import Any, Tuple, List, Dict
+# pylint: disable=unused-import,not-callable,import-error
+from typing import Any, Dict
 
 import os
 import json
@@ -10,11 +10,9 @@ from tensorflow.keras.backend import set_learning_phase
 
 import utils.env_setup
 
-from data import get_data, load_data, delete_data
+from data import Dataset
 from models import DRQA
-from utils import LocalStorageManager
-from utils import X_data_from_dataset, Y_data_from_dataset, QP_data_from_dataset
-from utils.data import get_argv
+from utils import LocalStorageManager, FeaturesUtils, DataUtils
 
 ###
 
@@ -24,14 +22,12 @@ set_learning_phase(0)
 
 LocalStorage = LocalStorageManager()
 
-N_ROWS_SUBSET = None  #  `None` for all rows :)
-
 ###
 
 
 def __predict():
-    X, _ = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
-    glove_matrix = get_data("glove")
+    X, _ = FeaturesUtils.X_from_raw_features(Dataset.extract("features"))
+    glove_matrix = Dataset.extract("glove")
 
     model = DRQA(glove_matrix)
 
@@ -46,7 +42,7 @@ def __predict():
 
 
 def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
-    _, question_indexes = X_data_from_dataset(get_data("features"), N_ROWS_SUBSET)
+    _, question_indexes = FeaturesUtils.X_from_raw_features(Dataset.extract("features"))
     question_indexes_unique = list(np.unique(question_indexes))
 
     answers_tokens_probs_map = {}
@@ -66,7 +62,6 @@ def __compute_answers_tokens_indexes(Y: np.ndarray) -> Dict[str, np.ndarray]:
     answers_tokens_indexes_map: Dict[str, np.ndarray] = {}
 
     ### weights the additional bit probability.
-    # __weight_answer_probs = lambda answer: answer[0:-1]
     __weight_answer_probs = lambda answer: answer[0:-1] - answer[-1]
 
     with alive_bar(len(list(answers_tokens_probs_map.items()))) as progress_bar:
@@ -90,7 +85,7 @@ def __compute_answers_predictions(answers_tokens_indexes_map: Any) -> Dict[str, 
 
     answers_for_question_map = {}
 
-    qids, _, passages, pids = QP_data_from_dataset(get_data("original"))
+    qids, _, passages, _ = FeaturesUtils.QP_data_from_dataset(Dataset.extract("original"))
     qids_unique = list(np.unique(qids))
 
     passage_by_question_map = {}
@@ -150,11 +145,6 @@ def test():
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     __store_answers_predictions(answers_for_question, "training.pred")
 
-    delete_data()
-    Y_pred = None
-    answers_tokens_indexes = None
-    answers_for_question = None
-
     print()
     print("The generated answers (json with predictions) file is available at:")
     print(str(LocalStorage.answers_predictions_url("training.pred")))
@@ -162,22 +152,26 @@ def test():
 
     #
 
-    # ### TODO: remove the following code ...
-    # Y_true = Y_data_from_dataset(get_data("labels"), N_ROWS_SUBSET)
-    #
-    # ### TODO: remove the following code ...
+    # Y_true = FeaturesUtils.Y_from_raw_labels(Dataset.extract("labels"))
     # answers_tokens_indexes = __compute_answers_tokens_indexes(Y_true)
     # answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
     # __store_answers_predictions(answers_for_question, "training.true")
+
+    #
+
+    Dataset.optimize_memory()
+    Y_pred = None
+    answers_tokens_indexes = None
+    answers_for_question = None
 
 
 ###
 
 if __name__ == "__main__":
-    json_file_url = get_argv()
-    assert isinstance(json_file_url, str)
-    assert len(json_file_url) > 5
-    assert ".json" in json_file_url
-    load_data(json_path=json_file_url)
+    file_url = DataUtils.get_first_argv()
+    assert isinstance(file_url, str)
+    assert len(file_url) > 5
+    assert ".json" in file_url
+    Dataset.load(json_path=file_url)
 
     test()

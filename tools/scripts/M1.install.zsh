@@ -22,7 +22,12 @@ is_pip_package_installed()
 
 if [[ $(is_pip_package_installed 'pandas') -eq '0' ]]
 then
-    pip install git+git://github.com/pandas-dev/pandas.git
+    # pip install git+git://github.com/pandas-dev/pandas.git
+    git clone --depth 1 https://github.com/pandas-dev/pandas.git
+    cd pandas
+    python3 setup.py install
+    cd ..
+    rm -rf pandas
 fi
 
 # 

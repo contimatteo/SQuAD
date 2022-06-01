@@ -1,14 +1,6 @@
 ###
 
-from .layers import GloveEmbeddings
-from .layers import DrqaRnn, Mask_layer
-from .layers import EnhancedProbabilities
-from .layers import WeightedSum, WeightedSumCustom
-
-from .attention import AlignedAttention
-from .attention import BiLinearSimilarityAttention, BiLinearSimilarity
-from .attention import WeightedSumSelfAttention
-
-from .losses import drqa_crossentropy_loss, drqa_prob_sum_loss
-
-from .metrics import drqa_accuracy
+from .attention import DrQaAttentionLayers
+from .layers import DrQaLayers
+from .losses import DrQaLosses
+from .metrics import DrQAMetrics

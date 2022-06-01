@@ -6,19 +6,15 @@ import numpy as np
 
 
 class OneHotEncoder:
-    # one_hot_dict = {}
-    # cache_dict = {}
 
     def fit(self, pos_list):
-        # self.one_hot_dict = {}
         pos_len = len(pos_list)
-
         id_m = np.identity(pos_len, dtype="int8")
-        pos_dict = {}
+
         for i, el in enumerate(pos_list):
-            # i = np.uint8(i)
             self.categorical_dict[el] = i
             self.one_hot_dict[i] = id_m[i]
+
         return self.one_hot_dict
 
     def get_one_hot_dict(self):
