@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -7,6 +8,8 @@ load_dotenv()
 ##  APP  ##
 
 APP_DEBUG: bool = True
+
+ENV_SEED = 5
 
 WANDB_DISABLED = "WANDB_DISABLED" not in os.environ or os.environ["WANDB_DISABLED"] == "true"
 
@@ -26,12 +29,7 @@ DIM_TOKEN_TF: int = 1
 ##################
 ##  NN + TRAIN  ##
 
-NN_EPOCHS = 1
-NN_BATCH_SIZE = 1536
+NN_EPOCHS = 4
+NN_BATCH_SIZE = 256
 NN_LEARNING_RATE = 5e-3
 NN_LEARNING_RATE_TYPE = "static"
-
-N_KFOLD_BUCKETS = 5
-
-ENV_SEED = 5
-
