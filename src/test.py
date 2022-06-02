@@ -169,9 +169,7 @@ def test():
 
 if __name__ == "__main__":
     file_url = DataUtils.get_first_argv()
-    assert isinstance(file_url, str)
-    assert len(file_url) > 5
-    assert ".json" in file_url
+    # file_url = DataUtils.get_first_argv()
     Dataset.load(json_path=file_url)
 
     test()
