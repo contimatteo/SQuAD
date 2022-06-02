@@ -4,6 +4,7 @@ import nltk
 
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
+import argparse
 
 ###
 
@@ -53,6 +54,24 @@ class DataUtils:
             return sys.argv[1]
         else:
             return None
+
+    @staticmethod
+    def parse_args():
+        parser = argparse.ArgumentParser(description="compute answers")
+        parser.add_argument('test_json', type=str, help='name of json file to parse')
+        return parser.parse_args()
+
+    @staticmethod
+    def get_input_file():
+        args = DataUtils.parse_args()
+        file_url = args.test_json
+
+        assert os.path.exists(file_url)
+        assert isinstance(file_url, str)
+        assert len(file_url) > 5
+        assert ".json" in file_url
+
+        return file_url
 
 
 ###
