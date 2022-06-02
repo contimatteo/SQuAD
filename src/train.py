@@ -91,10 +91,7 @@ def train():
 ###
 
 if __name__ == "__main__":
-    json_file_url = DataUtils.get_first_argv()
-    assert isinstance(json_file_url, str)
-    assert len(json_file_url) > 5
-    assert ".json" in json_file_url
+    json_file_url = DataUtils.get_input_file()
     Dataset.load(json_path=json_file_url)
 
     train()
