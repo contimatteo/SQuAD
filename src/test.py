@@ -168,8 +168,8 @@ def test():
 ###
 
 if __name__ == "__main__":
-    file_url = DataUtils.get_first_argv()
+    json_file_url = DataUtils.get_input_file()
     # file_url = DataUtils.get_first_argv()
-    Dataset.load(json_path=file_url)
+    Dataset.load(json_path=json_file_url)
 
     test()

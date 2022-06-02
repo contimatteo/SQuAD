@@ -5,6 +5,8 @@ import nltk
 from google_drive_downloader import GoogleDriveDownloader as gdd
 from shutil import copyfile
 import argparse
+import gdown
+import zipfile
 
 ###
 
@@ -58,18 +60,18 @@ class DataUtils:
     @staticmethod
     def parse_args():
         parser = argparse.ArgumentParser(description="compute answers")
-        parser.add_argument('test_json', type=str, help='name of json file to parse')
+        parser.add_argument('test_json', nargs='?',  type=str, help='name of json file to parse')
         return parser.parse_args()
 
     @staticmethod
-    def get_input_file():
+    def get_input_file(required=True):
         args = DataUtils.parse_args()
         file_url = args.test_json
-
-        assert os.path.exists(file_url)
-        assert isinstance(file_url, str)
-        assert len(file_url) > 5
-        assert ".json" in file_url
+        if required:
+            assert os.path.exists(file_url)
+            assert isinstance(file_url, str)
+            assert len(file_url) > 5
+            assert ".json" in file_url
 
         return file_url
 
@@ -80,8 +82,12 @@ class DataUtils:
 class GoogleDriveUtils:
 
     @staticmethod
-    def __download_file_by_id(drive_id, save_path, unzip=True):
-        gdd.download_file_from_google_drive(file_id=drive_id, dest_path=save_path, unzip=unzip)
+    def __download_file_by_id(drive_id, save_zip_path, unzip=True):
+        # gdd.download_file_from_google_drive(file_id=drive_id, dest_path=save_zip_path, unzip=unzip)
+        gdown.download(id=drive_id, output=save_zip_path, quiet=False)
+        if unzip:
+            with zipfile.ZipFile(save_zip_path, 'r') as zip_ref:
+                zip_ref.extractall(os.path.dirname(save_zip_path))
 
     @staticmethod
     def download_resource_by_id(drive_id, zip_file_name, required_file_name):

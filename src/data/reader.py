@@ -86,7 +86,7 @@ class DataReader:
     @staticmethod
     def glove(glove_dim):
         glove_file = GloVe.download(glove_dim)
-        glove = Glove.load(glove_file)
+        glove = GloVe.load(glove_file)
         return glove
 
     # @staticmethod
