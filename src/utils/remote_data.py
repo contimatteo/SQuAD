@@ -30,6 +30,10 @@ class DataUtils:
         return os.path.join(DataUtils.__root_dir(), "data", "raw")
 
     @staticmethod
+    def checkpoints_dir():
+        return os.path.join(DataUtils.__root_dir(), "data", "checkpoints")
+
+    @staticmethod
     def processed_data_dir():
         return os.path.join(DataUtils.__root_dir(), "data", "processed")
 
@@ -40,6 +44,10 @@ class DataUtils:
     @staticmethod
     def default_training_file_name():
         return os.path.join(DataUtils.data_dir(), "training_set.json")
+
+    @staticmethod
+    def model_weights_file_name():
+        return os.path.join(DataUtils.checkpoints_dir(), "DRQA.h5")
 
     @staticmethod
     def copy_file_content_to(from_file, to_file):
@@ -60,7 +68,7 @@ class DataUtils:
     @staticmethod
     def parse_args():
         parser = argparse.ArgumentParser(description="compute answers")
-        parser.add_argument('test_json', nargs='?',  type=str, help='name of json file to parse')
+        parser.add_argument('test_json', nargs='?', type=str, help='name of json file to parse')
         return parser.parse_args()
 
     @staticmethod

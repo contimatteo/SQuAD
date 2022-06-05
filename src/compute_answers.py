@@ -13,6 +13,7 @@ import utils.env_setup
 from data import Dataset
 from models import DRQA
 from utils import LocalStorageManager, FeaturesUtils, DataUtils
+from data import DataReader
 
 ###
 
@@ -143,11 +144,11 @@ def test():
     Y_pred = __predict()
     answers_tokens_indexes = __compute_answers_tokens_indexes(Y_pred)
     answers_for_question = __compute_answers_predictions(answers_tokens_indexes)
-    __store_answers_predictions(answers_for_question, "training.pred")
+    __store_answers_predictions(answers_for_question, "pred")
 
     print()
     print("The generated answers (json with predictions) file is available at:")
-    print(str(LocalStorage.answers_predictions_url("training.pred")))
+    print(str(LocalStorage.answers_predictions_url("pred")))
     print()
 
     #
@@ -171,5 +172,6 @@ if __name__ == "__main__":
     json_file_url = DataUtils.get_input_file()
     # file_url = DataUtils.get_first_argv()
     Dataset.load(json_path=json_file_url)
-
+    DataReader.model_weights()
+    #download weights
     test()

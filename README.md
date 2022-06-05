@@ -4,15 +4,15 @@ NLP system trained on Stanford Question Answering Dataset (SQuAD). SQuAD tests t
 
 ## Prepare train data
 
-$python train.py
+$python src/train.py
 
 
 ## Test data
 
-$python test.py test_set.json
+$python src/compute_answers.py *path_to_json_file*
 
 
 ## Evaluation
 
-$python evaluate.py test_set.json answers.training.pred.json
+$python src/evaluate.py *path_to_json_file* data/predictions/answers.pred.json
 
