@@ -58,20 +58,20 @@ or alternatively you can find all the different version of the `requirements` in
 
 ## Running the Tests
 
-### Training
+#### Training
 You can train the model from scratch using your **custom** dataset by running:
 ```
 $ python src/train.py "<path_of_your_json_dataset>"
 ```
 
-### Inference
+#### Inference
 You can run the inference procedure on a specific dataset by running:
 ```
 $ python src/compute_answers.py "<path_of_your_json_dataset>"
 ```
 once you have done this, you can see the output generated inside the `/data/predictions/answers.pred.json` file.
 
-### Evaluations
+#### Evaluations
 You can evaluate the performances of the inference by running:
 ```
 $ python src/evaluate.py "<path_of_your_json_dataset>" data/predictions/answers.pred.json
@@ -87,9 +87,9 @@ $ python src/evaluate.py "<path_of_your_json_dataset>" data/predictions/answers.
 ## Authors
 
 * Matteo Conti - *author* - [contimatteo](https://github.com/contimatteo)
-* Francesco Palmisano - *author* - [~](#)
-* Primiano Arminio Cristino - *author* - [~](#)
-* Luciano Massaccesi - *author* - [~](#)
+* Francesco Palmisano - *author* - [Frankgamer97](https://github.com/Frankgamer97)
+* Primiano Arminio Cristino - *author* - [primianocristino](https://github.com/primianocristino)
+* Luciano Massaccesi - *author* - [fruscello](https://github.com/fruscello)
 
 
 ## License
