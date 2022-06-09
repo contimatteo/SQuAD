@@ -31,3 +31,4 @@ swifter
 tensorflow
 tensorflow-addons
 wandb
+gdown

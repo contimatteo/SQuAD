@@ -29,3 +29,4 @@ swifter
 tensorflow-macos
 tensorflow-metal
 wandb
+gdown

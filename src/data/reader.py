@@ -25,6 +25,18 @@ class DataReader:
         return RAW_FILE
 
     @staticmethod
+    def __download_model_weights():
+        DRIVE_ID = "1mLDlYEV5kVY8vIqyQwm31AGpEs37-1fv"
+        RAW_FILE = DataUtils.model_weights_file_name()
+        REQUIRED_FILE = os.path.join(DataUtils.tmp_data_dir(), "DRQA.h5")
+        ZIP_FILE = os.path.join(DataUtils.tmp_data_dir(), "DRQA.zip")
+
+        GoogleDriveUtils.download_resource_by_id(DRIVE_ID, ZIP_FILE, REQUIRED_FILE)
+        DataUtils.copy_file_content_to(REQUIRED_FILE, RAW_FILE)
+
+        return RAW_FILE
+
+    @staticmethod
     def __load_dataset(json_path):
         print("Data downloading")
         raw_file = ""
@@ -86,8 +98,12 @@ class DataReader:
     @staticmethod
     def glove(glove_dim):
         glove_file = GloVe.download(glove_dim)
-        glove = Glove.load(glove_file)
+        glove = GloVe.load(glove_file)
         return glove
+
+    @staticmethod
+    def model_weights():
+        return DataReader.__download_model_weights()
 
     # @staticmethod
 
